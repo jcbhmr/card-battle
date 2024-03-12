@@ -4,7 +4,8 @@
     "build": "vite build",
     "lint": "tsc --noEmit",
     "preview": "vite preview",
-    "test": "vitest"
+    "test": "vitest",
+    "format": "prettier -w ."
   },
   "devDependencies": {
     "@types/node": "^20.11.26",
