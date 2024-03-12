@@ -14,7 +14,7 @@
 <p align=center><a href="https://upload.snakesandlattes.com/rules/a/AdventureTimeCardWarsFinnvsJake.pdf">Adventure Time Card Wars rulebook PDF</a>
   | <a href="https://uwwtw.instructure.com/courses/629539">UWW Canvas course</a>
   | <a href="https://discord.com/channels/1210270012871548968/1210270013316141087">Team Discord</a>
-  | <a href="">Requirements Report Google Doc</a>
+  | <a href="https://docs.google.com/document/d/14G7fjNbmNlFm-acpPyLgDmEr_H5b3vUcbiQiU-Q5cf8/edit">Requirements Report Google Doc</a>
 </p>
 
 This app is currently entirely client-side. There is no server-side component. You can get started easily using ⚡StackBlitz by clicking the <kbd>Open in Codeflow</kbd> button above.
