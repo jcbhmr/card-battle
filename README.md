@@ -44,12 +44,18 @@ function App() {
 
 You can find a complete list of all the Tailwind CSS classes available for different CSS properties as well as tons and tons of examples on the [Tailwind CSS website](https://tailwindcss.com/). Make sure you take advantage of the search box!
 
+There are a few npm scripts available:
+
+- **`npm run dev`:** Runs the Vite dev server so you can see a live reloading preview of your code as you edit it.
+- **`npm run format`:** Formats all the code using Prettier. Run this every so often.
+- **`npm run build`:** Compiles everything into an `index.html` and associated JavaScript and CSS files. This is what GitHub Actions will run before deploying this site to GitHub Pages.
+
 ### Cool tools
 
 This is Jacob's list of cool tech tools that were shown off at some point in team meetings.
 
 - **[StackBlitz](https://stackblitz.com/):** No-configuration Node.js dev env for frontend & light backend.
-- **[Excalidraw](https://excalidraw.com/):** Great for low-pressure crude sketches and diagrams when you need digital pen & paper.
+- **[Excalidraw](https://excalidraw.com/):** Great for low pressure crude sketches and diagrams when you need digital pen & paper.
 - **[XState](https://github.com/statelyai/xstate):** Makes diagrams, simulations, and more out of your state machine code!
 - **[Vite](https://vitejs.dev/):** The current best frontend build system.
 - **[TypeScript](https://www.typescriptlang.org/):** The best way to write JavaScript with type declarations.
@@ -60,3 +66,5 @@ This is Jacob's list of cool tech tools that were shown off at some point in tea
 - **[Craiyon](https://www.craiyon.com/):** Completely free no signup image generator AI. Inferior to DALLE2.
 - **[Tailwind CSS](https://tailwindcss.com/):** Put your CSS in your HTML instead of fragile linking to another file.
 - **[React](https://react.dev/):** The biggest JavaScript UI framework right now.
+- **[Prettier](https://prettier.io/):** The most popular JavaScript ecosystem code formatter.
+- **[Vitest](https://vitest.dev/):** Vite-based testing framework. Supports TypeScript out of the box.
