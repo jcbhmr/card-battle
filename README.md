@@ -9,7 +9,7 @@
 ![React](https://img.shields.io/static/v1?style=for-the-badge&message=React&color=222222&logo=React&logoColor=61DAFB&label=)
 ![Tailwind CSS](https://img.shields.io/static/v1?style=for-the-badge&message=Tailwind+CSS&color=222222&logo=Tailwind+CSS&logoColor=06B6D4&label=)
 
-[![Open in Codeflow](https://developer.stackblitz.com/img/open_in_codeflow.svg)](https://pr.new/https://github.com/typst-community/typst-docs)
+[![Open in Codeflow](https://developer.stackblitz.com/img/open_in_codeflow.svg)](https://pr.new/https://github.com/jcbhmr/card-battle)
 
 <p align=center><a href="https://upload.snakesandlattes.com/rules/a/AdventureTimeCardWarsFinnvsJake.pdf">Adventure Time Card Wars rulebook PDF</a>
   | <a href="https://uwwtw.instructure.com/courses/629539">UWW Canvas course</a>
