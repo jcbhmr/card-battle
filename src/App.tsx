@@ -1,23 +1,102 @@
 import { useState } from "react";
 
-function App() {
-  const [count, setCount] = useState(0);
-
+function AppBoard() {
   return (
-    <div className="min-h-screen bg-gray-100 flex flex-col justify-center items-center">
-      <h1 className="text-3xl font-bold mb-4">Vite + React</h1>
-      <div className="bg-white shadow-md rounded-lg p-6 mb-4">
-        <button
-          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Increment count
-        </button>
-        <p className="mt-4">Count is {count}</p>
+    <div className="grid grid-cols-1 gap-4">
+      <div className="space-y-4">
+        <div className="flex items-center space-x-4">
+          <div className="grid grid-cols-4 items-start gap-4">
+            <div className="w-full aspect-[1.4] rounded-lg overflow-hidden">
+              <img
+                alt="Card 1"
+                className="aspect-[1.4] object-cover border border-gray-100 dark:border-gray-800"
+                height={150}
+                src="/placeholder.svg"
+                width={150}
+              />
+            </div>
+            <div className="w-full aspect-[1.4] rounded-lg overflow-hidden">
+              <img
+                alt="Card 2"
+                className="aspect-[1.4] object-cover border border-gray-100 dark:border-gray-800"
+                height={150}
+                src="/placeholder.svg"
+                width={150}
+              />
+            </div>
+            <div className="w-full aspect-[1.4] rounded-lg overflow-hidden">
+              <img
+                alt="Card 3"
+                className="aspect-[1.4] object-cover border border-gray-100 dark:border-gray-800"
+                height={150}
+                src="/placeholder.svg"
+                width={150}
+              />
+            </div>
+            <div className="w-full aspect-[1.4] rounded-lg overflow-hidden">
+              <img
+                alt="Card 4"
+                className="aspect-[1.4] object-cover border border-gray-100 dark:border-gray-800"
+                height={150}
+                src="/placeholder.svg"
+                width={150}
+              />
+            </div>
+          </div>
+        </div>
       </div>
-      <p className="text-gray-600">
-        Click on the Vite and React logos to learn more
-      </p>
+      <div className="space-y-4">
+        <div className="flex items-center space-x-4">
+          <div className="grid grid-cols-4 items-start gap-4">
+            <div className="w-full aspect-[1.4] rounded-lg overflow-hidden">
+              <img
+                alt="Card 1"
+                className="aspect-[1.4] object-cover border border-gray-100 dark:border-gray-800"
+                height={150}
+                src="/placeholder.svg"
+                width={150}
+              />
+            </div>
+            <div className="w-full aspect-[1.4] rounded-lg overflow-hidden">
+              <img
+                alt="Card 2"
+                className="aspect-[1.4] object-cover border border-gray-100 dark:border-gray-800"
+                height={150}
+                src="/placeholder.svg"
+                width={150}
+              />
+            </div>
+            <div className="w-full aspect-[1.4] rounded-lg overflow-hidden">
+              <img
+                alt="Card 3"
+                className="aspect-[1.4] object-cover border border-gray-100 dark:border-gray-800"
+                height={150}
+                src="/placeholder.svg"
+                width={150}
+              />
+            </div>
+            <div className="w-full aspect-[1.4] rounded-lg overflow-hidden">
+              <img
+                alt="Card 4"
+                className="aspect-[1.4] object-cover border border-gray-100 dark:border-gray-800"
+                height={150}
+                src="/placeholder.svg"
+                width={150}
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+
+
+function App() {
+  return (
+    <div className="flex justify-center items-center h-screen p-4">
+      <AppBoard />
     </div>
   );
 }

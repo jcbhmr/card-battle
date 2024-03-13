@@ -69,3 +69,4 @@ This is Jacob's list of cool tech tools that were shown off at some point in tea
 - **[React](https://react.dev/):** The biggest JavaScript UI framework right now.
 - **[Prettier](https://prettier.io/):** The most popular JavaScript ecosystem code formatter.
 - **[Vitest](https://vitest.dev/):** Vite-based testing framework. Supports TypeScript out of the box.
+- **[shadcn/ui](https://ui.shadcn.com/):** Premade components to copy-paste into your React+TailwindCSS project.
