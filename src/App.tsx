@@ -1,4 +1,5 @@
 import { useState } from "react";
+import placeholderSVGURL from "./assets/placeholder.svg"
 
 function AppBoard() {
   return (
@@ -11,7 +12,7 @@ function AppBoard() {
                 alt="Card 1"
                 className="aspect-[1.4] object-cover border border-gray-100 dark:border-gray-800"
                 height={150}
-                src="/placeholder.svg"
+                src={placeholderSVGURL}
                 width={150}
               />
             </div>
@@ -20,7 +21,7 @@ function AppBoard() {
                 alt="Card 2"
                 className="aspect-[1.4] object-cover border border-gray-100 dark:border-gray-800"
                 height={150}
-                src="/placeholder.svg"
+                src={placeholderSVGURL}
                 width={150}
               />
             </div>
@@ -29,7 +30,7 @@ function AppBoard() {
                 alt="Card 3"
                 className="aspect-[1.4] object-cover border border-gray-100 dark:border-gray-800"
                 height={150}
-                src="/placeholder.svg"
+                src={placeholderSVGURL}
                 width={150}
               />
             </div>
@@ -38,7 +39,7 @@ function AppBoard() {
                 alt="Card 4"
                 className="aspect-[1.4] object-cover border border-gray-100 dark:border-gray-800"
                 height={150}
-                src="/placeholder.svg"
+                src={placeholderSVGURL}
                 width={150}
               />
             </div>
@@ -53,7 +54,7 @@ function AppBoard() {
                 alt="Card 1"
                 className="aspect-[1.4] object-cover border border-gray-100 dark:border-gray-800"
                 height={150}
-                src="/placeholder.svg"
+                src={placeholderSVGURL}
                 width={150}
               />
             </div>
@@ -62,7 +63,7 @@ function AppBoard() {
                 alt="Card 2"
                 className="aspect-[1.4] object-cover border border-gray-100 dark:border-gray-800"
                 height={150}
-                src="/placeholder.svg"
+                src={placeholderSVGURL}
                 width={150}
               />
             </div>
@@ -71,7 +72,7 @@ function AppBoard() {
                 alt="Card 3"
                 className="aspect-[1.4] object-cover border border-gray-100 dark:border-gray-800"
                 height={150}
-                src="/placeholder.svg"
+                src={placeholderSVGURL}
                 width={150}
               />
             </div>
@@ -80,7 +81,7 @@ function AppBoard() {
                 alt="Card 4"
                 className="aspect-[1.4] object-cover border border-gray-100 dark:border-gray-800"
                 height={150}
-                src="/placeholder.svg"
+                src={placeholderSVGURL}
                 width={150}
               />
             </div>
