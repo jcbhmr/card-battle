@@ -18,33 +18,7 @@
   | <a href="https://docs.google.com/document/d/14G7fjNbmNlFm-acpPyLgDmEr_H5b3vUcbiQiU-Q5cf8/edit">Requirements Report Google Doc</a>
 </p>
 
-This app is currently entirely client-side. There is no server-side component. You can get started easily using ⚡StackBlitz by clicking the <kbd>Open in Codeflow</kbd> button above.
-
-All of the API data model stuff should go in [`src/model.ts`](src/model.ts). If it ever overflows a single file, make a `src/model/` folder and put the files in there with a `src/model/index.ts` exporting the important bits.
-
-The UI actual _on the screen_ bits can start out all in [`src/App.tsx`](src/App.tsx) as one big file. If that gets too big the code can be split out into multiple files in `src/*.tsx`.
-
-This project uses Tailwind CSS for styling. This means you should prefer code like this:
-
-```js
-function App() {
-  return (
-    <div className="text-center">
-      <div class="flex">
-        <div class="flex-none w-14 h-14">01</div>
-        <div class="flex-initial w-64">02</div>
-        <div class="flex-initial w-32">03</div>
-      </div>
-      <div className="bg-slate-50 shadow-lg">
-        <p>Hello world!</p>
-      </div>
-    </div>
-  );
-}
-```
-
-You can find a complete list of all the Tailwind CSS classes available for different CSS properties as well as tons and tons of examples on the [Tailwind CSS website](https://tailwindcss.com/). Make sure you take advantage of the search box!
-
+This app is currently entirely client-side. There is no server-side component. You can get started easily using ⚡StackBlitz by clicking the <kbd>Open in Codeflow</kbd> button above. All of the API data model stuff should go in [`src/model.ts`](src/model.ts). If it ever overflows a single file, make a `src/model/` folder and put the files in there with a `src/model/index.ts` exporting the important bits. The UI actual _on the screen_ bits can start out all in [`src/App.tsx`](src/App.tsx) as one big file. If that gets too big the code can be split out into multiple files in `src/*.tsx`.
 There are a few npm scripts available:
 
 - **`npm run dev`:** Runs the Vite dev server so you can see a live reloading preview of your code as you edit it.
