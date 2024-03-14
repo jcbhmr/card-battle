@@ -19,7 +19,6 @@
 </p>
 
 This app is currently entirely client-side. There is no server-side component. You can get started easily using ⚡StackBlitz by clicking the <kbd>Open in Codeflow</kbd> button above. All of the API data model stuff should go in [`src/model.ts`](src/model.ts). If it ever overflows a single file, make a `src/model/` folder and put the files in there with a `src/model/index.ts` exporting the important bits. The UI actual _on the screen_ bits can start out all in [`src/App.tsx`](src/App.tsx) as one big file. If that gets too big the code can be split out into multiple files in `src/*.tsx`.
-There are a few npm scripts available:
 
 - **`npm run dev`:** Runs the Vite dev server so you can see a live reloading preview of your code as you edit it.
 - **`npm run format`:** Formats all the code using Prettier. Run this every so often.
