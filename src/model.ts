@@ -117,15 +117,27 @@ class BoardPos {
 }
 
 class SidedBoard {
-    lanes: BoardPos[][];
+    lanes: Map<number, BoardPos[]>;
 
-	constructor(sideOnePlayerId: number, sideTwoPlayerId: number) {
-		this.lanes = [
-			[new BoardPos(sideOnePlayerId), new BoardPos(sideTwoPlayerId)], 
-			[new BoardPos(sideOnePlayerId), new BoardPos(sideTwoPlayerId)], 
-			[new BoardPos(sideOnePlayerId), new BoardPos(sideTwoPlayerId)], 
-			[new BoardPos(sideOnePlayerId), new BoardPos(sideTwoPlayerId)]
-			];
+	constructor() {
+		this.lanes = new Map();
+	}
+
+	addPlayer(playerId: number) {
+		this.lanes.set(playerId, [new BoardPos(playerId), new BoardPos(playerId), new BoardPos(playerId), new BoardPos(playerId)]);
+	}
+
+	getLaneByOwnerId(ownerId: number): BoardPos[] | undefined {
+		return this.lanes.get(ownerId);
+	}
+
+	getBoardPosByOwnerId(ownerId: number, boardPos: number): BoardPos | undefined {
+		var lane = this.getLaneByOwnerId(ownerId);
+		if(typeof(lane) != "undefined") {
+			return lane[boardPos];
+		}else {
+			return lane;
+		}
 	}
 }
 
