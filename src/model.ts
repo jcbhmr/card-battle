@@ -5,17 +5,18 @@ const TurnPhases = {
 }
 
 const LandscapeType = { // Landscape type: associated hex color code for front to render
-	Null: '#94949c',
+	NULL: '#94949c',
 	Swamp: '#38541b',
 	Desert: '#b3b179',
 	Hills: '#468546',
 	Candylands: '#d192cc'
 }
 
-const AbilityType = {
+const AbilityUpdateType = {
 	EnterPlay: 0,
 	StartOfTurn: 1,
-	Active: 2
+	Active: 2,
+	Discard: 3
 }
 
 const AbilityDuration = {
@@ -48,7 +49,8 @@ const TargetType = {
 	Building: 1,
 	Landscape: 2,
 	Player: 3,
-	DiscardPile: 4
+	DiscardPile: 4,
+	EffectHolder: 5
 }
 
 export class Game {
@@ -61,7 +63,9 @@ export class Game {
 
 	constructor() {
 		this.players = [new Player(0), new Player(1)];
-		this.board = new SidedBoard(this.players[0].id, this.players[1].id);
+		this.board = new SidedBoard();
+		this.board.addPlayer(this.players[0].id);
+		this.board.addPlayer(this.players[1].id);
 		this.currentTurn = 0;
 		this.currentPlayer = this.players[0];
 		this.turnTimer = 90;
@@ -69,6 +73,10 @@ export class Game {
 	}
 	
 	static instance = new Game();
+
+	getPlayerById(playerId: number) {
+		return this.players[playerId];
+	}
 }
 
 class Player {
@@ -100,9 +108,9 @@ class BoardPos {
 
 	constructor(ownerId: number) {
 		this.ownerId = ownerId;
-		this.creature = Creatures.Null;
-		this.building = Buildings.Null;
-		this.landscape = LandscapeType.Null;
+		this.creature = Creatures.NULL;
+		this.building = Buildings.NULL;
+		this.landscape = LandscapeType.NULL;
 		this.activeEffects = []; // effectively used as active landscape effects
 	}
 	
@@ -127,12 +135,12 @@ class SidedBoard {
 		this.lanes.set(playerId, [new BoardPos(playerId), new BoardPos(playerId), new BoardPos(playerId), new BoardPos(playerId)]);
 	}
 
-	getLaneByOwnerId(ownerId: number): BoardPos[] | undefined {
+	getSideByOwnerId(ownerId: number): BoardPos[] | undefined {
 		return this.lanes.get(ownerId);
 	}
 
 	getBoardPosByOwnerId(ownerId: number, boardPos: number): BoardPos | undefined {
-		var lane = this.getLaneByOwnerId(ownerId);
+		var lane = this.getSideByOwnerId(ownerId);
 		if(typeof(lane) != "undefined") {
 			return lane[boardPos];
 		}else {
@@ -147,7 +155,9 @@ class Card {
     cardType: number;
     cost: number;
     landscapeType: string;
+	playedThisTurn: boolean;
     ability: Ability;
+	ownerId: number | null = null;
 
 	constructor(name: string, flavorText: string, cardType: number, cost: number, landscapeType: string, ability: Ability) {
 		this.name = name;
@@ -155,7 +165,12 @@ class Card {
 		this.cardType = cardType;
 		this.cost = cost;
 		this.landscapeType = landscapeType;
+		this.playedThisTurn = false;
 		this.ability = ability;
+	}
+
+	setOwnerId(ownerId: number) {
+		this.ownerId = ownerId;
 	}
 }
 
@@ -165,7 +180,7 @@ class Creature extends Card {
     maxDefense: number;
     activeEffects: Effect[];
 
-	constructor(name: string, flavorText: string, cost:number, landscapeType: string, ability: Ability, attack: number, defense: number) {
+	constructor(name: string, flavorText: string, cost: number, landscapeType: string, ability: Ability, attack: number, defense: number) {
 		super(name, flavorText, CardType.Creature, cost, landscapeType, ability);
 		this.attack = attack;
 		this.defense = defense;
@@ -184,39 +199,67 @@ class Creature extends Card {
 }
 
 class Building extends Card {
-	constructor(name: string, flavorText: string, cost:number, landscapeType: string, ability: Ability) {
+	constructor(name: string, flavorText: string, cost: number, landscapeType: string, ability: Ability) {
 		super(name, flavorText, CardType.Building, cost, landscapeType, ability);
 	}
 }
 
 class Spell extends Card {
-	constructor(name: string, flavorText: string, cost:number, landscapeType: string, ability: Ability) {
+	constructor(name: string, flavorText: string, cost: number, landscapeType: string, ability: Ability) {
 		super(name, flavorText, CardType.Spell, cost, landscapeType, ability);
 	}
 }
 
-class Landscape extends Card { // By having this class, the front end can render these like they're in your hand when the game starts so you can choose where your landscapes belong
+// By having this class, the front end can render these like they're in your hand when the game starts so you can choose where your landscapes belong
+class Landscape extends Card { 
 	constructor(name: string, flavorText: string, landscapeType: string) {
 		super(name, flavorText, CardType.Landscape, 0, landscapeType, Abilities.NULL);
 	}
 }
 
 class Ability {
-	constructor(name, desc, abilityType, abilityDuration, targeter, effect, healthCost, orAbility, andAbility) {
-		this.name = name;
+	description: string;
+	abilityType: number;
+	abilityDuration: number;
+	targeter: Targeter;
+	effect: Effect;
+	healthCost: number;
+	orAbility: Ability | null;
+	andAbility: Ability | null;
+
+	constructor(desc: string, abilityType: number, abilityDuration: number, targeter: 
+			Targeter, effect: Effect, healthCost: number, orAbility: Ability | null, andAbility: Ability | null) {
 		this.description = desc;
 		this.abilityType = abilityType;
 		this.abilityDuration = abilityDuration;
 		this.targeter = targeter;
 		this.effect = effect;
 		this.healthCost = healthCost;
-		this.orAbility = orAbility;
-		this.andAbility = andAbility;
+
+		//Just a check to make sure that no orAbility or andAbility is actually assigned null but uses the null ability instead
+		if(orAbility == null && orAbility != Abilities.NULL) {
+			this.orAbility = Abilities.NULL;
+		}else {
+			this.orAbility = orAbility;
+		}
+		if(andAbility == null && orAbility != Abilities.NULL) {
+			this.andAbility = Abilities.NULL;
+		}else {
+			this.andAbility = andAbility;
+		}
 	}
 }
 
 class Targeter {
-	constructor(playerTargeter, laneTargeter, needsPlayerSelection, numberPlayerSelections, selectionPredicate, targetType) {
+	playerTargeter: number;
+	laneTargeter: number;
+	needsPlayerSelection: boolean;
+	numberPlayerSelections: number;
+	selectionPredicate: Function | null;
+	targetType: number;
+
+	constructor(playerTargeter: number, laneTargeter: number, needsPlayerSelection: boolean, numberPlayerSelections: number, 
+			selectionPredicate: Function | null, targetType: number) {
 		this.playerTargeter = playerTargeter;
 		this.laneTargeter = laneTargeter;
 		this.needsPlayerSelection = needsPlayerSelection;
@@ -225,62 +268,84 @@ class Targeter {
 		this.targetType = targetType;
 	}
 	
-	static ANY_PREDICATE = (lane) => true; //Note that the lane should be a BoardPos instance, and the predicate should be checked for each valid BoardPos instance.
+	static ANY_PREDICATE = (lane: BoardPos) => true; //Note that the lane should be a BoardPos instance, and the predicate should be checked for each valid BoardPos instance.
 }
 
 class Effect { // Builder Class
+	attackBonus: Function;
+	defenseBonus: Function;
+	healthBonus: Function;
+	actionBonus: Function;
+	cardDiscount: Function;
+	damage: Function;
+	playerDamage: Function;
+	conditionsApplied: Function;
+	conditionsRemoved: Function;
+	disables: boolean;
+	readiesBeforeBattle: boolean;
+	cardsDrawn: Function;
+	cardsRevealed: Function;
+	playablePredicate: Function | null;
+
 	constructor() {
-		this.attackBonus = 0;
-		this.defenseBonus = 0;
-		this.healthBonus = 0;
-		this.actionBonus = 0;
-		this.damage = 0;
-		this.playerDamage = 0; //Used for player character health in the case of things like "deal x damage to a creature, then heal for that amount" cases. used ONLY for damaging/healing players.
-		this.conditionsApplied = [];
-		this.conditionsRemoved = [];
+		this.attackBonus = (game: Game) => {return 0};
+		this.defenseBonus = (game: Game) => {return 0};
+		this.healthBonus = (game: Game) => {return 0};
+		this.actionBonus = (game: Game) => {return 0};
+		this.cardDiscount = (game: Game) => {return 0};
+		this.damage = (game: Game) => {return 0};
+		//playerDamage maybe should be replaced with the andAbility member in Ability
+		this.playerDamage = (game: Game) => {return 0}; //Used for player hp in the case of things like "deal x damage to a creature, then heal for that amount" cases. used ONLY for damaging/healing players.
+		this.conditionsApplied = (game: Game) => {return []};
+		this.conditionsRemoved = (game: Game) => {return []};
 		this.disables = false;
 		this.readiesBeforeBattle = false;
-		this.cardsDrawn = 0;
-		this.cardsRevealed = 0;
+		this.cardsDrawn = (game: Game) => {return 0};
+		this.cardsRevealed = (game: Game) => {return 0};
 		this.playablePredicate = null;
 	}
 	
-	setAttackBonus(bonus) {
+	setAttackBonus(bonus: Function) {
 		this.attackBonus = bonus;
 		return this;
 	}
 	
-	setDefenseBonus(bonus) {
+	setDefenseBonus(bonus: Function) {
 		this.defenseBonus = bonus;
 		return this;
 	}
 	
-	setHealthBonus(bonus) {
+	setHealthBonus(bonus: Function) {
 		this.healthBonus = bonus;
 		return this;
 	}
 	
-	setActionBonus(bonus) {
+	setActionBonus(bonus: Function) {
 		this.actionBonus = bonus;
 		return this;
 	}
+
+	setCardDiscount(bonus: Function) {
+		this.cardDiscount = bonus;
+		return this;
+	}
 	
-	setDamage(damage) {
+	setDamage(damage: Function) {
 		this.damage = damage;
 		return this;
 	}
 	
-	setPlayerDamage(damage) {
+	setPlayerDamage(damage: Function) {
 		this.playerDamage = damage;
 		return this;
 	}
 	
-	setConditionsApplied(conditions) {
+	setConditionsApplied(conditions: Function) {
 		this.conditionsApplied = conditions;
 		return this;
 	}
 	
-	setConditionsRemoved(conditions) {
+	setConditionsRemoved(conditions: Function) {
 		this.conditionsRemoved = conditions;
 		return this;
 	}
@@ -295,55 +360,68 @@ class Effect { // Builder Class
 		return this;
 	}
 	
-	setCardsDrawn(cards) {
+	setCardsDrawn(cards: Function) {
 		this.cardsDrawn = cards;
 		return this;
 	}
 	
-	setCardsRevealed(cards) {
+	setCardsRevealed(cards: Function) {
 		this.cardsRevealed = cards;
 		return this;
 	}
 	
-	setPlayablePredicate(predicate) {
+	setPlayablePredicate(predicate: Function | null) {
 		this.playablePredicate = predicate;
 		return this;
 	}
-}
-
-class Abilities {
-	constructor() {}
-	
-	static NULL = new Ability("Null", "You shouldn't be seeing this!", AbilityType.EnterPlay, AbilityDuration.Instant,
-		new Targeter(PlayerTargeter.Self, LaneTargeter.None, false, 0, Targeter.ANY_PREDICATE, TargetType.Player));
-		
-	//Note that the predicate here is useless and is here for syntax. This should be checked when looking at the targers for lane, player, and type.
-	//A useful predicate would be something like (lane) => lane.creature.defense > 2 or (lane) => lane.creature.hasEffect == Effects.FROZEN
-	static DAMAGE_ALL_1 = new Ability("Damage All Lanes", "Deal 1 damage to any creature in any lane.", AbilityType.EnterPlay, AbilityDuration.Instant, 
-		new Targeter(PlayerTargeter.Opponent, LaneTargeter.AllLanes, false, 0, (lane) => lane.creature != null, TargetType.Creature), Effects.NULL, 0);
 }
 
 class Effects {
 	constructor() {}
 	
 	static NULL = new Effect();
-	static FROZEN = new Effect().setDisables().setPlayablePredicate((lane) => lane.activeEffects.length > 0 && lane.hasEffect(Effects.FROZEN));
+	static FROZEN = new Effect().setDisables().setPlayablePredicate((lane: BoardPos) => lane.activeEffects.length > 0 && lane.hasEffect(Effects.FROZEN));
+
+}
+
+class Abilities {
+	constructor() {}
+	
+	static NULL = new Ability("Null", AbilityUpdateType.EnterPlay, AbilityDuration.Instant,
+		new Targeter(PlayerTargeter.Self, LaneTargeter.None, false, 0, Targeter.ANY_PREDICATE, TargetType.Player), 
+		Effects.NULL, 0, null, null);
+		
+	//Note that the predicate here is useless and is here for syntax. This should be checked when looking at the targers for lane, player, and type.
+	//A useful predicate would be something like (lane) => lane.creature.defense > 2 or (lane) => lane.creature.hasEffect == Effects.FROZEN
+	static DAMAGE_ALL_1 = new Ability("Deal 1 damage to any creature in any lane.", AbilityUpdateType.EnterPlay, AbilityDuration.Instant, 
+		new Targeter(PlayerTargeter.Opponent, LaneTargeter.AllLanes, false, 0, (lane: BoardPos) => lane.creature != Creatures.NULL, TargetType.Creature), 
+		Effects.NULL, 0, Abilities.NULL, Abilities.NULL);
 }
 
 class Creatures {
 	constructor() {}
 	
-	static NULL = new Creature("Null", "You shouldn't be seeing this!", 0, LandscapeType.Null, Abilities.NULL, 0, 0);
+	static NULL = new Creature("Null", "You shouldn't be seeing this!", 0, LandscapeType.NULL, Abilities.NULL, 0, 0);
+	static DARK_ANGEL = new Creature("Dark Angel", "", 1, LandscapeType.Swamp, new Ability("+1 Attack for every 5 cards in your discard pile.", 
+	AbilityUpdateType.Discard, AbilityDuration.Round, new Targeter(PlayerTargeter.Self, LaneTargeter.None, false, 0, null, TargetType.DiscardPile), 
+	new Effect().attackBonus((game: Game, lane: BoardPos) => {
+		if(lane.creature.ownerId != null) {
+			return game.getPlayerById(lane.creature.ownerId).discardPile.length/5
+		} else {
+			return 0
+		}
+	}),0, Abilities.NULL, Abilities.NULL), 0, 5);
 }
 
 class Buildings {
 	constructor() {}
 	
-	static NULL = new Building("Null", "You shouldn't be seeing this!", 0, LandscapeType.Null, Abilities.NULL);
+	static NULL = new Building("Null", "You shouldn't be seeing this!", 0, LandscapeType.NULL, Abilities.NULL);
 }
 
 class Spells {
 	constructor() {}
 	
-	static NULL = new Spell("Null", "You shouldn't be seeing this!", 0, LandscapeType.Null, Abilities.NULL);
+	static NULL = new Spell("Null", "You shouldn't be seeing this!", 0, LandscapeType.NULL, Abilities.NULL);
+
 }
