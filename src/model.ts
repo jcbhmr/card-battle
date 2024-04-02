@@ -77,6 +77,30 @@ export class Game {
 	getPlayerById(playerId: number) {
 		return this.players[playerId];
 	}
+
+	enterNextPhase() {
+		this.turnPhase++;
+		if(this.turnPhase > TurnPhases.Battle) {
+			this.turnPhase = TurnPhases.Play;
+			this.switchTurns(this.currentPlayer.id);
+		}
+	}
+
+	switchTurns(currentPlayerId: number) {
+		if(currentPlayerId + 1 > this.players.length) {
+			this.currentPlayer = this.players[0];
+		}else {
+			this.currentPlayer = this.players[currentPlayerId+1];
+		}
+		this.resetCards(this.currentPlayer.id);
+	}
+
+	resetCards(playerId: number) {
+		this.board.getSideByOwnerId(playerId)?.map((boardPos) => {
+			boardPos.creature.isReady = true;
+			boardPos.building.isReady = true;
+		});
+	}
 }
 
 class Player {
@@ -155,8 +179,9 @@ class Card {
     cardType: number;
     cost: number;
     landscapeType: string;
-	playedThisTurn: boolean;
+	turnPlayed: number
     ability: Ability;
+	isReady: boolean;
 	ownerId: number | null = null;
 
 	constructor(name: string, flavorText: string, cardType: number, cost: number, landscapeType: string, ability: Ability) {
@@ -165,12 +190,17 @@ class Card {
 		this.cardType = cardType;
 		this.cost = cost;
 		this.landscapeType = landscapeType;
-		this.playedThisTurn = false;
+		this.turnPlayed = Game.instance.currentTurn;
 		this.ability = ability;
+		this.isReady = true;
 	}
 
 	setOwnerId(ownerId: number) {
 		this.ownerId = ownerId;
+	}
+
+	wasPlayedThisTurn() {
+		return Game.instance.currentTurn == this.turnPlayed;
 	}
 }
 
