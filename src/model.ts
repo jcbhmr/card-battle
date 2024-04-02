@@ -50,7 +50,9 @@ const TargetType = {
 	Landscape: 2,
 	Player: 3,
 	DiscardPile: 4,
-	EffectHolder: 5
+	EffectHolder: 5,
+	BoardPos: 6,
+	Board: 7
 }
 
 export class Game {
@@ -298,7 +300,21 @@ class Targeter {
 		this.targetType = targetType;
 	}
 	
+	//Selection Predicates
 	static ANY_PREDICATE = (lane: BoardPos) => true; //Note that the lane should be a BoardPos instance, and the predicate should be checked for each valid BoardPos instance.
+	
+	//Targeters
+	static PLAY_CREATURE = new Targeter(PlayerTargeter.Self, LaneTargeter.SingleLane, true, 1, (lane: BoardPos) => {return lane.creature == Creatures.NULL;},
+	TargetType.BoardPos);
+
+	static PLAY_BUILDING = new Targeter(PlayerTargeter.Self, LaneTargeter.SingleLane, true, 1, (lane: BoardPos) => {return lane.building == Buildings.NULL;},
+	TargetType.BoardPos);
+
+	static PLAY_SPELL = new Targeter(PlayerTargeter.Self, LaneTargeter.None, true, 1, Targeter.ANY_PREDICATE,
+	TargetType.Board);
+
+	static PLAY_LANDSCAPE = new Targeter(PlayerTargeter.Self, LaneTargeter.SingleLane, true, 1, (lane: BoardPos) => {return lane.landscape == LandscapeType.NULL;},
+	TargetType.BoardPos);
 }
 
 class Effect { // Builder Class
