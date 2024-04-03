@@ -132,6 +132,18 @@ class Player {
 		this.discardPile.push(this.hand[index])
 		this.hand.splice(index,1)
 	}
+
+	drawCard(amount:number){
+        for(let i=0;i<amount;i++){
+        if(this.deck.length>=0){
+            const drawnCard=this.deck.pop();
+            if(drawnCard){
+                this.hand.push(drawnCard);
+            }
+        }
+    }
+        
+    }
 }
 
 class BoardPos {
