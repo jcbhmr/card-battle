@@ -123,6 +123,15 @@ class Player {
 		this.hp = 25;
 		this.actions = 2;
 	}
+
+	discard(index: number = -1) {
+		if(index == -1){
+			index = Math.floor(Math.random()*this.hand.length)
+		}
+
+		this.discardPile.push(this.hand[index])
+		this.hand.splice(index,1)
+	}
 }
 
 class BoardPos {
