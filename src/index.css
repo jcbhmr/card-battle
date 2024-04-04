@@ -74,3 +74,8 @@
     @apply bg-background text-foreground;
   }
 }
+
+.flexbox_container{
+  display: flex;
+  flex-direction: row;
+}
