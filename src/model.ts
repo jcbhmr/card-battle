@@ -1,5 +1,5 @@
-import { runInThisContext } from "vm"
 
+//============================================================== Enums ==============================================================
 const TurnPhases = {
 	Play: 0,
 	Action: 1,
@@ -56,6 +56,7 @@ const TargetType = {
 	BoardPos: 6
 }
 
+//============================================================== Game ==============================================================
 export class Game {
     players: Player[];
     board: SidedBoard;
@@ -106,6 +107,7 @@ export class Game {
 	}
 }
 
+//============================================================== Player ==============================================================
 class Player {
     id: number;
     username: string;
@@ -147,6 +149,7 @@ class Player {
     }
 }
 
+//============================================================== Board ==============================================================
 class BoardPos {
     ownerId: number;
     creature: Creature;
@@ -236,6 +239,31 @@ class SidedBoard {
 	}
 }
 
+//============================================================== Events ==============================================================
+class GetTargetEvent extends Event {
+
+	execute: Function;
+
+	constructor(name: string, execute: Function) {
+		super(name);
+		this.execute = execute;
+	}
+}
+
+class GetTargetForAbilityEvent extends GetTargetEvent {
+
+	static defaultEventName: string = "getTargetForAbility";
+	targeter: Targeter;
+
+	constructor(execute: Function, target: Targeter) {
+		super(GetTargetForAbilityEvent.defaultEventName, execute);
+		this.targeter = target;
+	}
+
+	static NULL_EVENT = (pos: BoardPos) => {return false;};
+}
+
+//============================================================== Cards ==============================================================
 class Card {
     name: string;
     flavorText: string;
@@ -339,6 +367,7 @@ class Landscape extends Card {
 	}
 }
 
+//============================================================== Abilities and Effects ==============================================================
 class Ability {
 	description: string;
 	abilityType: number;
@@ -348,9 +377,11 @@ class Ability {
 	healthCost: number;
 	orAbility: Ability | null;
 	andAbility: Ability | null;
+	getTargetEvent: GetTargetForAbilityEvent;
+	private static getTargetEventTarget: EventTarget = new EventTarget();
 
 	constructor(desc: string, abilityType: number, abilityDuration: number, targeter: 
-			Targeter, effect: Effect, healthCost: number, orAbility: Ability | null, andAbility: Ability | null) {
+			Targeter, effect: Effect, healthCost: number, orAbility: Ability | null, andAbility: Ability | null, targetEventFunc: Function | null) {
 		this.description = desc;
 		this.abilityType = abilityType;
 		this.abilityDuration = abilityDuration;
@@ -359,89 +390,31 @@ class Ability {
 		this.healthCost = healthCost;
 
 		//Just a check to make sure that no orAbility or andAbility is actually assigned null but uses the null ability instead
-		if(orAbility == null && orAbility != Abilities.NULL) {
+		if(orAbility == null) {
 			this.orAbility = Abilities.NULL;
 		}else {
 			this.orAbility = orAbility;
 		}
-		if(andAbility == null && orAbility != Abilities.NULL) {
+		if(andAbility == null) {
 			this.andAbility = Abilities.NULL;
 		}else {
 			this.andAbility = andAbility;
 		}
+		if(targetEventFunc == null) {
+			this.getTargetEvent = new GetTargetForAbilityEvent(GetTargetForAbilityEvent.NULL_EVENT, targeter);
+		}else {
+			this.getTargetEvent = new GetTargetForAbilityEvent(targetEventFunc, targeter);
+		}
 	}
-}
 
-class GetTargetEvent extends Event {
-
-	execute: Function;
-
-	constructor(name: string, execute: Function) {
-		super(name);
-		this.execute = execute;
+	static addGetAbilityTargetEventListener(eventCallback: EventListenerOrEventListenerObject) {
+		Ability.getTargetEventTarget.addEventListener(GetTargetForAbilityEvent.defaultEventName, eventCallback);
 	}
-}
 
-class GetTargetForAbilityEvent extends GetTargetEvent {
-
-	targeter: Targeter;
-
-	constructor(name: string, execute: Function, target: Targeter) {
-		super(name, execute);
-		this.targeter = target;
+	//Not sure about dispatching instanced events through a static event target, will this work?
+	getAbilityTarget() {
+		return Ability.getTargetEventTarget.dispatchEvent(this.getTargetEvent);
 	}
-}
-
-class Targeter {
-	playerTargeter: number;
-	laneTargeter: number;
-	needsPlayerSelection: boolean;
-	numberPlayerSelections: number;
-	selectionPredicate: Function | null;
-	targetType: number;
-
-	constructor(playerTargeter: number, laneTargeter: number, needsPlayerSelection: boolean, numberPlayerSelections: number, 
-			selectionPredicate: Function | null, targetType: number) {
-		this.playerTargeter = playerTargeter;
-		this.laneTargeter = laneTargeter;
-		this.needsPlayerSelection = needsPlayerSelection;
-		this.numberPlayerSelections = numberPlayerSelections;
-		this.selectionPredicate = selectionPredicate;
-		this.targetType = targetType;
-	}
-	
-	//Selection Predicates
-	static ANY_PREDICATE = (lane: BoardPos) => true; //Note that the lane should be a BoardPos instance, and the predicate should be checked for each valid BoardPos instance.
-	
-	//Targeters
-	static CREATURE_TARGETER = new Targeter(PlayerTargeter.Self, LaneTargeter.SingleLane, true, 1,  (lane: BoardPos) => {return lane.creature == Creatures.NULL;},
-		TargetType.BoardPos);
-
-	static BUILDING_TARGETER = new Targeter(PlayerTargeter.Self, LaneTargeter.SingleLane, true, 1, (lane: BoardPos) => {return lane.building == Buildings.NULL;},
-		TargetType.BoardPos);
-
-	static SPELL_TARGETER = new Targeter(PlayerTargeter.Self, LaneTargeter.None, true, 1, Targeter.ANY_PREDICATE,
-		TargetType.BoardPos);
-
-	static LANDSCAPE_TARGETER = new Targeter(PlayerTargeter.Self, LaneTargeter.SingleLane, true, 1, (lane: BoardPos) => {return lane.landscape == LandscapeType.NULL;},
-		TargetType.BoardPos);
-
-	static GET_TARGET_FOR_CREATURE = new GetTargetEvent("getTargetForCreatureCard", (card: Creature, pos: BoardPos) => {
-		card.play(pos);
-	});
-
-	static GET_TARGET_FOR_BUILDING = new GetTargetEvent("getTargetForBuildingCard", (card: Building, pos: BoardPos) => {
-		card.play(pos);
-	});
-
-	static GET_TARGET_FOR_LANDSCAPE = new GetTargetEvent("getTargetForLandscapeCard", (card: Landscape, pos: BoardPos) => {
-		card.play(pos);
-	});
-
-	static GET_TARGET_FOR_SPELL = new GetTargetEvent("getTargetForSpellCard", (card: Spell, pos: BoardPos) => {
-		card.play(pos);
-	});
-
 }
 
 class Effect { // Builder Class
@@ -549,6 +522,60 @@ class Effect { // Builder Class
 	}
 }
 
+//============================================================== Util ==============================================================
+class Targeter {
+	playerTargeter: number;
+	laneTargeter: number;
+	needsPlayerSelection: boolean;
+	numberPlayerSelections: number;
+	selectionPredicate: Function | null;
+	targetType: number;
+
+	constructor(playerTargeter: number, laneTargeter: number, needsPlayerSelection: boolean, numberPlayerSelections: number, 
+			selectionPredicate: Function | null, targetType: number) {
+		this.playerTargeter = playerTargeter;
+		this.laneTargeter = laneTargeter;
+		this.needsPlayerSelection = needsPlayerSelection;
+		this.numberPlayerSelections = numberPlayerSelections;
+		this.selectionPredicate = selectionPredicate;
+		this.targetType = targetType;
+	}
+	
+	//Selection Predicates
+	static ANY_PREDICATE = (lane: BoardPos) => true; //Note that the lane should be a BoardPos instance, and the predicate should be checked for each valid BoardPos instance.
+	
+	//Targeters
+	static CREATURE_TARGETER = new Targeter(PlayerTargeter.Self, LaneTargeter.SingleLane, true, 1,  (lane: BoardPos) => {return lane.creature == Creatures.NULL;},
+		TargetType.BoardPos);
+
+	static BUILDING_TARGETER = new Targeter(PlayerTargeter.Self, LaneTargeter.SingleLane, true, 1, (lane: BoardPos) => {return lane.building == Buildings.NULL;},
+		TargetType.BoardPos);
+
+	static SPELL_TARGETER = new Targeter(PlayerTargeter.Self, LaneTargeter.None, true, 1, Targeter.ANY_PREDICATE,
+		TargetType.BoardPos);
+
+	static LANDSCAPE_TARGETER = new Targeter(PlayerTargeter.Self, LaneTargeter.SingleLane, true, 1, (lane: BoardPos) => {return lane.landscape == LandscapeType.NULL;},
+		TargetType.BoardPos);
+
+	static GET_TARGET_FOR_CREATURE = new GetTargetEvent("getTargetForCreatureCard", (card: Creature, pos: BoardPos) => {
+		card.play(pos);
+	});
+
+	static GET_TARGET_FOR_BUILDING = new GetTargetEvent("getTargetForBuildingCard", (card: Building, pos: BoardPos) => {
+		card.play(pos);
+	});
+
+	static GET_TARGET_FOR_LANDSCAPE = new GetTargetEvent("getTargetForLandscapeCard", (card: Landscape, pos: BoardPos) => {
+		card.play(pos);
+	});
+
+	static GET_TARGET_FOR_SPELL = new GetTargetEvent("getTargetForSpellCard", (card: Spell, pos: BoardPos) => {
+		card.play(pos);
+	});
+
+}
+
+//============================================================== Singletons ==============================================================
 class Effects {
 	constructor() {}
 	
@@ -562,13 +589,17 @@ class Abilities {
 	
 	static NULL = new Ability("Null", AbilityUpdateType.EnterPlay, AbilityDuration.Instant,
 		new Targeter(PlayerTargeter.Self, LaneTargeter.None, false, 0, Targeter.ANY_PREDICATE, TargetType.Player), 
-		Effects.NULL, 0, null, null);
+		Effects.NULL, 0, null, null, GetTargetForAbilityEvent.NULL_EVENT);
 		
 	//Note that the predicate here is useless and is here for syntax. This should be checked when looking at the targers for lane, player, and type.
 	//A useful predicate would be something like (lane) => lane.creature.defense > 2 or (lane) => lane.creature.hasEffect == Effects.FROZEN
-	static DAMAGE_ALL_1 = new Ability("Deal 1 damage to any creature in any lane.", AbilityUpdateType.EnterPlay, AbilityDuration.Instant, 
+	static DAMAGE_ALL_1 = new Ability("Deal 1 damage to every creature in every lane.", AbilityUpdateType.EnterPlay, AbilityDuration.Instant, 
 		new Targeter(PlayerTargeter.Opponent, LaneTargeter.AllLanes, false, 0, (lane: BoardPos) => lane.creature != Creatures.NULL, TargetType.Creature), 
-		Effects.NULL, 0, Abilities.NULL, Abilities.NULL);
+		new Effect().damage((game: Game, lane: BoardPos) => {return 1;}), 0, Abilities.NULL, Abilities.NULL, GetTargetForAbilityEvent.NULL_EVENT);
+
+	// static DAMAGE_CREATURE_1 = new Ability("Deal 1 damage to any creature in any lane.", AbilityUpdateType.EnterPlay, AbilityDuration.Instant, 
+	// 	new Targeter(PlayerTargeter.Opponent, LaneTargeter.SingleLane, true, 1, (lane: BoardPos) => lane.creature != Creatures.NULL, TargetType.Creature), 
+	// 	new Effect().damage((game: Game, lane: BoardPos) => {return 1;}), 0, Abilities.NULL, Abilities.NULL, (lane: BoardPos, card: Creature) => {});
 }
 
 class Creatures {
@@ -583,7 +614,7 @@ class Creatures {
 		} else {
 			return 0
 		}
-	}),0, Abilities.NULL, Abilities.NULL), 0, 5);
+	}),0, Abilities.NULL, Abilities.NULL, GetTargetForAbilityEvent.NULL_EVENT), 0, 5);
 }
 
 class Buildings {
