@@ -10,7 +10,7 @@ import { Game } from "./model";
  * Documentation: https://v0.dev/docs#integrating-generated-code-into-your-nextjs-app
  * 
  * 
- * @returns Returns a card component
+ * @returns Returns a creature component
  * @param cardName: the actual name of the card, cardText: the description of the text on the card,
  * actionCost: the cost of the card, landscapeType: the type of landscape that the card needs, 
  * attack and defense: the offensive and defensive stats of the card respectively, imagePath: the 
@@ -57,7 +57,7 @@ attack, defense, imagePath}: { cardName: string, cardText: string, actionCost: n
  * @returns Returns a card component
  * @param cardName: the actual name of the card, cardText: the description of the text on the card,
  * actionCost: the cost of the card, landscapeType: the type of landscape that the card needs,
- * imagePath: the location of the image for the card
+ * imagePath: the location of the image for the card. this is made for spell/building cards
  */
 function CardComponent({cardName, cardText, actionCost, landscapeType, imagePath}: 
   { cardName: string, cardText: string, actionCost: number,landscapeType: string,imagePath: string}) {
@@ -91,8 +91,12 @@ function CardComponent({cardName, cardText, actionCost, landscapeType, imagePath
 
 /**
  * This method will (currently) only make an array of "generic" card/creature components. This method WILL
- * have to be updated to get a players hand from 
- * @returns 
+ * have to be updated to get a players hand from the game object. tempGameObject is my current placeholder
+ * for that.
+ * 
+ * 
+ * @author Tanner Brown
+ * @returns Array of CardComponents/CreatureComponents
  */
 function HandOfCards(){
   // let playerHand = tempGameObject.players[0].hand
@@ -113,7 +117,10 @@ function HandOfCards(){
     }
   }
   return(
-    shownHand
+    <div className="flexbox_container">
+      {shownHand}
+    </div>
+    
   )
 }
 
@@ -208,12 +215,6 @@ function AppBoard() {
   )
 }
 
-function Test({myString}: {myString: string}){
-  return(
-      <p>{myString}</p>
-  )
-}
-
 function App() {
   return (
     <div className="flex justify-center items-center h-screen p-4">
@@ -221,6 +222,7 @@ function App() {
     </div>
   );
 }
+
 
 export default App;
 
