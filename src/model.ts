@@ -1,3 +1,5 @@
+import { runInThisContext } from "vm"
+
 const TurnPhases = {
 	Play: 0,
 	Action: 1,
@@ -51,8 +53,7 @@ const TargetType = {
 	Player: 3,
 	DiscardPile: 4,
 	EffectHolder: 5,
-	BoardPos: 6,
-	Board: 7
+	BoardPos: 6
 }
 
 export class Game {
@@ -160,6 +161,45 @@ class BoardPos {
 		this.landscape = LandscapeType.NULL;
 		this.activeEffects = []; // effectively used as active landscape effects
 	}
+
+	setCreature(card: Creature) {
+		if(this.creature == Creatures.NULL) {
+			this.creature = card;
+			return true;
+		}
+		return false;
+	}
+
+	removeCreature() {
+		this.creature = Creatures.NULL;
+		return true;
+	}
+
+	setBuilding(card: Building) {
+		if(this.building == Buildings.NULL) {
+			this.building = card;
+			return true;
+		}
+		return false;
+	}
+
+	removeBuilding() {
+		this.building = Buildings.NULL;
+		return true;
+	}
+
+	setLandscape(card: Landscape) {
+		if(this.landscape == LandscapeType.NULL) {
+			this.landscape = card.landscapeType;
+			return true;
+		}
+		return false;
+	}
+
+	removeLandscape() {
+		this.landscape = LandscapeType.NULL;
+		return true;
+	}
 	
 	hasEffect(effect: Effect) {
 		for(var i = 0; i < this.activeEffects.length; i++) {
@@ -226,7 +266,7 @@ class Card {
 		return Game.instance.currentTurn == this.turnPlayed;
 	}
 
-	play(target: Targeter) {
+	play(target: any) {
 		return false;
 	}
 }
@@ -244,7 +284,14 @@ class Creature extends Card {
 		this.maxDefense = defense; // Used when healing a creature so it doesn't overheal, and cards that say things like "if a creature has exactly x damage."
 		this.activeEffects = [];
 	}
-		
+
+	override play(pos: BoardPos) {
+		if(pos.creature == Creatures.NULL) {
+			return pos.setCreature(this);
+		}
+		return false;
+	}
+	
 	hasEffect(effect: Effect) {
 		for(var i = 0; i < this.activeEffects.length; i++) {
 			if(this.activeEffects[i] == effect) {
@@ -259,11 +306,22 @@ class Building extends Card {
 	constructor(name: string, flavorText: string, cost: number, landscapeType: string, ability: Ability) {
 		super(name, flavorText, CardType.Building, cost, landscapeType, ability);
 	}
+
+	override play(pos: BoardPos) {
+		if(pos.building == Buildings.NULL) {
+			return pos.setBuilding(this);
+		}
+		return false;
+	}
 }
 
 class Spell extends Card {
 	constructor(name: string, flavorText: string, cost: number, landscapeType: string, ability: Ability) {
 		super(name, flavorText, CardType.Spell, cost, landscapeType, ability);
+	}
+
+	override play(pos: BoardPos) { //TODO
+		return false;
 	}
 }
 
@@ -271,6 +329,13 @@ class Spell extends Card {
 class Landscape extends Card { 
 	constructor(name: string, flavorText: string, landscapeType: string) {
 		super(name, flavorText, CardType.Landscape, 0, landscapeType, Abilities.NULL);
+	}
+
+	override play(pos: BoardPos) {
+		if(pos.landscape == LandscapeType.NULL) {
+			return pos.setLandscape(this);
+		}
+		return false;
 	}
 }
 
@@ -307,6 +372,26 @@ class Ability {
 	}
 }
 
+class GetTargetEvent extends Event {
+
+	execute: Function;
+
+	constructor(name: string, execute: Function) {
+		super(name);
+		this.execute = execute;
+	}
+}
+
+class GetTargetForAbilityEvent extends GetTargetEvent {
+
+	targeter: Targeter;
+
+	constructor(name: string, execute: Function, target: Targeter) {
+		super(name, execute);
+		this.targeter = target;
+	}
+}
+
 class Targeter {
 	playerTargeter: number;
 	laneTargeter: number;
@@ -329,17 +414,34 @@ class Targeter {
 	static ANY_PREDICATE = (lane: BoardPos) => true; //Note that the lane should be a BoardPos instance, and the predicate should be checked for each valid BoardPos instance.
 	
 	//Targeters
-	static PLAY_CREATURE = new Targeter(PlayerTargeter.Self, LaneTargeter.SingleLane, true, 1, (lane: BoardPos) => {return lane.creature == Creatures.NULL;},
-	TargetType.BoardPos);
+	static CREATURE_TARGETER = new Targeter(PlayerTargeter.Self, LaneTargeter.SingleLane, true, 1,  (lane: BoardPos) => {return lane.creature == Creatures.NULL;},
+		TargetType.BoardPos);
 
-	static PLAY_BUILDING = new Targeter(PlayerTargeter.Self, LaneTargeter.SingleLane, true, 1, (lane: BoardPos) => {return lane.building == Buildings.NULL;},
-	TargetType.BoardPos);
+	static BUILDING_TARGETER = new Targeter(PlayerTargeter.Self, LaneTargeter.SingleLane, true, 1, (lane: BoardPos) => {return lane.building == Buildings.NULL;},
+		TargetType.BoardPos);
 
-	static PLAY_SPELL = new Targeter(PlayerTargeter.Self, LaneTargeter.None, true, 1, Targeter.ANY_PREDICATE,
-	TargetType.Board);
+	static SPELL_TARGETER = new Targeter(PlayerTargeter.Self, LaneTargeter.None, true, 1, Targeter.ANY_PREDICATE,
+		TargetType.BoardPos);
 
-	static PLAY_LANDSCAPE = new Targeter(PlayerTargeter.Self, LaneTargeter.SingleLane, true, 1, (lane: BoardPos) => {return lane.landscape == LandscapeType.NULL;},
-	TargetType.BoardPos);
+	static LANDSCAPE_TARGETER = new Targeter(PlayerTargeter.Self, LaneTargeter.SingleLane, true, 1, (lane: BoardPos) => {return lane.landscape == LandscapeType.NULL;},
+		TargetType.BoardPos);
+
+	static GET_TARGET_FOR_CREATURE = new GetTargetEvent("getTargetForCreatureCard", (card: Creature, pos: BoardPos) => {
+		card.play(pos);
+	});
+
+	static GET_TARGET_FOR_BUILDING = new GetTargetEvent("getTargetForBuildingCard", (card: Building, pos: BoardPos) => {
+		card.play(pos);
+	});
+
+	static GET_TARGET_FOR_LANDSCAPE = new GetTargetEvent("getTargetForLandscapeCard", (card: Landscape, pos: BoardPos) => {
+		card.play(pos);
+	});
+
+	static GET_TARGET_FOR_SPELL = new GetTargetEvent("getTargetForSpellCard", (card: Spell, pos: BoardPos) => {
+		card.play(pos);
+	});
+
 }
 
 class Effect { // Builder Class
