@@ -225,6 +225,10 @@ class Card {
 	wasPlayedThisTurn() {
 		return Game.instance.currentTurn == this.turnPlayed;
 	}
+
+	play(target: Targeter) {
+		return false;
+	}
 }
 
 class Creature extends Card {
