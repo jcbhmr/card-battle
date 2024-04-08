@@ -306,6 +306,17 @@ class Card {
 	play(target: any) {
 		return false;
 	}
+	death(){
+		if(Game.instance.players[0].id==this.ownerId){
+			Game.instance.players[0].discardPile.push(this);
+			//Have to locate card here so we can pop it off the lane 
+			//Will probably have to overload in each class to work properly 
+		}
+		else{
+			Game.instance.players[1].discardPile.push(this);
+			//Have to locate card here so we can pop it off the lane 
+		}
+	}
 }
 
 class Creature extends Card {
