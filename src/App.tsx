@@ -18,7 +18,7 @@ function CardComponent({cardName, cardText, actionCost, landscapeType, imagePath
   { cardName: string, cardText: string, actionCost: number,landscapeType: string,imagePath: string
   children: ReactNode}) {
     return (
-        <div className="flex flex-col rounded-lg border overflow-hidden w-[200px]">
+        <div className="card_shape">
           <div className="flex aspect-16/9">
             <img
               alt={cardName}
@@ -35,9 +35,9 @@ function CardComponent({cardName, cardText, actionCost, landscapeType, imagePath
           <div className="flex-1 p-4 grid gap-2">
             <h2 className="text-lg font-bold tracking-tight">{cardName}</h2>
             <p className="text-sm line-clamp-3">{cardText}</p>
-            <div>
-              <div>Action Cost: {actionCost}</div>
-              <div>Landscape Type: {landscapeType}</div>
+            <div className="text-xs">
+              <div>AC: {actionCost} Type: {landscapeType} </div>
+              <div></div>
 
               {children}
             </div>
@@ -59,7 +59,7 @@ function CreatureComponent({cardName, cardText, actionCost, landscapeType,
   attack, defense, imagePath}: { cardName: string, cardText: string, actionCost: number, 
     landscapeType: string, attack: number, defense: number, imagePath: string}) {
 
-  let child = (<><div>{attack}</div><div>{defense}</div></>)
+  let child = (<><div>Attack: {attack}</div><div>Defense: {defense}</div></>)
   return <CardComponent cardName={cardName} cardText={cardText} actionCost={actionCost} 
   landscapeType={landscapeType} imagePath={imagePath}>
     {child}
@@ -73,8 +73,15 @@ function CreatureComponent({cardName, cardText, actionCost, landscapeType,
  */
 function PileOfCards({size}: {size: number}){
   return(
-    <div className="card_shape">
-      {size}
+    <div className="card_shape flex h-screen hover:border-yellow-800">
+      <div className="text-center text-9xl m-auto">   
+       <div className="">
+       {size}
+       </div>
+        
+
+      </div>
+      
     </div>
   )
 }
@@ -95,11 +102,11 @@ function HandOfCards(){
   for(let i = 0; i < 5; i++){
     // let card = playerHand[i];
     //if(card.constructor.name == "Creature"){
-    if(false){
+    if(true){
       // shownHand.push(CreatureComponent({cardName: card.name, cardText:card.flavorText, actionCost: card.cost,
       // landscapeType: card.landscapeType, attack: card.attack,defense:card.defense,imagePath: ""}))
       shownHand.push(CreatureComponent({cardName: "name", cardText: "flavorText", actionCost: 0,
-      landscapeType: "landscapeType", attack: 0, defense:0,imagePath: ""}))
+      landscapeType: "lType", attack: 0, defense:0,imagePath: ""}))
     }
     // children does not HAVE to be assigned here, but it has the red underline if you dont
     //so i've given it an empty element just to stop that
@@ -210,7 +217,7 @@ function AppBoard() {
 function App() {
   return (
     <div className="flex justify-center items-center h-screen p-4">
-      <HandOfCards/>
+      <PileOfCards size={1}/>
     </div>
   );
 }

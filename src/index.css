@@ -86,5 +86,23 @@
   border-radius: 0.5rem; 
   border-width: 1px; 
   width: 200px;
-  height: 200px;
+  height: 300px;
+}
+
+.center-in-card {
+  text-align:center;
+  margin: 0;
+  position: absolute;
+  top: 50%;
+  -ms-transform: translateY(-50%);
+  transform: translateY(-50%);
+}
+
+.invisible-text{
+  visibility: hidden;
+}
+
+.invisible-text:hover{
+  visibility: visible;
+  transition-delay: 0.3s;
 }
