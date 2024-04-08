@@ -1,52 +1,7 @@
-import { useState } from "react";
+import { ReactNode, useState } from "react";
 import placeholderSVGURL from "./assets/placeholder.svg"
 import { Game } from "./model";
 
-
-
-/**
- * v0 by Vercel.
- * @see https://v0.dev/t/WuNN16G0fnd
- * Documentation: https://v0.dev/docs#integrating-generated-code-into-your-nextjs-app
- * 
- * 
- * @returns Returns a creature component
- * @param cardName: the actual name of the card, cardText: the description of the text on the card,
- * actionCost: the cost of the card, landscapeType: the type of landscape that the card needs, 
- * attack and defense: the offensive and defensive stats of the card respectively, imagePath: the 
- * location of the image for the card
- */
-function CreatureComponent({cardName, cardText, actionCost, landscapeType,
-attack, defense, imagePath}: { cardName: string, cardText: string, actionCost: number, 
-  landscapeType: string, attack: number, defense: number, imagePath: string}) {
-  return (
-      <div className="flex flex-col rounded-lg border overflow-hidden w-[200px]">
-        <div className="flex aspect-16/9">
-          <img
-            alt={cardName}
-            className="object-cover"
-            height={135}
-            src={imagePath}
-            style={{
-              aspectRatio: "240/135",
-              objectFit: "cover",
-            }}
-            width={350}
-          />
-        </div>
-        <div className="flex-1 p-4 grid gap-2">
-          <h2 className="text-lg font-bold tracking-tight">{cardName}</h2>
-          <p className="text-sm line-clamp-3">{cardText}</p>
-          <div>
-            <div>Action Cost: {actionCost}</div>
-            <div>Landscape Type: {landscapeType}</div>
-            <div>Attack: {attack}</div>
-            <div>Defense: {defense}</div>
-          </div>
-        </div>
-      </div>
-  )
-}
 
 /**
  * v0 by Vercel.
@@ -59,8 +14,9 @@ attack, defense, imagePath}: { cardName: string, cardText: string, actionCost: n
  * actionCost: the cost of the card, landscapeType: the type of landscape that the card needs,
  * imagePath: the location of the image for the card. this is made for spell/building cards
  */
-function CardComponent({cardName, cardText, actionCost, landscapeType, imagePath}: 
-  { cardName: string, cardText: string, actionCost: number,landscapeType: string,imagePath: string}) {
+function CardComponent({cardName, cardText, actionCost, landscapeType, imagePath, children}: 
+  { cardName: string, cardText: string, actionCost: number,landscapeType: string,imagePath: string
+  children: ReactNode}) {
     return (
         <div className="flex flex-col rounded-lg border overflow-hidden w-[200px]">
           <div className="flex aspect-16/9">
@@ -82,11 +38,33 @@ function CardComponent({cardName, cardText, actionCost, landscapeType, imagePath
             <div>
               <div>Action Cost: {actionCost}</div>
               <div>Landscape Type: {landscapeType}</div>
+
+              {children}
             </div>
           </div>
         </div>
     )
   }
+
+/**
+ * so basically this is just Card Component, but for creatures. It's kinda like a fucked up version
+ * of inheritance for objects. I'm using the children props that Jacob showed me to essentially just
+ * add attack and defense to the rest of a card component.
+ * @author Tanner Brown and Jacob Hummer
+ * @param cardName: string, cardText: string, actionCost: number, 
+    landscapeType: string, attack: number, defense: number, imagePath: string
+ * @returns CardComponent, but with attack/defense values
+ */
+function CreatureComponent({cardName, cardText, actionCost, landscapeType,
+  attack, defense, imagePath}: { cardName: string, cardText: string, actionCost: number, 
+    landscapeType: string, attack: number, defense: number, imagePath: string}) {
+
+  let child = (<><div>{attack}</div><div>{defense}</div></>)
+  return <CardComponent cardName={cardName} cardText={cardText} actionCost={actionCost} 
+  landscapeType={landscapeType} imagePath={imagePath}>
+    {child}
+  </CardComponent>
+}
 
 
 /**
@@ -105,19 +83,21 @@ function HandOfCards(){
   for(let i = 0; i < 5; i++){
     // let card = playerHand[i];
     //if(card.constructor.name == "Creature"){
-    if(true){
+    if(false){
       // shownHand.push(CreatureComponent({cardName: card.name, cardText:card.flavorText, actionCost: card.cost,
       // landscapeType: card.landscapeType, attack: card.attack,defense:card.defense,imagePath: ""}))
       shownHand.push(CreatureComponent({cardName: "name", cardText: "flavorText", actionCost: 0,
       landscapeType: "landscapeType", attack: 0, defense:0,imagePath: ""}))
     }
+    // children does not HAVE to be assigned here, but it has the red underline if you dont
+    //so i've given it an empty element just to stop that
     else{
       shownHand.push(CardComponent({cardName:"name", cardText: "text", actionCost:0, landscapeType: "landscape",
-    imagePath: ""}))
+    imagePath: "", children: <></>}))
     }
   }
   return(
-    <div className="flexbox_container">
+    <div className="flex flex-row">
       {shownHand}
     </div>
     
@@ -218,7 +198,7 @@ function AppBoard() {
 function App() {
   return (
     <div className="flex justify-center items-center h-screen p-4">
-      <AppBoard/>
+      <HandOfCards/>
     </div>
   );
 }
