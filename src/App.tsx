@@ -66,6 +66,18 @@ function CreatureComponent({cardName, cardText, actionCost, landscapeType,
   </CardComponent>
 }
 
+/**
+ * NOT DONE
+ * @param param0 
+ * @returns 
+ */
+function PileOfCards({size}: {size: number}){
+  return(
+    <div className="card_shape">
+      {size}
+    </div>
+  )
+}
 
 /**
  * This method will (currently) only make an array of "generic" card/creature components. This method WILL
