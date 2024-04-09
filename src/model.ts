@@ -108,7 +108,9 @@ class Game {
 	}
 
 	playCard(card: Card) {
-		
+		if (this.turnPhase != TurnPhases.Play){
+			return;
+		}
 	}
 }
 
@@ -316,6 +318,11 @@ class Card {
 			Game.instance.players[1].discardPile.push(this);
 			//Have to locate card here so we can pop it off the lane 
 		}
+	}
+
+	returnToHand(){
+		if(this.ownerId != null)
+			Game.instance.getPlayerById(this.ownerId).hand.push(this);
 	}
 }
 
