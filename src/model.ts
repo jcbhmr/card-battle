@@ -4,6 +4,13 @@ const TurnPhases = {
 	Action: 1,
 	Battle: 2
  }
+
+
+ const CardLocations = {
+	Deck: "deck",
+	Hand: "hand",
+	Discard: "discardPile"
+ }
  
  
  const LandscapeType = { // Landscape type: associated hex color code for front to render
@@ -308,10 +315,10 @@ const TurnPhases = {
 	ability: Ability;
 	isReady: boolean;
 	ownerId: number | null = null;
-	board: BoardPOS | null = null;
+	location: BoardPos | String = CardLocations.Deck;
 	getTargetEvent: GetTargetEvent | null;
  
- 
+
 	constructor(name: string, flavorText: string, cardType: number, cost: number, landscapeType: string, ability: Ability) {
 		this.name = name;
 		this.flavorText = flavorText;
@@ -353,17 +360,33 @@ const TurnPhases = {
  
 	death(){
 		if(this.ownerId != null){
-			Game.instance.getPlayerById(this.ownerId).discard.push(this);
-			this.board.removeCreature();
-	}
+			Game.instance.getPlayerById(this.ownerId).discardPile.push(this);
+			this.removeCardFromBoard(CardLocations.Discard)
+		}
 	}
  
  
 	returnToHand(){
 		if(this.ownerId != null){
 			Game.instance.getPlayerById(this.ownerId).hand.push(this);
-			this.board.removeCreature();
+			this.removeCardFromBoard(CardLocations.Hand)
 		}
+	}
+
+
+	removeCardFromBoard(newLocation: String = CardLocations.Discard){
+		Game.eventHandler.dispatchEvent(new CustomEvent("removeCard", { detail: this }));
+		if(typeof this.location == "string"){
+			console.log("Card is not on board")
+			return;
+		}
+		this.location.removeCreature();
+		this.location = newLocation;
+	}
+
+
+	drawCard(){
+		Game.eventHandler.dispatchEvent(new CustomEvent("drawCard", { detail: this }));
 	}
  }
  
