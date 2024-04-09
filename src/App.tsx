@@ -268,17 +268,20 @@ function LandscapeCard(){
     landscapeType: "lType",imagePath: "", children:""});
   }
   return(
-    <div className="landscape_shape">
+    <div className="landscape_shape flex justify-center items-center">
       {c}
       {c2}
     </div>
   )
 }
+
 function App() {
   return (
+    <>
     <div className="flex justify-center items-center h-screen p-4">
       <Board/>
     </div>
+    </>
   );
 }
 
