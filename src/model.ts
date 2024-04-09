@@ -107,7 +107,9 @@ export class Game {
 	}
 
 	playCard(card: Card) {
-		
+		if (this.turnPhase != TurnPhases.Play){
+			return;
+		}
 	}
 }
 
@@ -269,6 +271,7 @@ export class Card {
     ability: Ability;
 	isReady: boolean;
 	ownerId: number | null = null;
+	board: BoardPOS | null = null;
 	getTargetEvent: GetTargetEvent | null;
 
 	constructor(name: string, flavorText: string, cardType: number, cost: number, landscapeType: string, ability: Ability) {
@@ -305,15 +308,18 @@ export class Card {
 	play(target: any) {
 		return false;
 	}
+
 	death(){
-		if(Game.instance.players[0].id==this.ownerId){
-			Game.instance.players[0].discardPile.push(this);
-			//Have to locate card here so we can pop it off the lane 
-			//Will probably have to overload in each class to work properly 
-		}
-		else{
-			Game.instance.players[1].discardPile.push(this);
-			//Have to locate card here so we can pop it off the lane 
+		if(this.ownerId != null){
+			Game.instance.getPlayerById(this.ownerId).discard.push(this);
+			this.board.removeCreature();
+	} 
+	}
+
+	returnToHand(){
+		if(this.ownerId != null){
+			Game.instance.getPlayerById(this.ownerId).hand.push(this);
+			this.board.removeCreature();
 		}
 	}
 }
