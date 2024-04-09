@@ -229,7 +229,7 @@ let tempGameObject = new Game();
 /**
  * INCOMPLETE METHOD
  * currently using Creatures as placeholders for landscapes. Basically, I just made some generic looking ones 
- * for testing purposes. 
+ * for testing purposes. a
  * @returns 
  */
 function Board(){
