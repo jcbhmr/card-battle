@@ -217,61 +217,41 @@ function AppBoard() {
 }
 
 
-function checkIfExists(thing){
-  if(thing){
-    return thing;
-  }
-  else{
-    return (<></>);
-  }
-}
-let tempGameObject = new Game();
 /**
  * INCOMPLETE METHOD
  * currently using Creatures as placeholders for landscapes. Basically, I just made some generic looking ones 
  * for testing purposes. a
  * @returns 
  */
-function Board(){
+function Board({game}: {game: Game}){
   let p1Board = []
   let p2Board = []
   for(let i = 0; i > 4; i++){
-    let player1Creature = tempGameObject.board.getBoardPosByOwnerId(0, i)?.creature
-    let player1Building = tempGameObject.board.getBoardPosByOwnerId(0, i)?.building
+    p1Board.push(LandscapeCard({creature: game.board.getBoardPosByOwnerId(0, i)?.creature, 
+    building: game.board.getBoardPosByOwnerId(0, i)?.building}));
 
-    let player2Creature = tempGameObject.board.getBoardPosByOwnerId(1, i)?.creature
-    let player2Building = tempGameObject.board.getBoardPosByOwnerId(1, i)?.building
+    p2Board.push(LandscapeCard({creature: game.board.getBoardPosByOwnerId(1, i)?.creature, 
+      building: game.board.getBoardPosByOwnerId(1, i)?.building}));
     // dont know why but i added them to the same array instead of making them into landscape components
     // then doing that but I'm running low on time so this will just have to stay like that for now. 
     // Definitively not complete.
-    p1Board.push(checkIfExists(player1Creature));
-    p1Board.push(checkIfExists(player1Building));
-    p2Board.push(checkIfExists(player2Creature));
-    p2Board.push(checkIfExists(player2Building));
   }
   
   return(
     <div className="board_shape">
       <br></br>
       <div className="flex flex-row justify-between justify-around">
-        {t}
-        {t}
-        {t}
-        {t}
+        {p1Board}
       </div>
       <br></br>
       <div className="flex flex-row justify-between justify-around">
-        {t}
-        {t}
-        {t}
-        {t}
+        {p2Board}
       </div>   
     </div>
         
   )
 }
 /**
- * INCOMPLETE METHOD!
  * This method will take in a Creature and building from a given "landscape card" from the backend. This will 
  * then dynamically render them inside of the landscape. Also need to figure out how to center cards inside
  * of a landscape.
@@ -280,16 +260,16 @@ function Board(){
  * 
  * @returns 
  */
-function LandscapeCard({building, creature}: {building: Building, creature: Creature}){
-  //c is creature, b is building
+function LandscapeCard({building, creature}: {building: Building | undefined, creature: Creature | undefined}){
+  //c is creature, b is building. default values are empty tags (is that what they're called?)
   let c = (<></>);
   let b = (<></>);
-  // will need to change this to check if creature is at zone
+  // check if creature is undefined
   if(creature){
     c = CreatureComponent({cardName: creature.name, cardText: creature.flavorText, actionCost: creature.cost,
     landscapeType: creature.landscapeType, attack: creature.attack, defense: creature.defense,imagePath: ""});
   }
-  // will need to change this to check if building is at zone
+  // check if building is undefined
   if(building){
     b = CardComponent({cardName: building.name, cardText: building.flavorText, actionCost: building.cost,
     landscapeType: building.landscapeType,imagePath: ""});
@@ -303,6 +283,7 @@ function LandscapeCard({building, creature}: {building: Building, creature: Crea
 }
 
 function App() {
+
   return (
     <>
     <div className="flex justify-center items-center h-screen p-4">
