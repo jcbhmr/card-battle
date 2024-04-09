@@ -20,7 +20,7 @@ function CardComponent({cardName, cardText, actionCost, landscapeType, imagePath
   { cardName: string, cardText: string, actionCost: number,landscapeType: string,imagePath: string
   children?: ReactNode}) {
     return (
-        <div className="card_shape">
+        <div className="card_shape overflow-auto">
           <div className="flex aspect-16/9">
             <img
               alt={cardName}
@@ -69,52 +69,42 @@ function CreatureComponent({cardName, cardText, actionCost, landscapeType,
 }
 
 /**
- * NOT DONE
- * @param param0 
- * @returns 
+ * Displays card shape with a number on it indicating how many cards are in the pile. 
+ * @param size, a number that represents number of cards in pile
+ * @returns returns markup displaying what i wrote just above
  */
 function PileOfCards({size}: {size: number}){
   return(
-    <div className="card_shape flex h-screen hover:border-yellow-800">
+    <div className="card_shape flex h-screen hover:border-red-800">
       <div className="text-center text-9xl m-auto">   
        <div className="">
        {size}
        </div>
-        
-
       </div>
-      
     </div>
   )
 }
-
 /**
- * This method will (currently) only make an array of "generic" card/creature components. This method WILL
- * have to be updated to get a players hand from the game object. tempGameObject is my current placeholder
- * for that.
- * 
- * 
+ * Creates markup that displays players hand
  * @author Tanner Brown
  * @returns Array of CardComponents/CreatureComponents
  */
-function HandOfCards(){
-  // let playerHand = tempGameObject.players[0].hand
-  let shownHand = []
-  //for(let i = 0; i < playerHand.length; i++){
-  for(let i = 0; i < 5; i++){
-    // let card = playerHand[i];
-    //if(card.constructor.name == "Creature"){
-    if(true){
-      // shownHand.push(CreatureComponent({cardName: card.name, cardText:card.flavorText, actionCost: card.cost,
-      // landscapeType: card.landscapeType, attack: card.attack,defense:card.defense,imagePath: ""}))
-      shownHand.push(CreatureComponent({cardName: "name", cardText: "flavorText", actionCost: 0,
-      landscapeType: "lType", attack: 0, defense:0,imagePath: ""}))
+function HandOfCards({game}: {game: Game}){
+  let playerHand = game.players[0].hand;
+  let shownHand = [];
+  for(let i = 0; i < playerHand.length; i++){
+    let card = playerHand[i];
+    // not even sure if this if statement would even work. Will have to ask Jacob about it or
+    // test it with backends code
+    if(card.constructor.name == "Creature"){
+      //red underline is due to game.players[i].hand being an array of type Card[]. the supertype
+      //card does not have attack or defense 
+      shownHand.push(CreatureComponent({cardName: card.name, cardText: card.flavorText, actionCost: card.cost,
+      landscapeType: card.landscapeType, attack: card.attack, defense: card.defense,imagePath: ""}))
     }
-    // children does not HAVE to be assigned here, but it has the red underline if you dont
-    //so i've given it an empty element just to stop that
     else{
-      shownHand.push(CardComponent({cardName:"name", cardText: "text", actionCost:0, landscapeType: "landscape",
-    imagePath: "", children: <></>}))
+      shownHand.push(CardComponent({cardName:card.name, cardText: card.flavorText, actionCost:card.cost,
+         landscapeType: card.landscapeType,imagePath: ""}))
     }
   }
   return(
@@ -218,29 +208,28 @@ function AppBoard() {
 
 
 /**
- * INCOMPLETE METHOD
- * currently using Creatures as placeholders for landscapes. Basically, I just made some generic looking ones 
- * for testing purposes. a
- * @returns 
+ * 
+ * Board loops through the board (the actual array that keeps track of the board) to display each 
+ * creature, building in the array inside of each landscape inside of a larger board.
+ * @returns markup that displays the board.
  */
 function Board({game}: {game: Game}){
   let p1Board = []
   let p2Board = []
+  //Looping through board to display it
   for(let i = 0; i > 4; i++){
     p1Board.push(LandscapeCard({creature: game.board.getBoardPosByOwnerId(0, i)?.creature, 
     building: game.board.getBoardPosByOwnerId(0, i)?.building}));
 
     p2Board.push(LandscapeCard({creature: game.board.getBoardPosByOwnerId(1, i)?.creature, 
       building: game.board.getBoardPosByOwnerId(1, i)?.building}));
-    // dont know why but i added them to the same array instead of making them into landscape components
-    // then doing that but I'm running low on time so this will just have to stay like that for now. 
-    // Definitively not complete.
   }
   
   return(
     <div className="board_shape">
       <br></br>
       <div className="flex flex-row justify-between justify-around">
+        {/**not sure if just printing the array will work*/}
         {p1Board}
       </div>
       <br></br>
@@ -253,12 +242,8 @@ function Board({game}: {game: Game}){
 }
 /**
  * This method will take in a Creature and building from a given "landscape card" from the backend. This will 
- * then dynamically render them inside of the landscape. Also need to figure out how to center cards inside
- * of a landscape.
- * TODO: add passing in a creature and building, then change if statements to check if those buildings are null 
- * or such, then change c and c2 to have appropriate values
- * 
- * @returns 
+ * then dynamically render them inside of the landscape. 
+ * @returns markup that displays a landscape box with building and creature optionally inside
  */
 function LandscapeCard({building, creature}: {building: Building | undefined, creature: Creature | undefined}){
   //c is creature, b is building. default values are empty tags (is that what they're called?)
@@ -287,7 +272,7 @@ function App() {
   return (
     <>
     <div className="flex justify-center items-center h-screen p-4">
-      <Board/>
+      <PileOfCards size={1}/>
     </div>
     </>
   );

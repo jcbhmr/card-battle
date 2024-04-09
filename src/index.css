@@ -81,7 +81,6 @@
 }
 
 .card_shape{
-  overflow: auto; 
   flex-direction: column; 
   border-radius: 0.5rem; 
   border-width: 2px; 
