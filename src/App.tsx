@@ -1,7 +1,10 @@
 import { ReactNode, useState } from "react";
 import placeholderSVGURL from "./assets/placeholder.svg"
 import { Game } from "./model";
+import { Creature } from "./model";
 
+
+//let testCreature = new Creature("", "", 1, "", null, 2, 3);
 
 /**
  * v0 by Vercel.
@@ -125,7 +128,7 @@ function HandOfCards(){
 
 function AppBoard() {
   return (
-    <div className="grid grid-cols-1 gap-4">
+    <div className="grid grid-cols-1 gap-4 border-yellow-800">
       <div className="space-y-4">
         <div className="flex items-center space-x-4">
           <div className="grid grid-cols-4 items-start gap-4">
@@ -213,11 +216,68 @@ function AppBoard() {
     </div>
   )
 }
-
+/**
+ * INCOMPLETE METHOD
+ * currently using Creatures as placeholders for landscapes. Basically, I just made some generic looking ones 
+ * for testing purposes. 
+ * @returns 
+ */
+function Board(){
+  let t = LandscapeCard();
+  return(
+    <div className="board_shape">
+      <br></br>
+      <div className="flex flex-row justify-between justify-around">
+        {t}
+        {t}
+        {t}
+        {t}
+      </div>
+      <br></br>
+      <div className="flex flex-row justify-between justify-around">
+        {t}
+        {t}
+        {t}
+        {t}
+      </div>   
+    </div>
+        
+  )
+}
+/**
+ * INCOMPLETE METHOD!
+ * This method will take in a Creature and building from a given "landscape card" from the backend. This will 
+ * then dynamically render them inside of the landscape. Also need to figure out how to center cards inside
+ * of a landscape.
+ * TODO: add passing in a creature and building, then change if statements to check if those buildings are null 
+ * or such, then change c and c2 to have appropriate values
+ * 
+ * @returns 
+ */
+function LandscapeCard(){
+  let c = (<></>);
+  let c2 = (<></>);
+  // will need to change this to check if creature is at zone
+  if(true){
+    c = CreatureComponent({cardName: "name", cardText: "flavorText", actionCost: 0,
+    landscapeType: "lType", attack: 0, defense:0,imagePath: ""});
+  }
+  // will need to change this to check if building is at zone
+  if(true){
+    c2 = CardComponent({cardName: "name", cardText: "flavorText", actionCost: 0,
+    landscapeType: "lType",imagePath: "", children:""});
+  }
+  return(
+    <div className="landscape_shape">
+      {c}
+      {c2}
+    </div>
+  )
+}
 function App() {
   return (
     <div className="flex justify-center items-center h-screen p-4">
-      <PileOfCards size={1}/>
+      <Board/>
     </div>
   );
 }

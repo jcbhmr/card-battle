@@ -1,3 +1,4 @@
+
 const TurnPhases = {
 	Play: 0,
 	Action: 1,
@@ -231,7 +232,7 @@ class Card {
 	}
 }
 
-class Creature extends Card {
+export class Creature extends Card {
     attack: number;
     defense: number;
     maxDefense: number;

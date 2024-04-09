@@ -81,13 +81,38 @@
 }
 
 .card_shape{
-  overflow: hidden; 
+  overflow: auto; 
   flex-direction: column; 
   border-radius: 0.5rem; 
-  border-width: 1px; 
+  border-width: 2px; 
+  border-color: black;
+  width: 100px;
+  height: 150px;
+}
+
+.landscape_shape{
+  flex-direction: column; 
+  border-radius: 0.5rem; 
+  border-width: 2px; 
+  border-color: black;
   width: 200px;
   height: 300px;
+  display: flex;
+  justify-content: center;
+  
 }
+
+.board_shape{
+  border-radius: 0.5rem; 
+  border-width: 3px; 
+  border-color: black;
+  width: 1000px;
+  height: 700px;
+}
+
+
+
+
 
 .center-in-card {
   text-align:center;
@@ -96,13 +121,4 @@
   top: 50%;
   -ms-transform: translateY(-50%);
   transform: translateY(-50%);
-}
-
-.invisible-text{
-  visibility: hidden;
-}
-
-.invisible-text:hover{
-  visibility: visible;
-  transition-delay: 0.3s;
 }
