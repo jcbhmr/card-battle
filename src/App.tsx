@@ -1,7 +1,6 @@
 import { ReactNode, useState } from "react";
 import placeholderSVGURL from "./assets/placeholder.svg"
-import { Game } from "./model";
-import { Creature } from "./model";
+import {Game, Creature, Building } from "./model"
 
 
 //let testCreature = new Creature("", "", 1, "", null, 2, 3);
@@ -19,7 +18,7 @@ import { Creature } from "./model";
  */
 function CardComponent({cardName, cardText, actionCost, landscapeType, imagePath, children}: 
   { cardName: string, cardText: string, actionCost: number,landscapeType: string,imagePath: string
-  children: ReactNode}) {
+  children?: ReactNode}) {
     return (
         <div className="card_shape">
           <div className="flex aspect-16/9">
@@ -216,6 +215,17 @@ function AppBoard() {
     </div>
   )
 }
+
+
+function checkIfExists(thing){
+  if(thing){
+    return thing;
+  }
+  else{
+    return (<></>);
+  }
+}
+let tempGameObject = new Game();
 /**
  * INCOMPLETE METHOD
  * currently using Creatures as placeholders for landscapes. Basically, I just made some generic looking ones 
@@ -223,7 +233,23 @@ function AppBoard() {
  * @returns 
  */
 function Board(){
-  let t = LandscapeCard();
+  let p1Board = []
+  let p2Board = []
+  for(let i = 0; i > 4; i++){
+    let player1Creature = tempGameObject.board.getBoardPosByOwnerId(0, i)?.creature
+    let player1Building = tempGameObject.board.getBoardPosByOwnerId(0, i)?.building
+
+    let player2Creature = tempGameObject.board.getBoardPosByOwnerId(1, i)?.creature
+    let player2Building = tempGameObject.board.getBoardPosByOwnerId(1, i)?.building
+    // dont know why but i added them to the same array instead of making them into landscape components
+    // then doing that but I'm running low on time so this will just have to stay like that for now. 
+    // Definitively not complete.
+    p1Board.push(checkIfExists(player1Creature));
+    p1Board.push(checkIfExists(player1Building));
+    p2Board.push(checkIfExists(player2Creature));
+    p2Board.push(checkIfExists(player2Building));
+  }
+  
   return(
     <div className="board_shape">
       <br></br>
@@ -254,23 +280,24 @@ function Board(){
  * 
  * @returns 
  */
-function LandscapeCard(){
+function LandscapeCard({building, creature}: {building: Building, creature: Creature}){
+  //c is creature, b is building
   let c = (<></>);
-  let c2 = (<></>);
+  let b = (<></>);
   // will need to change this to check if creature is at zone
-  if(true){
-    c = CreatureComponent({cardName: "name", cardText: "flavorText", actionCost: 0,
-    landscapeType: "lType", attack: 0, defense:0,imagePath: ""});
+  if(creature){
+    c = CreatureComponent({cardName: creature.name, cardText: creature.flavorText, actionCost: creature.cost,
+    landscapeType: creature.landscapeType, attack: creature.attack, defense: creature.defense,imagePath: ""});
   }
   // will need to change this to check if building is at zone
-  if(true){
-    c2 = CardComponent({cardName: "name", cardText: "flavorText", actionCost: 0,
-    landscapeType: "lType",imagePath: "", children:""});
+  if(building){
+    b = CardComponent({cardName: building.name, cardText: building.flavorText, actionCost: building.cost,
+    landscapeType: building.landscapeType,imagePath: ""});
   }
   return(
     <div className="landscape_shape flex justify-center items-center">
       {c}
-      {c2}
+      {b}
     </div>
   )
 }

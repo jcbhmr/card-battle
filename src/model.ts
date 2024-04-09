@@ -1,4 +1,3 @@
-
 //============================================================== Enums ==============================================================
 const TurnPhases = {
 	Play: 0,
@@ -57,7 +56,7 @@ const TargetType = {
 }
 
 //============================================================== Game ==============================================================
-class Game {
+export class Game {
     players: Player[];
     board: SidedBoard;
     currentTurn: number;
@@ -113,7 +112,7 @@ class Game {
 }
 
 //============================================================== Player ==============================================================
-class Player {
+export class Player {
     id: number;
     username: string;
     discardPile: Card[];
@@ -155,7 +154,7 @@ class Player {
 }
 
 //============================================================== Board ==============================================================
-class BoardPos {
+export class BoardPos {
     ownerId: number;
     creature: Creature;
     building: Building;
@@ -219,7 +218,7 @@ class BoardPos {
 	}
 }
 
-class SidedBoard {
+export class SidedBoard {
     lanes: Map<number, BoardPos[]>;
 
 	constructor() {
@@ -245,7 +244,7 @@ class SidedBoard {
 }
 
 //============================================================== Events ==============================================================
-class GetTargetEvent extends Event {
+export class GetTargetEvent extends Event {
 
 	execute: Function;
 	targeter: Targeter | null;
@@ -260,7 +259,7 @@ class GetTargetEvent extends Event {
 }
 
 //============================================================== Cards ==============================================================
-class Card {
+export class Card {
     name: string;
     flavorText: string;
     cardType: number;
@@ -319,7 +318,7 @@ class Card {
 	}
 }
 
-class Creature extends Card {
+export class Creature extends Card {
     attack: number;
     defense: number;
     maxDefense: number;
@@ -357,7 +356,7 @@ class Creature extends Card {
 	}
 }
 
-class Building extends Card {
+export class Building extends Card {
 	constructor(name: string, flavorText: string, cost: number, landscapeType: string, ability: Ability) {
 		super(name, flavorText, CardType.Building, cost, landscapeType, ability);
 		this.getTargetEvent = new GetTargetEvent("getTargetForBuilding", (pos: BoardPos) => {
@@ -377,7 +376,7 @@ class Building extends Card {
 	}
 }
 
-class Spell extends Card {
+export class Spell extends Card {
 	constructor(name: string, flavorText: string, cost: number, landscapeType: string, ability: Ability) {
 		super(name, flavorText, CardType.Spell, cost, landscapeType, ability);
 		this.getTargetEvent = new GetTargetEvent("getTargetForSpell", (pos: BoardPos) => {
@@ -395,7 +394,7 @@ class Spell extends Card {
 }
 
 // By having this class, the front end can render these like they're in your hand when the game starts so you can choose where your landscapes belong
-class Landscape extends Card { 
+export class Landscape extends Card { 
 	constructor(name: string, flavorText: string, landscapeType: string) {
 		super(name, flavorText, CardType.Landscape, 0, landscapeType, Abilities.NULL);
 		this.getTargetEvent = new GetTargetEvent("getTargetForLandscape", (pos: BoardPos) => {
@@ -416,7 +415,7 @@ class Landscape extends Card {
 }
 
 //============================================================== Abilities and Effects ==============================================================
-class Ability {
+export class Ability {
 	description: string;
 	targeter: Targeter;
 	effect: Effect;
@@ -502,7 +501,7 @@ class Ability {
 	}
 }
 
-class Effect { // Builder Class
+export class Effect { // Builder Class
 	attackBonus: Function;
 	defenseBonus: Function;
 	healthBonus: Function;
@@ -622,7 +621,7 @@ class Effect { // Builder Class
 }
 
 //============================================================== Util ==============================================================
-class Targeter {
+export class Targeter {
 	playerTargeter: number;
 	laneTargeter: number;
 	needsPlayerSelection: boolean;
@@ -658,7 +657,7 @@ class Targeter {
 }
 
 //============================================================== Singletons ==============================================================
-class Effects {
+export class Effects {
 	constructor() {}
 	
 	static NULL = new Effect();
