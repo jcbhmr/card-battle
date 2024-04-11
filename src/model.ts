@@ -143,8 +143,9 @@ const TurnPhases = {
 	hand: Card[];
 	hp: number;
 	actions: number;
- 
- 
+	cardDiscount: number;
+
+
 	constructor(id: number) {
 		this.id = id;
 		this.username = "";
@@ -153,8 +154,8 @@ const TurnPhases = {
 		this.hand = [];
 		this.hp = 25;
 		this.actions = 2;
+		this.cardDiscount = 0;
 	}
- 
  
 	discard(index: number = -1) {
 		if(index == -1){
@@ -165,7 +166,6 @@ const TurnPhases = {
 		this.discardPile.push(this.hand[index])
 		this.hand.splice(index,1)
 	}
- 
  
 	drawCard(amount:number){
 		for(let i=0;i<amount;i++){
@@ -325,8 +325,8 @@ const TurnPhases = {
 	isReady: boolean;
 	ownerId: number | null = null;
 	location: BoardPos | String = CardLocations.Deck;
-	getTargetEvent: GetTargetEvent | null;
- 
+	getTargetEvent: GetTargetEvent | null = null;
+	activeEffects: Effect[] = [];
 
 	constructor(name: string, flavorText: string, cardType: number, cost: number, landscapeType: string, ability: Ability) {
 		this.name = name;
@@ -337,7 +337,10 @@ const TurnPhases = {
 		this.turnPlayed = Game.instance.currentTurn;
 		this.ability = ability;
 		this.isReady = true;
-		this.getTargetEvent = null;
+	}
+
+	static addCardChangedEventListener(eventCallback: EventListenerOrEventListenerObject) {
+		Game.instance.addEventListener("displayCards", eventCallback);
 	}
  
 	//Not sure about dispatching instanced events through a static event target, will this work?
@@ -367,16 +370,16 @@ const TurnPhases = {
 			this.removeCardFromBoard(CardLocations.Discard)
 		}
 	}
+
+	addEffect(effect: Effect) {
+		this.activeEffects.push(effect);
+	}
  
 	returnToHand(){
 		if(this.ownerId != null){
 			Game.instance.getPlayerById(this.ownerId).hand.push(this);
 			this.removeCardFromBoard(CardLocations.Hand)
 		}
-	}
-
-	static addCardChangedEventListener(eventCallback: EventListenerOrEventListenerObject) {
-		Game.instance.addEventListener("displayCards", eventCallback);
 	}
 
 	removeCardFromBoard(newLocation: String = CardLocations.Discard){ // Whole screen is redrawn on cardChanged, so not sure if we need this
@@ -402,7 +405,6 @@ const TurnPhases = {
 	attack: number;
 	defense: number;
 	maxDefense: number;
-	activeEffects: Effect[];
  
  
 	constructor(name: string, flavorText: string, cost: number, landscapeType: string, ability: Ability, attack: number, defense: number) {
@@ -410,24 +412,36 @@ const TurnPhases = {
 		this.attack = attack;
 		this.defense = defense;
 		this.maxDefense = defense; // Used when healing a creature so it doesn't overheal, and cards that say things like "if a creature has exactly x damage."
-		this.activeEffects = [];
 		this.getTargetEvent = new GetTargetEvent("getTargetForCreature", (pos: BoardPos) => {
 			this.play(pos);
 		});
 	}
  
-	static addGetTargetEventListener(eventCallback: EventListenerOrEventListenerObject) {
+	static addGetTargetEventListener(eventCallback: EventListenerOrEventListenerObject): void {
 		Game.instance.addEventListener("getTargetForCreature", eventCallback);
 	}
  
-	override play(pos: BoardPos) {
+	override play(pos: BoardPos): boolean {
 		if(pos.creature == Creatures.NULL) {
 			return pos.setCreature(this);
 		}
 		return false;
 	}
-   
-	hasEffect(effect: Effect) {
+
+	override addEffect(effect: Effect): void {
+		super.addEffect(effect);
+		this.attack += effect.attackBonus.call(null, Game.instance);
+		
+		//We have absolutely no way to reveal cards for effect.cardsRevealed at the moment, will probably be removed.
+		if(this.ownerId != null) {
+			Game.instance.getPlayerById(this.ownerId).actions += effect.actionBonus.call(null, Game.instance);
+			Game.instance.getPlayerById(this.ownerId).cardDiscount += effect.cardDiscount.call(null, Game.instance);
+			Game.instance.getPlayerById(this.ownerId).drawCard(effect.cardsDrawn.call(null, Game.instance));
+		}
+		
+	}
+
+	hasEffect(effect: Effect): boolean {
 		for(var i = 0; i < this.activeEffects.length; i++) {
 			if(this.activeEffects[i] == effect) {
 				return true;
@@ -552,7 +566,7 @@ const TurnPhases = {
 		return Game.instance.dispatchEvent(this.getTargetEvent);
 	}
  
-	activate() {
+	activate(playerId: number) {
 		if(this.targeter.needsPlayerSelection) {
 			this.getAbilityTarget();
 		}else {
@@ -570,12 +584,8 @@ const TurnPhases = {
 	//  BoardPos: 6
 	// }
 	apply(target: any) {
-		if(target instanceof Creature) {
-			this.applyCreature(target);
-		}else if(target instanceof Building) {
-			// this.applyBuilding(target); //TODO
-		}else if(target instanceof Landscape) {
-			// this.applyLandscape(target); //TODO
+		if(target instanceof Card) {
+			this.applyCard(target);
 		}else if(target instanceof Player) {
 			// this.applyPlayer(target); //TODO
 		}
@@ -588,15 +598,14 @@ const TurnPhases = {
 		}
 	}
  
-	applyCreature(target: Creature) {
+	applyCard(target: Card) {
 		target.activeEffects.push(this.effect);
 		if(this.healthCost != 0) {
 			//How do we want to handle health cost when we don't know who "activated" this ability?
 		}
 	}
  }
- 
- 
+
  export class Effect { // Builder Class
 	attackBonus: Function;
 	defenseBonus: Function;
@@ -760,46 +769,119 @@ const TurnPhases = {
 	static PLAY_LANDSCAPE_TARGETER = new Targeter(PlayerTargeter.Self, LaneTargeter.SingleLane, true, 1, (lane: BoardPos) => {return lane.landscape == LandscapeType.NULL;},
 		TargetType.BoardPos);
 
-	getBoardPosUsingSelection(playerId: number, selection: BoardPos | null = null): BoardPos[] | null {
-		if(this.playerTargeter == PlayerTargeter.Self) {
-			switch(this.laneTargeter) {
-				case LaneTargeter.AllLanes:
-					var lanes: BoardPos[] | undefined = Game.instance.board.getSideByOwnerId(playerId);
-					return typeof(lanes) == "undefined" ? null : lanes;
-				case LaneTargeter.AdjacentLanes:
-					if(selection == null) {
-						return null;
+	getValidBoardPos(playerId: number): BoardPos[] | null {
+		if(this.targetType == TargetType.DiscardPile || this.targetType == TargetType.EffectHolder || this.targetType == TargetType.Player) {
+			return null;
+		}
+		var player = playerId;
+		if(this.playerTargeter == PlayerTargeter.Opponent) {
+			player = playerId+1 >= Game.instance.players.length ? 0 : playerId + 1
+		}
+
+		switch(this.laneTargeter) {
+			case LaneTargeter.AllLanes:
+				var lanes: BoardPos[] | undefined = Game.instance.board.getSideByOwnerId(player);
+				if(typeof(lanes) == "undefined") {
+					return null;
+				}else {
+					for(var i = 0; i < lanes.length; i++) {
+						var pos: BoardPos = lanes[i];
+						var predicate: boolean = this.selectionPredicate?.call(null, pos);
+						if(!predicate) {
+							lanes.splice(i, 1);
+						}
 					}
-					
-					return Game.instance.board.getAllAdjacentBoardPos(playerId, selection);
+					return lanes;
+				}
+			case LaneTargeter.AdjacentLanes:
+				var lanes: BoardPos[] | undefined = Game.instance.board.getSideByOwnerId(player);
+				if(typeof(lanes) == "undefined") {
+					return null;
+				}else {
+					for(var i = 0; i < lanes.length; i++) {
+						var pos: BoardPos = lanes[i];
+						var predicate: boolean = this.selectionPredicate?.call(null, pos);
+						if(!predicate) {
+							lanes.splice(i, 1);
+						}
+					}
+					return lanes;
+				}
 				case LaneTargeter.SingleLane:
-					if(selection != null) {
+					var lanes: BoardPos[] | undefined = Game.instance.board.getSideByOwnerId(player);
+					if(typeof(lanes) == "undefined") {
 						return null;
 					}else {
-						return selection;
+						for(var i = 0; i < lanes.length; i++) {
+							var pos: BoardPos = lanes[i];
+							var predicate: boolean = this.selectionPredicate?.call(null, pos);
+							if(!predicate) {
+								lanes.splice(i, 1);
+							}
+						}
+						return lanes;
 					}
-			}
-		}else {
-			var player = playerId+1 >= Game.instance.players.length ? 0 : playerId + 1
-			switch(this.laneTargeter) {
-				case LaneTargeter.AllLanes:
-					var lanes: BoardPos[] | undefined = Game.instance.board.getSideByOwnerId(Game.instance.players[player].id);
-					return typeof(lanes) == "undefined" ? null : lanes;
-				case LaneTargeter.AdjacentLanes:
-					if(selection == null) {
-						return null;
+				default:
+					return null;
+		}
+	}
+
+	getValidTargets(playerId: number): BoardPos[] | null {
+		var validPos: BoardPos[] | null = this.getValidBoardPos(playerId);
+		if(validPos == null) {
+			return null;
+		}else if(this.targetType == TargetType.BoardPos) {
+			return validPos;
+		}
+
+		for(var i = 0; i < validPos.length; i++) {
+			var pos: BoardPos = validPos[i];
+			switch(this.targetType) {
+				case TargetType.Building:
+					if(pos.building == Buildings.NULL) {
+						validPos.splice(i, 1);
 					}
-					
-					return Game.instance.board.getAllAdjacentBoardPos(Game.instance.players[player].id, selection);
-				case LaneTargeter.SingleLane:
-					if(selection != null) {
-						return null;
-					}else {
-						return selection;
+					break;
+				case TargetType.Creature:
+					if(pos.creature == Creatures.NULL) {
+						validPos.splice(i, 1);
 					}
+					break;
+				case TargetType.Landscape:
+					if(pos.landscape == LandscapeType.NULL) {
+						validPos.splice(i, 1);
+					}
+					break;
 			}
 		}
-		return null;
+		return validPos;
+	}
+
+	getBoardPosUsingSelection(playerId: number, selection: BoardPos | null = null): BoardPos[] | null {
+		var player = playerId;
+		if(this.playerTargeter == PlayerTargeter.Opponent) {
+			player = playerId+1 >= Game.instance.players.length ? 0 : playerId + 1
+		}
+
+		switch(this.laneTargeter) {
+			case LaneTargeter.AllLanes:
+				var lanes: BoardPos[] | undefined = Game.instance.board.getSideByOwnerId(player);
+				return typeof(lanes) == "undefined" ? null : lanes;
+			case LaneTargeter.AdjacentLanes:
+				if(selection == null) {
+					return null;
+				}
+				
+				return Game.instance.board.getAllAdjacentBoardPos(player, selection);
+			case LaneTargeter.SingleLane:
+				if(selection != null) {
+					return null;
+				}else {
+					return selection;
+				}
+			default:
+				return null;
+		}
 	}
  }
  
