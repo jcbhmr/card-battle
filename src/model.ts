@@ -1,5 +1,7 @@
+import { Abilities, Creatures, Buildings, Spells, Effects } from "./singletons";
+
 //============================================================== Enums ==============================================================
-const TurnPhases = {
+export const TurnPhases = {
   Play: 0,
   Action: 1,
   Battle: 2,
@@ -11,7 +13,7 @@ const CardLocations = {
   Discard: "discardPile",
 };
 
-const LandscapeType = {
+export const LandscapeType = {
   // Landscape type: associated hex color code for front to render
   NULL: "#94949c",
   Swamp: "#38541b",
@@ -20,14 +22,14 @@ const LandscapeType = {
   Candylands: "#d192cc",
 };
 
-const EffectUpdateType = {
+export const EffectUpdateType = {
   EnterPlay: 0,
   StartOfTurn: 1,
   Active: 2,
   Discard: 3,
 };
 
-const EffectDuration = {
+export const EffectDuration = {
   Instant: 0,
   Turn: 1,
   Round: 2,
@@ -40,19 +42,19 @@ const CardType = {
   Landscape: 3,
 };
 
-const LaneTargeter = {
+export const LaneTargeter = {
   None: 0,
   SingleLane: 1,
   AdjacentLanes: 2,
   AllLanes: 3,
 };
 
-const PlayerTargeter = {
+export const PlayerTargeter = {
   Self: 0,
   Opponent: 1,
 };
 
-const TargetType = {
+export const TargetType = {
   Creature: 0,
   Building: 1,
   Landscape: 2,
@@ -61,204 +63,6 @@ const TargetType = {
   EffectHolder: 5,
   BoardPos: 6,
 };
-
-//============================================================== Player ==============================================================
-export class Player {
-  id: number;
-  username: string;
-  discardPile: Card[];
-  deck: Card[];
-  hand: Card[];
-  hp: number;
-  actions: number;
-  cardDiscount: number;
-
-  constructor(id: number) {
-    this.id = id;
-    this.username = "";
-    this.discardPile = [];
-    this.deck = [];
-    this.hand = [];
-    this.hp = 25;
-    this.actions = 2;
-    this.cardDiscount = 0;
-  }
-
-  discard(index: number = -1) {
-    if (index == -1) {
-      index = Math.floor(Math.random() * this.hand.length);
-    }
-
-    this.discardPile.push(this.hand[index]);
-    this.hand.splice(index, 1);
-  }
-
-  drawCard(amount: number) {
-    for (let i = 0; i < amount; i++) {
-      if (this.deck.length >= 0) {
-        const drawnCard = this.deck.pop();
-        if (drawnCard) {
-          this.hand.push(drawnCard);
-        }
-      }
-    }
-  }
-}
-
-export class Effect {
-  // Builder Class
-  attackBonus: Function;
-  defenseBonus: Function;
-  healthBonus: Function;
-  actionBonus: Function;
-  cardDiscount: Function;
-  damage: Function;
-  playerDamage: Function;
-  conditionsApplied: Function;
-  conditionsRemoved: Function;
-  disables: boolean;
-  readiesBeforeBattle: boolean;
-  cardsDrawn: Function;
-  cardsRevealed: Function;
-  playablePredicate: Function | null;
-  effectDuration: number;
-  effectUpdateType: number;
-
-  constructor() {
-    this.attackBonus = (game: Game) => {
-      return 0;
-    };
-    this.defenseBonus = (game: Game) => {
-      return 0;
-    };
-    this.healthBonus = (game: Game) => {
-      return 0;
-    };
-    this.actionBonus = (game: Game) => {
-      return 0;
-    };
-    this.cardDiscount = (game: Game) => {
-      return 0;
-    };
-    this.damage = (game: Game) => {
-      return 0;
-    };
-    //playerDamage maybe should be replaced with the andAbility member in Ability
-    this.playerDamage = (game: Game) => {
-      return 0;
-    }; //Used for player hp in the case of things like "deal x damage to a creature, then heal for that amount" cases. used ONLY for damaging/healing players.
-    this.conditionsApplied = (game: Game) => {
-      return [];
-    };
-    this.conditionsRemoved = (game: Game) => {
-      return [];
-    };
-    this.disables = false;
-    this.readiesBeforeBattle = false;
-    this.cardsDrawn = (game: Game) => {
-      return 0;
-    };
-    this.cardsRevealed = (game: Game) => {
-      return 0;
-    };
-    this.playablePredicate = null;
-    this.effectDuration = EffectDuration.Instant;
-    this.effectUpdateType = EffectUpdateType.EnterPlay;
-  }
-
-  setAttackBonus(bonus: Function) {
-    this.attackBonus = bonus;
-    return this;
-  }
-
-  setDefenseBonus(bonus: Function) {
-    this.defenseBonus = bonus;
-    return this;
-  }
-
-  setHealthBonus(bonus: Function) {
-    this.healthBonus = bonus;
-    return this;
-  }
-
-  setActionBonus(bonus: Function) {
-    this.actionBonus = bonus;
-    return this;
-  }
-
-  setCardDiscount(bonus: Function) {
-    this.cardDiscount = bonus;
-    return this;
-  }
-
-  setDamage(damage: Function) {
-    this.damage = damage;
-    return this;
-  }
-
-  setPlayerDamage(damage: Function) {
-    this.playerDamage = damage;
-    return this;
-  }
-
-  setConditionsApplied(conditions: Function) {
-    this.conditionsApplied = conditions;
-    return this;
-  }
-
-  setConditionsRemoved(conditions: Function) {
-    this.conditionsRemoved = conditions;
-    return this;
-  }
-
-  setDisables() {
-    this.disables = true;
-    return this;
-  }
-
-  setReadiesBeforeBattle() {
-    this.readiesBeforeBattle = true;
-    return this;
-  }
-
-  setCardsDrawn(cards: Function) {
-    this.cardsDrawn = cards;
-    return this;
-  }
-
-  setCardsRevealed(cards: Function) {
-    this.cardsRevealed = cards;
-    return this;
-  }
-
-  setPlayablePredicate(predicate: Function | null) {
-    this.playablePredicate = predicate;
-    return this;
-  }
-
-  setEffectDuration(duration: number) {
-    this.effectDuration = duration;
-    return this;
-  }
-
-  setEffectUpdateType(updateType: number) {
-    this.effectUpdateType = updateType;
-    return this;
-  }
-}
-
-//============================================================== Singletons ==============================================================
-export class Effects {
-  constructor() {}
-
-  static NULL = new Effect();
-  static FROZEN = new Effect()
-    .setDisables()
-    .setPlayablePredicate(
-      (lane: BoardPos) =>
-        lane.activeEffects.length > 0 && lane.hasEffect(Effects.FROZEN),
-    );
-}
 
 //============================================================== Util ==============================================================
 export class Targeter {
@@ -286,7 +90,7 @@ export class Targeter {
   }
 
   //Selection Predicates
-  static ANY_PREDICATE = (lane: BoardPos) => true; //Note that the lane should be a BoardPos instance, and the predicate should be checked for each valid BoardPos instance.
+  static ANY_PREDICATE = (_lane: BoardPos) => true; //Note that the lane should be a BoardPos instance, and the predicate should be checked for each valid BoardPos instance.
 
   //Targeters
   static PLAY_CREATURE_TARGETER = new Targeter(
@@ -331,7 +135,7 @@ export class Targeter {
     TargetType.BoardPos,
   );
 
-  getValidBoardPos(playerId: number): BoardPos[] | null {
+  private getValidBoardPos(playerId: number): BoardPos[] | null {
     if (
       this.targetType == TargetType.DiscardPile ||
       this.targetType == TargetType.EffectHolder ||
@@ -458,6 +262,72 @@ export class Targeter {
   }
 }
 
+//============================================================== Events ==============================================================
+export class GetTargetEvent extends Event {
+  execute: Function;
+  targeter: Targeter | null;
+  executorId: number
+
+  constructor(
+    name: string,
+    execute: Function,
+    executorId: number,
+    targeter: Targeter | null = null
+  ) {
+    super(name);
+    this.execute = execute;
+    this.targeter = targeter;
+    this.executorId = executorId;
+  }
+
+  static NULL_EVENT = (_pos: BoardPos) => {
+    return false;
+  };
+}
+
+//============================================================== Player ==============================================================
+export class Player {
+  id: number;
+  username: string;
+  discardPile: Card[];
+  deck: Card[];
+  hand: Card[];
+  hp: number;
+  actions: number;
+  cardDiscount: number;
+
+  constructor(id: number) {
+    this.id = id;
+    this.username = "";
+    this.discardPile = [];
+    this.deck = [];
+    this.hand = [];
+    this.hp = 25;
+    this.actions = 2;
+    this.cardDiscount = 0;
+  }
+
+  discard(index: number = -1) {
+    if (index == -1) {
+      index = Math.floor(Math.random() * this.hand.length);
+    }
+
+    this.discardPile.push(this.hand[index]);
+    this.hand.splice(index, 1);
+  }
+
+  drawCard(amount: number) {
+    for (let i = 0; i < amount; i++) {
+      if (this.deck.length >= 0) {
+        const drawnCard = this.deck.pop();
+        if (drawnCard) {
+          this.hand.push(drawnCard);
+        }
+      }
+    }
+  }
+}
+
 //============================================================== Abilities and Effects ==============================================================
 export class Ability {
   description: string;
@@ -466,7 +336,7 @@ export class Ability {
   healthCost: number;
   orAbility: Ability | null;
   andAbility: Ability | null;
-  getTargetEvent: GetTargetEvent;
+  targetEventFunc: Function | null;
 
   constructor(
     desc: string,
@@ -481,6 +351,7 @@ export class Ability {
     this.targeter = targeter;
     this.effect = effect;
     this.healthCost = healthCost;
+    this.targetEventFunc = targetEventFunc;
 
     //Just a check to make sure that no orAbility or andAbility is actually assigned null but uses the null ability instead
     if (orAbility == null) {
@@ -493,19 +364,7 @@ export class Ability {
     } else {
       this.andAbility = andAbility;
     }
-    if (targetEventFunc == null || targeter.needsPlayerSelection == false) {
-      this.getTargetEvent = new GetTargetEvent(
-        "getTargetForAbility",
-        GetTargetEvent.NULL_EVENT,
-        targeter,
-      );
-    } else {
-      this.getTargetEvent = new GetTargetEvent(
-        "getTargetForAbility",
-        targetEventFunc,
-        targeter,
-      );
-    }
+
   }
 
   static addGetAbilityTargetEventListener(
@@ -533,15 +392,46 @@ export class Ability {
   }
 
   //Not sure about dispatching instanced events through a static event target, will this work?
-  getAbilityTarget() {
-    return Game.instance.dispatchEvent(this.getTargetEvent);
+  getAbilityTarget(playerId: number) {
+    if(!this.targeter.needsPlayerSelection || this.targeter.numberPlayerSelections == 0 || this.targetEventFunc == null) {
+      return false;
+    }
+
+    return Game.instance.dispatchEvent(new GetTargetEvent(
+      "getTargetForAbility",
+      this.targetEventFunc,
+      playerId,
+      this.targeter
+    ));
+    
   }
 
-  activate(playerId: number) {
+  activate(card: Card, playerId: number): boolean {
     if (this.targeter.needsPlayerSelection) {
-      this.getAbilityTarget();
+      if(this.getAbilityTarget(playerId)) {
+        card.isReady = false;
+        card.displayCards(); //I feel like displayCards() should be in Game and should be static?
+        return true;
+      }
     } else {
+      var targets: BoardPos[] | null = this.targeter.getValidTargets(playerId);
+      if(targets != null) {
+        for(var i = 0; i < targets?.length; i++) {
+          if(this.targeter.targetType == TargetType.Creature) {
+            targets[i].creature.addEffect(this.effect);
+          }else if(this.targeter.targetType == TargetType.Building) {
+            targets[i].building.addEffect(this.effect);
+          }else if(this.targeter.targetType == TargetType.Landscape) {
+            targets[i].addEffect(this.effect);
+          }
+        }
+        if(this.healthCost > 0) {
+          Game.instance.getPlayerById(playerId).hp -= this.healthCost;
+        }
+        return true;
+      }
     }
+    return false;
   }
 
   // const TargetType = {
@@ -553,93 +443,176 @@ export class Ability {
   //  EffectHolder: 5,
   //  BoardPos: 6
   // }
-  apply(target: any) {
-    if (target instanceof Card) {
-      this.applyCard(target);
-    } else if (target instanceof Player) {
-      // this.applyPlayer(target); //TODO
-    }
-    // else if(target instanceof DiscardPile) { //How to handle this case for TargetType?
+  // apply(target: any, playerId: number) {
+  //   if (target instanceof Card) {
+  //     this.applyCard(target, playerId);
+  //   } else if (target instanceof Player) {
+  //     // this.applyPlayer(target); //TODO
+  //   }
+  //   // else if(target instanceof DiscardPile) { //How to handle this case for TargetType?
 
-    // }
-    else if (target instanceof BoardPos) {
-      // this.applyBoard(target); //TODO
-    }
-  }
+  //   // }
+  //   else if (target instanceof BoardPos) {
+  //     // this.applyBoard(target); //TODO
+  //   }
+  // }
 
-  applyCard(target: Card) {
-    target.activeEffects.push(this.effect);
-    if (this.healthCost != 0) {
-      //How do we want to handle health cost when we don't know who "activated" this ability?
-    }
-  }
+  // applyCard(target: Card, playerId: number) {
+  //   target.addEffect(this.effect);
+  //   if (this.healthCost != 0) {
+  //     Game.instance.getPlayerById(playerId).hp -= this.healthCost;
+  //   }
+  // }
+
+  // applyPlayer(target: Player, playerId: number) {
+  //   target.addEffect(this.effect);
+  //   if (this.healthCost != 0) {
+  //     Game.instance.getPlayerById(playerId).hp -= this.healthCost;
+  //   }
+  // }
+
 }
 
-class Abilities {
-  constructor() {}
+export class Effect {
+  // Builder Class
+  attackBonus: () => number;
+  defenseBonus: () => number;
+  healthBonus: () => number;
+  actionBonus: () => number;
+  cardDiscount: () => number;
+  damage: () => number;
+  playerDamage: () => number;
+  conditionsApplied: () => Effect[];
+  conditionsRemoved: () => Effect[];
+  disables: boolean;
+  readiesBeforeBattle: boolean;
+  cardsDrawn: () => number;
+  cardsRevealed: () => number;
+  playablePredicate: Function | null;
+  effectDuration: number;
+  effectUpdateType: number;
 
-  static NULL = new Ability(
-    "Null",
-    new Targeter(
-      PlayerTargeter.Self,
-      LaneTargeter.None,
-      false,
-      0,
-      Targeter.ANY_PREDICATE,
-      TargetType.Player,
-    ),
-    Effects.NULL,
-    0,
-    null,
-    null,
-  );
+  constructor() {
+    this.attackBonus = () => {
+      return 0;
+    };
+    this.defenseBonus = () => {
+      return 0;
+    };
+    this.healthBonus = () => {
+      return 0;
+    };
+    this.actionBonus = () => {
+      return 0;
+    };
+    this.cardDiscount = () => {
+      return 0;
+    };
+    this.damage = () => {
+      return 0;
+    };
+    //playerDamage maybe should be replaced with the andAbility member in Ability
+    this.playerDamage = () => {
+      return 0;
+    }; //Used for player hp in the case of things like "deal x damage to a creature, then heal for that amount" cases. used ONLY for damaging/healing players.
+    this.conditionsApplied = () => {
+      return [];
+    };
+    this.conditionsRemoved = () => {
+      return [];
+    };
+    this.disables = false;
+    this.readiesBeforeBattle = false;
+    this.cardsDrawn = () => {
+      return 0;
+    };
+    this.cardsRevealed = () => {
+      return 0;
+    };
+    this.playablePredicate = null;
+    this.effectDuration = EffectDuration.Instant;
+    this.effectUpdateType = EffectUpdateType.EnterPlay;
+  }
 
-  //Note that the predicate here is useless and is here for syntax. This should be checked when looking at the targers for lane, player, and type.
-  //A useful predicate would be something like (lane) => lane.creature.defense > 2 or (lane) => lane.creature.hasEffect == Effects.FROZEN
-  static DAMAGE_ALL_1 = new Ability(
-    "Deal 1 damage to every creature in every lane.",
-    new Targeter(
-      PlayerTargeter.Opponent,
-      LaneTargeter.AllLanes,
-      false,
-      0,
-      (lane: BoardPos) => lane.creature != Creatures.NULL,
-      TargetType.Creature,
-    ),
-    new Effect()
-      .damage((game: Game, lane: BoardPos) => {
-        return 1;
-      })
-      .setEffectDuration(EffectDuration.Instant)
-      .setEffectUpdateType(EffectUpdateType.EnterPlay),
-    0,
-    Abilities.NULL,
-    Abilities.NULL,
-  );
+  setAttackBonus(bonus: () => number) {
+    this.attackBonus = bonus;
+    return this;
+  }
 
-  static DAMAGE_CREATURE_1 = new Ability(
-    "Deal 1 damage to any creature in any lane.",
-    new Targeter(
-      PlayerTargeter.Opponent,
-      LaneTargeter.SingleLane,
-      true,
-      1,
-      (lane: BoardPos) => lane.creature != Creatures.NULL,
-      TargetType.Creature,
-    ),
-    new Effect()
-      .damage((game: Game, lane: BoardPos) => {
-        return 1;
-      })
-      .setEffectDuration(EffectDuration.Instant)
-      .setEffectUpdateType(EffectUpdateType.EnterPlay),
-    0,
-    Abilities.NULL,
-    Abilities.NULL,
-    (card: Creature) => {
-      this.apply(card);
-    },
-  );
+  setDefenseBonus(bonus: () => number) {
+    this.defenseBonus = bonus;
+    return this;
+  }
+
+  setHealthBonus(bonus: () => number) {
+    this.healthBonus = bonus;
+    return this;
+  }
+
+  setActionBonus(bonus: () => number) {
+    this.actionBonus = bonus;
+    return this;
+  }
+
+  setCardDiscount(bonus: () => number) {
+    this.cardDiscount = bonus;
+    return this;
+  }
+
+  setDamage(damage: () => number) {
+    this.damage = damage;
+    return this;
+  }
+
+  setPlayerDamage(damage: () => number) {
+    this.playerDamage = damage;
+    return this;
+  }
+
+  setConditionsApplied(conditions: () => Effect[]) {
+    this.conditionsApplied = conditions;
+    return this;
+  }
+
+  setConditionsRemoved(conditions: () => Effect[]) {
+    this.conditionsRemoved = conditions;
+    return this;
+  }
+
+  setDisables() {
+    this.disables = true;
+    return this;
+  }
+
+  setReadiesBeforeBattle() {
+    this.readiesBeforeBattle = true;
+    return this;
+  }
+
+  setCardsDrawn(cards: () => number) {
+    this.cardsDrawn = cards;
+    return this;
+  }
+
+  setCardsRevealed(cards: () => number) {
+    this.cardsRevealed = cards;
+    return this;
+  }
+
+  setPlayablePredicate(predicate: Function | null) {
+    this.playablePredicate = predicate;
+    return this;
+  }
+
+  setEffectDuration(duration: number) {
+    this.effectDuration = duration;
+    return this;
+  }
+
+  setEffectUpdateType(updateType: number) {
+    this.effectUpdateType = updateType;
+    return this;
+  }
 }
 
 //============================================================== Board ==============================================================
@@ -698,6 +671,43 @@ export class BoardPos {
   removeLandscape() {
     this.landscape = LandscapeType.NULL;
     return true;
+  }
+
+  addEffect(effect: Effect) {
+    this.activeEffects.push(effect);
+    if(this.creature != Creatures.NULL) {
+      this.creature.attack += effect.attackBonus.call(null);
+      this.creature.defense -= effect.damage.call(null);
+      this.creature.defense += effect.defenseBonus.call(null);
+      this.creature.isReady = !effect.disables;
+    }
+    if(this.building != Buildings.NULL) {
+      this.building.isReady = !effect.disables;
+    }
+
+    effect.conditionsApplied.call(null).map((effect: Effect) => {this.addEffect(effect)});
+    effect.conditionsApplied.call(null).map((effect: Effect) => {this.removeEffect(effect)});
+    
+    //We have absolutely no way to reveal cards for effect.cardsRevealed at the moment, will probably be removed.
+    Game.instance.getPlayerById(this.ownerId).actions += effect.actionBonus.call(null);
+    Game.instance.getPlayerById(this.ownerId).cardDiscount += effect.cardDiscount.call(null);
+    Game.instance.getPlayerById(this.ownerId).drawCard(effect.cardsDrawn.call(null));
+  }
+
+  removeEffect(effect: Effect) {
+    if(effect == Effects.NULL) {
+      return false;
+    }
+
+    if(this.hasEffect(effect)) {
+      for(var i = 0; i < this.activeEffects.length; i++) {
+        if(this.activeEffects[i] == effect) {
+          this.activeEffects[i] == Effects.NULL;
+        }
+      }
+      return true;
+    }
+    return false;
   }
 
   hasEffect(effect: Effect) {
@@ -763,26 +773,6 @@ export class SidedBoard {
   }
 }
 
-//============================================================== Events ==============================================================
-export class GetTargetEvent extends Event {
-  execute: Function;
-  targeter: Targeter | null;
-
-  constructor(
-    name: string,
-    execute: Function,
-    targeter: Targeter | null = null,
-  ) {
-    super(name);
-    this.execute = execute;
-    this.targeter = targeter;
-  }
-
-  static NULL_EVENT = (_pos: BoardPos) => {
-    return false;
-  };
-}
-
 //============================================================== Cards ==============================================================
 export class Card {
   name: string;
@@ -794,8 +784,9 @@ export class Card {
   ability: Ability;
   isReady: boolean;
   ownerId: number | null = null;
+  currentOwnerId: number | null = null;
   location: BoardPos | String = CardLocations.Deck;
-  getTargetEvent: GetTargetEvent | null = null;
+  targetEventFunc: Function | null;
   activeEffects: Effect[] = [];
 
   constructor(
@@ -805,6 +796,7 @@ export class Card {
     cost: number,
     landscapeType: string,
     ability: Ability,
+    targetEventFunc: Function | null = null
   ) {
     this.name = name;
     this.flavorText = flavorText;
@@ -814,21 +806,13 @@ export class Card {
     this.turnPlayed = Game.instance.currentTurn;
     this.ability = ability;
     this.isReady = true;
+    this.targetEventFunc = targetEventFunc;
   }
 
   static addCardChangedEventListener(
     eventCallback: EventListenerOrEventListenerObject,
   ) {
     Game.instance.addEventListener("displayCards", eventCallback);
-  }
-
-  //Not sure about dispatching instanced events through a static event target, will this work?
-  getTarget() {
-    if (this.getTargetEvent != null) {
-      return Game.instance.dispatchEvent(this.getTargetEvent);
-    } else {
-      return false;
-    }
   }
 
   setOwnerId(ownerId: number) {
@@ -839,7 +823,7 @@ export class Card {
     return Game.instance.currentTurn == this.turnPlayed;
   }
 
-  play(target: any, id: number | null = null) {
+  play(_target: any, _id: number | null = null) {
     return false;
   }
 
@@ -850,8 +834,39 @@ export class Card {
     }
   }
 
+  activateAbility() {
+    if(this.currentOwnerId != null) {
+      this.ability.activate(this, this.currentOwnerId);
+    }
+  }
+
   addEffect(effect: Effect) {
     this.activeEffects.push(effect);
+  }
+
+  removeEffect(effect: Effect) {
+    if(effect == Effects.NULL) {
+      return false;
+    }
+
+    if(this.hasEffect(effect)) {
+      for(var i = 0; i < this.activeEffects.length; i++) {
+        if(this.activeEffects[i] == effect) {
+          this.activeEffects[i] == Effects.NULL;
+        }
+      }
+      return true;
+    }
+    return false;
+  }
+
+  hasEffect(effect: Effect) {
+    for (var i = 0; i < this.activeEffects.length; i++) {
+      if (this.activeEffects[i] == effect) {
+        return true;
+      }
+    }
+    return false;
   }
 
   returnToHand() {
@@ -899,17 +914,13 @@ export class Creature extends Card {
     ability: Ability,
     attack: number,
     defense: number,
+    targetEventFunc: Function | null = null
   ) {
     super(name, flavorText, CardType.Creature, cost, landscapeType, ability);
     this.attack = attack;
     this.defense = defense;
     this.maxDefense = defense; // Used when healing a creature so it doesn't overheal, and cards that say things like "if a creature has exactly x damage."
-    this.getTargetEvent = new GetTargetEvent(
-      "getTargetForCreature",
-      (pos: BoardPos) => {
-        this.play(pos);
-      },
-    );
+    this.targetEventFunc = targetEventFunc;
   }
 
   static addGetTargetEventListener(
@@ -918,36 +929,29 @@ export class Creature extends Card {
     Game.instance.addEventListener("getTargetForCreature", eventCallback);
   }
 
-  override play(pos: BoardPos): boolean {
+  override play(pos: BoardPos) {
     if (pos.creature == Creatures.NULL) {
       return pos.setCreature(this);
     }
     return false;
   }
 
-  override addEffect(effect: Effect): void {
+  override addEffect(effect: Effect) {
     super.addEffect(effect);
-    this.attack += effect.attackBonus.call(null, Game.instance);
+    this.attack += effect.attackBonus.call(null);
+    this.defense -= effect.damage.call(null);
+    this.defense += effect.defenseBonus.call(null);
+    this.isReady = !effect.disables;
 
+    effect.conditionsApplied.call(null).map((effect: Effect) => {this.addEffect(effect)});
+    effect.conditionsApplied.call(null).map((effect: Effect) => {this.removeEffect(effect)});
+    
     //We have absolutely no way to reveal cards for effect.cardsRevealed at the moment, will probably be removed.
-    if (this.ownerId != null) {
-      Game.instance.getPlayerById(this.ownerId).actions +=
-        effect.actionBonus.call(null, Game.instance);
-      Game.instance.getPlayerById(this.ownerId).cardDiscount +=
-        effect.cardDiscount.call(null, Game.instance);
-      Game.instance
-        .getPlayerById(this.ownerId)
-        .drawCard(effect.cardsDrawn.call(null, Game.instance));
+    if(this.currentOwnerId != null) {
+      Game.instance.getPlayerById(this.currentOwnerId).actions += effect.actionBonus.call(null);
+      Game.instance.getPlayerById(this.currentOwnerId).cardDiscount += effect.cardDiscount.call(null);
+      Game.instance.getPlayerById(this.currentOwnerId).drawCard(effect.cardsDrawn.call(null));
     }
-  }
-
-  hasEffect(effect: Effect): boolean {
-    for (var i = 0; i < this.activeEffects.length; i++) {
-      if (this.activeEffects[i] == effect) {
-        return true;
-      }
-    }
-    return false;
   }
 }
 
@@ -958,14 +962,10 @@ export class Building extends Card {
     cost: number,
     landscapeType: string,
     ability: Ability,
+    targetEventFunc: Function | null = null
   ) {
     super(name, flavorText, CardType.Building, cost, landscapeType, ability);
-    this.getTargetEvent = new GetTargetEvent(
-      "getTargetForBuilding",
-      (pos: BoardPos) => {
-        this.play(pos);
-      },
-    );
+    this.targetEventFunc = targetEventFunc;
   }
 
   static addGetTargetEventListener(
@@ -989,14 +989,10 @@ export class Spell extends Card {
     cost: number,
     landscapeType: string,
     ability: Ability,
+    targetEventFunc: Function | null = null
   ) {
     super(name, flavorText, CardType.Spell, cost, landscapeType, ability);
-    this.getTargetEvent = new GetTargetEvent(
-      "getTargetForSpell",
-      (pos: BoardPos) => {
-        this.play(pos);
-      },
-    );
+    this.targetEventFunc = targetEventFunc;
   }
 
   static addGetTargetEventListener(
@@ -1013,21 +1009,14 @@ export class Spell extends Card {
 
 // By having this class, the front end can render these like they're in your hand when the game starts so you can choose where your landscapes belong
 export class Landscape extends Card {
-  constructor(name: string, flavorText: string, landscapeType: string) {
-    super(
-      name,
-      flavorText,
-      CardType.Landscape,
-      0,
-      landscapeType,
-      Abilities.NULL,
-    );
-    this.getTargetEvent = new GetTargetEvent(
-      "getTargetForLandscape",
-      (pos: BoardPos) => {
-        this.play(pos);
-      },
-    );
+  constructor(
+    name: string, 
+    flavorText: 
+    string, 
+    landscapeType: string,
+    ) {
+    super(name, flavorText, CardType.Landscape, 0, landscapeType, Abilities.NULL);
+    this.targetEventFunc = null;
   }
 
   static addGetTargetEventListener(
@@ -1042,78 +1031,6 @@ export class Landscape extends Card {
     }
     return false;
   }
-}
-
-class Creatures {
-  constructor() {}
-
-  static NULL = new Creature(
-    "Null",
-    "You shouldn't be seeing this!",
-    0,
-    LandscapeType.NULL,
-    Abilities.NULL,
-    0,
-    0,
-  );
-  static DARK_ANGEL = new Creature(
-    "Dark Angel",
-    "",
-    1,
-    LandscapeType.Swamp,
-    new Ability(
-      "+1 Attack for every 5 cards in your discard pile.",
-      new Targeter(
-        PlayerTargeter.Self,
-        LaneTargeter.None,
-        false,
-        0,
-        null,
-        TargetType.DiscardPile,
-      ),
-      new Effect()
-        .attackBonus((game: Game, lane: BoardPos) => {
-          if (lane.creature.ownerId != null) {
-            return (
-              game.getPlayerById(lane.creature.ownerId).discardPile.length / 5
-            );
-          } else {
-            return 0;
-          }
-        })
-        .setEffectDuration(EffectDuration.Round)
-        .setEffectUpdateType(EffectUpdateType.Discard),
-      0,
-      Abilities.NULL,
-      Abilities.NULL,
-    ),
-    0,
-    5,
-  );
-}
-
-class Buildings {
-  constructor() {}
-
-  static NULL = new Building(
-    "Null",
-    "You shouldn't be seeing this!",
-    0,
-    LandscapeType.NULL,
-    Abilities.NULL,
-  );
-}
-
-class Spells {
-  constructor() {}
-
-  static NULL = new Spell(
-    "Null",
-    "You shouldn't be seeing this!",
-    0,
-    LandscapeType.NULL,
-    Abilities.NULL,
-  );
 }
 
 //============================================================== Game ==============================================================
