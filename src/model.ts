@@ -4,7 +4,7 @@ const TurnPhases = {
 	Action: 1,
 	Battle: 2
  }
-
+//hi
 
  const CardLocations = {
 	Deck: "deck",
