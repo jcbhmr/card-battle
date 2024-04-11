@@ -45,7 +45,7 @@ export class Abilities {
       TargetType.Creature,
     ),
     new Effect()
-      .damage(() => {
+      .setDamage(() => {
         return 1;
       })
       .setEffectDuration(EffectDuration.Instant)
@@ -65,7 +65,7 @@ export class Abilities {
       TargetType.Creature,
     ),
     new Effect()
-      .damage(() => {
+      .setDamage(() => {
         return 1;
       })
       .setEffectDuration(EffectDuration.Instant)
@@ -94,6 +94,7 @@ export class Creatures {
     0,
     0,
   );
+
   static DARK_ANGEL = new Creature(
     "Dark Angel",
     "",
@@ -110,10 +111,9 @@ export class Creatures {
         TargetType.DiscardPile,
       ),
       new Effect()
-        .attackBonus(() => {
-          if (lane.creature.ownerId != null) {
-            return
-              game.getPlayerById(lane.creature.ownerId).discardPile.length / 5;
+        .setAttackBonus(() => {
+          if (Creatures.DARK_ANGEL.currentOwnerId != null) {
+            return Game.instance.getPlayerById(this.DARK_ANGEL.currentOwnerId).discardPile.length / 5;
           } else {
             return 0;
           }

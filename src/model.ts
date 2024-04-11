@@ -475,58 +475,58 @@ export class Ability {
 
 export class Effect {
   // Builder Class
-  attackBonus: () => number;
-  defenseBonus: () => number;
-  healthBonus: () => number;
-  actionBonus: () => number;
-  cardDiscount: () => number;
-  damage: () => number;
-  playerDamage: () => number;
-  conditionsApplied: () => Effect[];
-  conditionsRemoved: () => Effect[];
+  attackBonus: (_pos: BoardPos) => number;
+  defenseBonus: (_pos: BoardPos) => number;
+  healthBonus: (_pos: BoardPos) => number;
+  actionBonus: (_pos: BoardPos) => number;
+  cardDiscount: (_pos: BoardPos) => number;
+  damage: (_pos: BoardPos) => number;
+  playerDamage: (_pos: BoardPos) => number;
+  conditionsApplied: (_pos: BoardPos) => Effect[];
+  conditionsRemoved: (_pos: BoardPos) => Effect[];
   disables: boolean;
   readiesBeforeBattle: boolean;
-  cardsDrawn: () => number;
-  cardsRevealed: () => number;
+  cardsDrawn: (_pos: BoardPos) => number;
+  cardsRevealed: (_pos: BoardPos) => number;
   playablePredicate: Function | null;
   effectDuration: number;
   effectUpdateType: number;
 
   constructor() {
-    this.attackBonus = () => {
+    this.attackBonus = (_pos: BoardPos) => {
       return 0;
     };
-    this.defenseBonus = () => {
+    this.defenseBonus = (_pos: BoardPos) => {
       return 0;
     };
-    this.healthBonus = () => {
+    this.healthBonus = (_pos: BoardPos) => {
       return 0;
     };
-    this.actionBonus = () => {
+    this.actionBonus = (_pos: BoardPos) => {
       return 0;
     };
-    this.cardDiscount = () => {
+    this.cardDiscount = (_pos: BoardPos) => {
       return 0;
     };
-    this.damage = () => {
+    this.damage = (_pos: BoardPos) => {
       return 0;
     };
     //playerDamage maybe should be replaced with the andAbility member in Ability
-    this.playerDamage = () => {
+    this.playerDamage = (_pos: BoardPos) => {
       return 0;
     }; //Used for player hp in the case of things like "deal x damage to a creature, then heal for that amount" cases. used ONLY for damaging/healing players.
-    this.conditionsApplied = () => {
+    this.conditionsApplied = (_pos: BoardPos) => {
       return [];
     };
-    this.conditionsRemoved = () => {
+    this.conditionsRemoved = (_pos: BoardPos) => {
       return [];
     };
     this.disables = false;
     this.readiesBeforeBattle = false;
-    this.cardsDrawn = () => {
+    this.cardsDrawn = (_pos: BoardPos) => {
       return 0;
     };
-    this.cardsRevealed = () => {
+    this.cardsRevealed = (_pos: BoardPos) => {
       return 0;
     };
     this.playablePredicate = null;
@@ -534,47 +534,47 @@ export class Effect {
     this.effectUpdateType = EffectUpdateType.EnterPlay;
   }
 
-  setAttackBonus(bonus: () => number) {
+  setAttackBonus(bonus: (_pos: BoardPos) => number) {
     this.attackBonus = bonus;
     return this;
   }
 
-  setDefenseBonus(bonus: () => number) {
+  setDefenseBonus(bonus: (_pos: BoardPos) => number) {
     this.defenseBonus = bonus;
     return this;
   }
 
-  setHealthBonus(bonus: () => number) {
+  setHealthBonus(bonus: (_pos: BoardPos) => number) {
     this.healthBonus = bonus;
     return this;
   }
 
-  setActionBonus(bonus: () => number) {
+  setActionBonus(bonus: (_pos: BoardPos) => number) {
     this.actionBonus = bonus;
     return this;
   }
 
-  setCardDiscount(bonus: () => number) {
+  setCardDiscount(bonus: (_pos: BoardPos) => number) {
     this.cardDiscount = bonus;
     return this;
   }
 
-  setDamage(damage: () => number) {
+  setDamage(damage: (_pos: BoardPos) => number) {
     this.damage = damage;
     return this;
   }
 
-  setPlayerDamage(damage: () => number) {
+  setPlayerDamage(damage: (_pos: BoardPos) => number) {
     this.playerDamage = damage;
     return this;
   }
 
-  setConditionsApplied(conditions: () => Effect[]) {
+  setConditionsApplied(conditions: (_pos: BoardPos) => Effect[]) {
     this.conditionsApplied = conditions;
     return this;
   }
 
-  setConditionsRemoved(conditions: () => Effect[]) {
+  setConditionsRemoved(conditions: (_pos: BoardPos) => Effect[]) {
     this.conditionsRemoved = conditions;
     return this;
   }
@@ -589,12 +589,12 @@ export class Effect {
     return this;
   }
 
-  setCardsDrawn(cards: () => number) {
+  setCardsDrawn(cards: (_pos: BoardPos) => number) {
     this.cardsDrawn = cards;
     return this;
   }
 
-  setCardsRevealed(cards: () => number) {
+  setCardsRevealed(cards: (_pos: BoardPos) => number) {
     this.cardsRevealed = cards;
     return this;
   }
@@ -676,22 +676,22 @@ export class BoardPos {
   addEffect(effect: Effect) {
     this.activeEffects.push(effect);
     if(this.creature != Creatures.NULL) {
-      this.creature.attack += effect.attackBonus.call(null);
-      this.creature.defense -= effect.damage.call(null);
-      this.creature.defense += effect.defenseBonus.call(null);
+      this.creature.attack += effect.attackBonus.call(null, this);
+      this.creature.defense -= effect.damage.call(null, this);
+      this.creature.defense += effect.defenseBonus.call(null, this);
       this.creature.isReady = !effect.disables;
     }
     if(this.building != Buildings.NULL) {
       this.building.isReady = !effect.disables;
     }
 
-    effect.conditionsApplied.call(null).map((effect: Effect) => {this.addEffect(effect)});
-    effect.conditionsApplied.call(null).map((effect: Effect) => {this.removeEffect(effect)});
+    effect.conditionsApplied.call(null, this).map((effect: Effect) => {this.addEffect(effect)});
+    effect.conditionsApplied.call(null, this).map((effect: Effect) => {this.removeEffect(effect)});
     
     //We have absolutely no way to reveal cards for effect.cardsRevealed at the moment, will probably be removed.
-    Game.instance.getPlayerById(this.ownerId).actions += effect.actionBonus.call(null);
-    Game.instance.getPlayerById(this.ownerId).cardDiscount += effect.cardDiscount.call(null);
-    Game.instance.getPlayerById(this.ownerId).drawCard(effect.cardsDrawn.call(null));
+    Game.instance.getPlayerById(this.ownerId).actions += effect.actionBonus.call(null, this);
+    Game.instance.getPlayerById(this.ownerId).cardDiscount += effect.cardDiscount.call(null, this);
+    Game.instance.getPlayerById(this.ownerId).drawCard(effect.cardsDrawn.call(null, this));
   }
 
   removeEffect(effect: Effect) {
@@ -938,19 +938,21 @@ export class Creature extends Card {
 
   override addEffect(effect: Effect) {
     super.addEffect(effect);
-    this.attack += effect.attackBonus.call(null);
-    this.defense -= effect.damage.call(null);
-    this.defense += effect.defenseBonus.call(null);
-    this.isReady = !effect.disables;
+    if(this.location instanceof BoardPos) {
+      this.attack += effect.attackBonus.call(null, this.location);
+      this.defense -= effect.damage.call(null, this.location);
+      this.defense += effect.defenseBonus.call(null, this.location);
+      this.isReady = !effect.disables;
 
-    effect.conditionsApplied.call(null).map((effect: Effect) => {this.addEffect(effect)});
-    effect.conditionsApplied.call(null).map((effect: Effect) => {this.removeEffect(effect)});
+      effect.conditionsApplied.call(null, this.location).map((effect: Effect) => {this.addEffect(effect)});
+      effect.conditionsApplied.call(null, this.location).map((effect: Effect) => {this.removeEffect(effect)});
     
-    //We have absolutely no way to reveal cards for effect.cardsRevealed at the moment, will probably be removed.
-    if(this.currentOwnerId != null) {
-      Game.instance.getPlayerById(this.currentOwnerId).actions += effect.actionBonus.call(null);
-      Game.instance.getPlayerById(this.currentOwnerId).cardDiscount += effect.cardDiscount.call(null);
-      Game.instance.getPlayerById(this.currentOwnerId).drawCard(effect.cardsDrawn.call(null));
+      //We have absolutely no way to reveal cards for effect.cardsRevealed at the moment, will probably be removed.
+      if(this.currentOwnerId != null) {
+        Game.instance.getPlayerById(this.currentOwnerId).actions += effect.actionBonus.call(null, this.location);
+        Game.instance.getPlayerById(this.currentOwnerId).cardDiscount += effect.cardDiscount.call(null, this.location);
+        Game.instance.getPlayerById(this.currentOwnerId).drawCard(effect.cardsDrawn.call(null, this.location));
+      }
     }
   }
 }
@@ -979,6 +981,23 @@ export class Building extends Card {
       return pos.setBuilding(this);
     }
     return false;
+  }
+
+  override addEffect(effect: Effect) {
+    super.addEffect(effect);
+    if(this.location instanceof BoardPos) {
+      this.isReady = !effect.disables;
+
+      effect.conditionsApplied.call(null, this.location).map((effect: Effect) => {this.addEffect(effect)});
+      effect.conditionsApplied.call(null, this.location).map((effect: Effect) => {this.removeEffect(effect)});
+    
+      //We have absolutely no way to reveal cards for effect.cardsRevealed at the moment, will probably be removed.
+      if(this.currentOwnerId != null) {
+        Game.instance.getPlayerById(this.currentOwnerId).actions += effect.actionBonus.call(null, this.location);
+        Game.instance.getPlayerById(this.currentOwnerId).cardDiscount += effect.cardDiscount.call(null, this.location);
+        Game.instance.getPlayerById(this.currentOwnerId).drawCard(effect.cardsDrawn.call(null, this.location));
+      }
+    }
   }
 }
 
@@ -1030,6 +1049,23 @@ export class Landscape extends Card {
       return pos.setLandscape(this);
     }
     return false;
+  }
+
+  override addEffect(effect: Effect) {
+    super.addEffect(effect);
+    if(this.location instanceof BoardPos) {
+      this.isReady = !effect.disables;
+
+      effect.conditionsApplied.call(null, this.location).map((effect: Effect) => {this.addEffect(effect)});
+      effect.conditionsApplied.call(null, this.location).map((effect: Effect) => {this.removeEffect(effect)});
+    
+      //We have absolutely no way to reveal cards for effect.cardsRevealed at the moment, will probably be removed.
+      if(this.currentOwnerId != null) {
+        Game.instance.getPlayerById(this.currentOwnerId).actions += effect.actionBonus.call(null, this.location);
+        Game.instance.getPlayerById(this.currentOwnerId).cardDiscount += effect.cardDiscount.call(null, this.location);
+        Game.instance.getPlayerById(this.currentOwnerId).drawCard(effect.cardsDrawn.call(null, this.location));
+      }
+    }
   }
 }
 
