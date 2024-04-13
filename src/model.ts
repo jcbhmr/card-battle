@@ -321,6 +321,7 @@ export class Player {
       if (this.deck.length >= 0) {
         const drawnCard = this.deck.pop();
         if (drawnCard) {
+          drawnCard.returnToHand()
           this.hand.push(drawnCard);
         }
       }
@@ -409,8 +410,8 @@ export class Ability {
   activate(card: Card, playerId: number): boolean {
     if (this.targeter.needsPlayerSelection) {
       if(this.getAbilityTarget(playerId)) {
-        card.isReady = false;
-        card.displayCards(); //I feel like displayCards() should be in Game and should be static?
+        card.setIsReady(false);
+        card.displayCard(); //I feel like displayCards() should be in Game and should be static?
         return true;
       }
     } else {
@@ -679,10 +680,10 @@ export class BoardPos {
       this.creature.attack += effect.attackBonus.call(null, this);
       this.creature.defense -= effect.damage.call(null, this);
       this.creature.defense += effect.defenseBonus.call(null, this);
-      this.creature.isReady = !effect.disables;
+      this.creature.setIsReady(!effect.disables);
     }
     if(this.building != Buildings.NULL) {
-      this.building.isReady = !effect.disables;
+      this.building.setIsReady(!effect.disables);
     }
 
     effect.conditionsApplied.call(null, this).map((effect: Effect) => {this.addEffect(effect)});
@@ -778,16 +779,16 @@ export class Card {
   name: string;
   flavorText: string;
   cardType: number;
-  cost: number;
   landscapeType: string;
+  targetEventFunc: Function | null;
   turnPlayed: number;
   ability: Ability;
-  isReady: boolean;
   ownerId: number | null = null;
   currentOwnerId: number | null = null;
-  location: BoardPos | String = CardLocations.Deck;
-  targetEventFunc: Function | null;
-  activeEffects: Effect[] = [];
+  private cost: number;
+  private isReady: boolean;
+  private location: BoardPos | String = CardLocations.Deck;
+  private activeEffects: Effect[] = [];
 
   constructor(
     name: string,
@@ -808,7 +809,27 @@ export class Card {
     this.isReady = true;
     this.targetEventFunc = targetEventFunc;
   }
+  //
+  getCost(){
+    return this.cost;
+  }
+  setCost(cost: number){
+    this.cost = cost;
+    this.displayCard();
+  }
 
+  getIsReady(){
+    return this.isReady;
+  }
+  setIsReady(isReady: boolean){
+    this.isReady = isReady;
+    this.displayCard();
+  }
+
+  getLocation(){
+    return this.location;
+  }
+  //
   static addCardChangedEventListener(
     eventCallback: EventListenerOrEventListenerObject,
   ) {
@@ -824,13 +845,15 @@ export class Card {
   }
 
   play(_target: any, _id: number | null = null) {
+    
+    this.displayCard();
     return false;
   }
 
   death() {
     if (this.ownerId != null) {
       Game.instance.getPlayerById(this.ownerId).discardPile.push(this);
-      this.removeCardFromBoard(CardLocations.Discard);
+      this.moveCard(CardLocations.Discard);
     }
   }
 
@@ -842,6 +865,7 @@ export class Card {
 
   addEffect(effect: Effect) {
     this.activeEffects.push(effect);
+    this.displayCard();
   }
 
   removeEffect(effect: Effect) {
@@ -855,6 +879,7 @@ export class Card {
           this.activeEffects[i] == Effects.NULL;
         }
       }
+      this.displayCard();
       return true;
     }
     return false;
@@ -872,31 +897,94 @@ export class Card {
   returnToHand() {
     if (this.ownerId != null) {
       Game.instance.getPlayerById(this.ownerId).hand.push(this);
-      this.removeCardFromBoard(CardLocations.Hand);
+      this.moveCard(CardLocations.Hand);
     }
   }
 
-  removeCardFromBoard(newLocation: String = CardLocations.Discard) {
-    // Whole screen is redrawn on cardChanged, so not sure if we need this
+  moveCard(newLocation: String) {
     Game.instance.dispatchEvent(
       new CustomEvent("removeCard", { detail: this }),
     );
-    if (typeof this.location == "string") {
-      console.log("Card is not on board");
-      return;
-    }
 
+    //REMOVING CARD
     if (this.location instanceof BoardPos) {
       //Type safe check for removeCreature()
-      this.location.removeCreature();
-      this.location = newLocation;
+      var type = this.constructor.name;
+      switch(type){
+        case 'Creature':
+          this.location.removeCreature();
+          break;
+        case 'Building':
+          this.location.removeBuilding();
+          break;
+      }
+    } else {
+      switch(this.location){
+        case CardLocations.Deck:
+          if(this.ownerId != null){
+            var deck = Game.instance.getPlayerById(this.ownerId).deck;
+            deck.splice(deck.indexOf(this), 1);
+          }
+          break;
+        case CardLocations.Hand:
+          if(this.ownerId != null){
+            var hand = Game.instance.getPlayerById(this.ownerId).hand;
+            hand.splice(hand.indexOf(this), 1);
+          }
+          break;
+        case CardLocations.Discard:
+          if(this.ownerId != null){
+            var discardPile = Game.instance.getPlayerById(this.ownerId).discardPile;
+            discardPile.splice(discardPile.indexOf(this), 1);
+          }
+          break
+      }
     }
+
+    this.location = newLocation;
+    
+    //ADDING CARD
+    if (this.location instanceof BoardPos) {
+      //Type safe check for removeCreature()
+      var type = this.constructor.name;
+      switch(type){
+        case 'Creature':
+          this.location.setCreature(this);
+          break;
+        case 'Building':
+          this.location.setBuilding(this);
+          break;
+      }
+    } else {
+      switch(this.location){
+        case CardLocations.Deck:
+          if(this.ownerId != null){
+            var deck = Game.instance.getPlayerById(this.ownerId).deck;
+            deck.push(this);
+          }
+          break;
+        case CardLocations.Hand:
+          if(this.ownerId != null){
+            var hand = Game.instance.getPlayerById(this.ownerId).hand;
+            hand.push(this);
+          }
+          break;
+        case CardLocations.Discard:
+          if(this.ownerId != null){
+            var discardPile = Game.instance.getPlayerById(this.ownerId).discardPile;
+            discardPile.push(this);
+          }
+          break
+      }
+    }
+
+    this.displayCard();
   }
 
-  displayCards() {
+  displayCard() {
     //Was drawCard, name changed for clarity
     Game.instance.dispatchEvent(
-      new CustomEvent("displayCards", { detail: this }),
+      new CustomEvent("displayCard", { detail: this }),
     );
   }
 }
@@ -938,14 +1026,14 @@ export class Creature extends Card {
 
   override addEffect(effect: Effect) {
     super.addEffect(effect);
-    if(this.location instanceof BoardPos) {
-      this.attack += effect.attackBonus.call(null, this.location);
-      this.defense -= effect.damage.call(null, this.location);
-      this.defense += effect.defenseBonus.call(null, this.location);
-      this.isReady = !effect.disables;
+    if(this.getLocation() instanceof BoardPos) {
+      this.attack += effect.attackBonus.call(null, this.getLocation());
+      this.defense -= effect.damage.call(null, this.getLocation);
+      this.defense += effect.defenseBonus.call(null, this.getLocation);
+      this.setIsReady(effect.disables);
 
-      effect.conditionsApplied.call(null, this.location).map((effect: Effect) => {this.addEffect(effect)});
-      effect.conditionsApplied.call(null, this.location).map((effect: Effect) => {this.removeEffect(effect)});
+      effect.conditionsApplied.call(null, this.getLocation()).map((effect: Effect) => {this.addEffect(effect)});
+      effect.conditionsApplied.call(null, this.getLocation()).map((effect: Effect) => {this.removeEffect(effect)});
     
       //We have absolutely no way to reveal cards for effect.cardsRevealed at the moment, will probably be removed.
       if(this.currentOwnerId != null) {
@@ -985,17 +1073,17 @@ export class Building extends Card {
 
   override addEffect(effect: Effect) {
     super.addEffect(effect);
-    if(this.location instanceof BoardPos) {
-      this.isReady = !effect.disables;
+    if(this.getLocation() instanceof BoardPos) {
+      this.setIsReady(!effect.disables);
 
-      effect.conditionsApplied.call(null, this.location).map((effect: Effect) => {this.addEffect(effect)});
-      effect.conditionsApplied.call(null, this.location).map((effect: Effect) => {this.removeEffect(effect)});
+      effect.conditionsApplied.call(null, this.getLocation()).map((effect: Effect) => {this.addEffect(effect)});
+      effect.conditionsApplied.call(null, this.getLocation()).map((effect: Effect) => {this.removeEffect(effect)});
     
       //We have absolutely no way to reveal cards for effect.cardsRevealed at the moment, will probably be removed.
       if(this.currentOwnerId != null) {
-        Game.instance.getPlayerById(this.currentOwnerId).actions += effect.actionBonus.call(null, this.location);
-        Game.instance.getPlayerById(this.currentOwnerId).cardDiscount += effect.cardDiscount.call(null, this.location);
-        Game.instance.getPlayerById(this.currentOwnerId).drawCard(effect.cardsDrawn.call(null, this.location));
+        Game.instance.getPlayerById(this.currentOwnerId).actions += effect.actionBonus.call(null, this.getLocation());
+        Game.instance.getPlayerById(this.currentOwnerId).cardDiscount += effect.cardDiscount.call(null, this.getLocation());
+        Game.instance.getPlayerById(this.currentOwnerId).drawCard(effect.cardsDrawn.call(null, this.getLocation()));
       }
     }
   }
@@ -1053,17 +1141,17 @@ export class Landscape extends Card {
 
   override addEffect(effect: Effect) {
     super.addEffect(effect);
-    if(this.location instanceof BoardPos) {
-      this.isReady = !effect.disables;
+    if(this.getLocation() instanceof BoardPos) {
+      this.setIsReady(!effect.disables);
 
-      effect.conditionsApplied.call(null, this.location).map((effect: Effect) => {this.addEffect(effect)});
-      effect.conditionsApplied.call(null, this.location).map((effect: Effect) => {this.removeEffect(effect)});
+      effect.conditionsApplied.call(null, this.getLocation()).map((effect: Effect) => {this.addEffect(effect)});
+      effect.conditionsApplied.call(null, this.getLocation()).map((effect: Effect) => {this.removeEffect(effect)});
     
       //We have absolutely no way to reveal cards for effect.cardsRevealed at the moment, will probably be removed.
       if(this.currentOwnerId != null) {
-        Game.instance.getPlayerById(this.currentOwnerId).actions += effect.actionBonus.call(null, this.location);
-        Game.instance.getPlayerById(this.currentOwnerId).cardDiscount += effect.cardDiscount.call(null, this.location);
-        Game.instance.getPlayerById(this.currentOwnerId).drawCard(effect.cardsDrawn.call(null, this.location));
+        Game.instance.getPlayerById(this.currentOwnerId).actions += effect.actionBonus.call(null, this.getLocation());
+        Game.instance.getPlayerById(this.currentOwnerId).cardDiscount += effect.cardDiscount.call(null, this.getLocation());
+        Game.instance.getPlayerById(this.currentOwnerId).drawCard(effect.cardsDrawn.call(null, this.getLocation()));
       }
     }
   }
@@ -1122,8 +1210,8 @@ export class Game extends EventTarget {
 
   resetCards(playerId: number) {
     this.board.getSideByOwnerId(playerId)?.map((boardPos) => {
-      boardPos.creature.isReady = true;
-      boardPos.building.isReady = true;
+      boardPos.creature.setIsReady(true);
+      boardPos.building.setIsReady(true);
     });
   }
 
