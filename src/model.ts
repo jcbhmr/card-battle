@@ -1158,6 +1158,22 @@ export class Creature extends Card {
     0,
     5,
   );
+
+  Attack(Target:Creature|Player){
+    if(Target instanceof Creature){
+      Target.defense-=this.attack;
+      if(Target.defense<=0){
+        Target.death();
+      }
+       this.defense-=Target.attack;
+       if(this.defense<=0){
+        this.death();
+       }
+    }
+    else{
+      Target.hp-=this.attack;
+    }
+  }
 }
 
 export class Building extends Card {
