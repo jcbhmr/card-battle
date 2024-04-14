@@ -528,19 +528,13 @@ export class Ability {
   static addGetAbilityDiscardPileTargetEventListener(
     eventCallback: EventListenerOrEventListenerObject,
   ) {
-    Game.getInstance().addEventListener(
-      "getTargetDiscardPileForAbility",
-      eventCallback,
-    );
+    Game.getInstance().addEventListener("getTargetDiscardPileForAbility", eventCallback);
   }
 
   static addGetAbilityEffectHolderTargetEventListener(
     eventCallback: EventListenerOrEventListenerObject,
   ) {
-    Game.getInstance().addEventListener(
-      "getTargetEffectHolderForAbility",
-      eventCallback,
-    );
+    Game.getInstance().addEventListener("getTargetEffectHolderForAbility", eventCallback);
   }
 
   //Not sure about dispatching instanced events through a static event target, will this work?
@@ -921,7 +915,6 @@ export class Card {
   }
 
   play(_target: any, _id: number | null = null) {
-    
     this.displayCard();
     return false;
   }
@@ -929,7 +922,7 @@ export class Card {
   death() {
     if (this.ownerId != null) {
       Game.getInstance().getPlayerById(this.ownerId).discardPile.push(this);
-      this.moveCard(CardLocations.Discard);
+      // this.moveCard(CardLocations.Discard);
     }
   }
 
@@ -973,89 +966,89 @@ export class Card {
   returnToHand() {
     if (this.ownerId != null) {
       Game.getInstance().getPlayerById(this.ownerId).hand.push(this);
-      this.moveCard(CardLocations.Hand);
+      // this.moveCard(CardLocations.Hand);
     }
   }
 
-  moveCard(newLocation: string) {
-    Game.getInstance().dispatchEvent(
-      new CustomEvent("removeCard", { detail: this }),
-    );
+  // moveCard(newLocation: string | BoardPos) {
+  //   Game.getInstance().dispatchEvent(
+  //     new CustomEvent("removeCard", { detail: this }),
+  //   );
 
-    //REMOVING CARD
-    if (this.location instanceof BoardPos) {
-      //Type safe check for removeCreature()
-      var type = this.constructor.name;
-      switch(type){
-        case 'Creature':
-          this.location.removeCreature();
-          break;
-        case 'Building':
-          this.location.removeBuilding();
-          break;
-      }
-    } else {
-      switch(this.location){
-        case CardLocations.Deck:
-          if(this.ownerId != null){
-            var deck = Game.getInstance().getPlayerById(this.ownerId).deck;
-            deck.splice(deck.indexOf(this), 1);
-          }
-          break;
-        case CardLocations.Hand:
-          if(this.ownerId != null){
-            var hand = Game.getInstance().getPlayerById(this.ownerId).hand;
-            hand.splice(hand.indexOf(this), 1);
-          }
-          break;
-        case CardLocations.Discard:
-          if(this.ownerId != null){
-            var discardPile = Game.getInstance().getPlayerById(this.ownerId).discardPile;
-            discardPile.splice(discardPile.indexOf(this), 1);
-          }
-          break
-      }
-    }
+  //   //REMOVING CARD
+  //   if (this.location instanceof BoardPos) {
+  //     //Type safe check for removeCreature()
+  //     var type = this.constructor.name;
+  //     switch(type){
+  //       case 'Creature':
+  //         this.location.removeCreature();
+  //         break;
+  //       case 'Building':
+  //         this.location.removeBuilding();
+  //         break;
+  //     }
+  //   } else {
+  //     switch(this.location){
+  //       case CardLocations.Deck:
+  //         if(this.ownerId != null){
+  //           var deck = Game.getInstance().getPlayerById(this.ownerId).deck;
+  //           deck.splice(deck.indexOf(this), 1);
+  //         }
+  //         break;
+  //       case CardLocations.Hand:
+  //         if(this.ownerId != null){
+  //           var hand = Game.getInstance().getPlayerById(this.ownerId).hand;
+  //           hand.splice(hand.indexOf(this), 1);
+  //         }
+  //         break;
+  //       case CardLocations.Discard:
+  //         if(this.ownerId != null){
+  //           var discardPile = Game.getInstance().getPlayerById(this.ownerId).discardPile;
+  //           discardPile.splice(discardPile.indexOf(this), 1);
+  //         }
+  //         break
+  //     }
+  //   }
 
-    this.location = newLocation;
+  //   this.location = newLocation;
     
-    //ADDING CARD
-    if (this.location instanceof BoardPos) {
-      //Type safe check for removeCreature()
-      var type = this.constructor.name;
-      switch(type){
-        case 'Creature':
-          this.location.setCreature(this);
-          break;
-        case 'Building':
-          this.location.setBuilding(this);
-          break;
-      }
-    } else {
-      switch(this.location){
-        case CardLocations.Deck:
-          if(this.ownerId != null){
-            var deck = Game.getInstance().getPlayerById(this.ownerId).deck;
-            deck.push(this);
-          }
-          break;
-        case CardLocations.Hand:
-          if(this.ownerId != null){
-            var hand = Game.getInstance().getPlayerById(this.ownerId).hand;
-            hand.push(this);
-          }
-          break;
-        case CardLocations.Discard:
-          if(this.ownerId != null){
-            var discardPile = Game.getInstance().getPlayerById(this.ownerId).discardPile;
-            discardPile.push(this);
-          }
-          break
-      }
-    }
+  //   //ADDING CARD
+  //   if (this.location instanceof BoardPos) {
+  //     //Type safe check for removeCreature()
+  //     var type = this.constructor.name;
+  //     switch(type){
+  //       case 'Creature':
+  //         this.location.setCreature(this);
+  //         break;
+  //       case 'Building':
+  //         this.location.setBuilding(this);
+  //         break;
+  //     }
+  //   } else {
+  //     switch(this.location){
+  //       case CardLocations.Deck:
+  //         if(this.ownerId != null){
+  //           var deck = Game.getInstance().getPlayerById(this.ownerId).deck;
+  //           deck.push(this);
+  //         }
+  //         break;
+  //       case CardLocations.Hand:
+  //         if(this.ownerId != null){
+  //           var hand = Game.getInstance().getPlayerById(this.ownerId).hand;
+  //           hand.push(this);
+  //         }
+  //         break;
+  //       case CardLocations.Discard:
+  //         if(this.ownerId != null){
+  //           var discardPile = Game.getInstance().getPlayerById(this.ownerId).discardPile;
+  //           discardPile.push(this);
+  //         }
+  //         break;
+  //     }
+  //   }
 
-    this.displayCard();
-  }
+  //   this.displayCard();
+  // }
 
   displayCard() {
     //Was drawCard, name changed for clarity
@@ -1064,6 +1057,7 @@ export class Card {
     );
   }
 }
+
 
 export class Creature extends Card {
   attack: number;
@@ -1150,7 +1144,7 @@ export class Creature extends Card {
       new Effect()
         .setAttackBonus((pos: BoardPos) => {
           if (pos.creature != Creature.NULL && pos.creature.currentOwnerId != null) {
-              return 0; //Game.getInstance().getPlayerById(pos.creature.currentOwnerId).discardPile.length / 5;
+              return 1; //Game.getInstance().getPlayerById(pos.creature.currentOwnerId).discardPile.length / 5;
           } else {
             return 0;
           }
@@ -1194,17 +1188,18 @@ export class Building extends Card {
 
   override addEffect(effect: Effect) {
     super.addEffect(effect);
-    if(this.getLocation() instanceof BoardPos) {
-      this.setIsReady(!effect.disables);
+    var loc: string | BoardPos = this.getLocation();
+    if(loc instanceof BoardPos) {
+      this.setIsReady(effect.disables);
 
-      effect.conditionsApplied.call(null, this.getLocation()).map((effect: Effect) => {this.addEffect(effect)});
-      effect.conditionsApplied.call(null, this.getLocation()).map((effect: Effect) => {this.removeEffect(effect)});
+      effect.conditionsApplied.call(null, loc).map((effect: Effect) => {this.addEffect(effect)});
+      effect.conditionsApplied.call(null, loc).map((effect: Effect) => {this.removeEffect(effect)});
     
       //We have absolutely no way to reveal cards for effect.cardsRevealed at the moment, will probably be removed.
       if(this.currentOwnerId != null) {
-        Game.getInstance().getPlayerById(this.currentOwnerId).actions += effect.actionBonus.call(null, this.getLocation());
-        Game.getInstance().getPlayerById(this.currentOwnerId).cardDiscount += effect.cardDiscount.call(null, this.getLocation());
-        Game.getInstance().getPlayerById(this.currentOwnerId).drawCard(effect.cardsDrawn.call(null, this.getLocation()));
+        Game.getInstance().getPlayerById(this.currentOwnerId).actions += effect.actionBonus.call(null, loc);
+        Game.getInstance().getPlayerById(this.currentOwnerId).cardDiscount += effect.cardDiscount.call(null, loc);
+        Game.getInstance().getPlayerById(this.currentOwnerId).drawCard(effect.cardsDrawn.call(null, loc));
       }
     }
   }
@@ -1280,17 +1275,18 @@ export class Landscape extends Card {
 
   override addEffect(effect: Effect) {
     super.addEffect(effect);
-    if(this.getLocation() instanceof BoardPos) {
-      this.setIsReady(!effect.disables);
+    var loc: string | BoardPos = this.getLocation();
+    if(loc instanceof BoardPos) {
+      this.setIsReady(effect.disables);
 
-      effect.conditionsApplied.call(null, this.getLocation()).map((effect: Effect) => {this.addEffect(effect)});
-      effect.conditionsApplied.call(null, this.getLocation()).map((effect: Effect) => {this.removeEffect(effect)});
+      effect.conditionsApplied.call(null, loc).map((effect: Effect) => {this.addEffect(effect)});
+      effect.conditionsApplied.call(null, loc).map((effect: Effect) => {this.removeEffect(effect)});
     
       //We have absolutely no way to reveal cards for effect.cardsRevealed at the moment, will probably be removed.
       if(this.currentOwnerId != null) {
-        Game.getInstance().getPlayerById(this.currentOwnerId).actions += effect.actionBonus.call(null, this.getLocation());
-        Game.getInstance().getPlayerById(this.currentOwnerId).cardDiscount += effect.cardDiscount.call(null, this.getLocation());
-        Game.getInstance().getPlayerById(this.currentOwnerId).drawCard(effect.cardsDrawn.call(null, this.getLocation()));
+        Game.getInstance().getPlayerById(this.currentOwnerId).actions += effect.actionBonus.call(null, loc);
+        Game.getInstance().getPlayerById(this.currentOwnerId).cardDiscount += effect.cardDiscount.call(null, loc);
+        Game.getInstance().getPlayerById(this.currentOwnerId).drawCard(effect.cardsDrawn.call(null, loc));
       }
     }
   }
@@ -1317,17 +1313,17 @@ export class Game extends EventTarget {
     this.turnPhase = TurnPhases.Play;
   }
 
-  private static instance = new Game();
+  // static instance = new Game(); // This throws an error because the full Game class isn't parsed at the time of Game creation.
 
-  static getInstance(): Game {
-    return Game.instance;
-  }
+  // static getInstance(): Game {
+  //   return Game.instance;
+  // }
 
-  static addEventListener(
+  addEventListener(
     event: string,
     eventCallback: EventListenerOrEventListenerObject,
   ) {
-    Game.getInstance().addEventListener(event, eventCallback);
+    this.addEventListener(event, eventCallback);
   }
 
   getPlayerById(playerId: number) {

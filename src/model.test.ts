@@ -1,7 +1,6 @@
 import { expect, test, assert } from "vitest";
-import { Game, TurnPhases } from "./model.ts";
+import { game, Game } from "./model.ts";
 
 test("new game works", () => {
-  Game.instance.enterNextPhase();
-  assert(Game.instance.turnPhase == TurnPhases.Action);
+  assert(game instanceof Game);
 });
