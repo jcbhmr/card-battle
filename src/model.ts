@@ -537,7 +537,6 @@ export class Ability {
     Game.getInstance().addEventListener("getTargetEffectHolderForAbility", eventCallback);
   }
 
-  //Not sure about dispatching instanced events through a static event target, will this work?
   getAbilityTarget(playerId: number) {
     if(!this.targeter.needsPlayerSelection || this.targeter.numberPlayerSelections == 0 || this.targetEventFunc == null) {
       return false;
@@ -580,45 +579,7 @@ export class Ability {
     return false;
   }
 
-  // const TargetType = {
-  //  Creature: 0,
-  //  Building: 1,
-  //  Landscape: 2,
-  //  Player: 3,
-  //  DiscardPile: 4,
-  //  EffectHolder: 5,
-  //  BoardPos: 6
-  // }
-  // apply(target: any, playerId: number) {
-  //   if (target instanceof Card) {
-  //     this.applyCard(target, playerId);
-  //   } else if (target instanceof Player) {
-  //     // this.applyPlayer(target); //TODO
-  //   }
-  //   // else if(target instanceof DiscardPile) { //How to handle this case for TargetType?
-
-  //   // }
-  //   else if (target instanceof BoardPos) {
-  //     // this.applyBoard(target); //TODO
-  //   }
-  // }
-
-  // applyCard(target: Card, playerId: number) {
-  //   target.addEffect(this.effect);
-  //   if (this.healthCost != 0) {
-  //     Game.getInstance().getPlayerById(playerId).hp -= this.healthCost;
-  //   }
-  // }
-
-  // applyPlayer(target: Player, playerId: number) {
-  //   target.addEffect(this.effect);
-  //   if (this.healthCost != 0) {
-  //     Game.getInstance().getPlayerById(playerId).hp -= this.healthCost;
-  //   }
-  // }
-
   //Ability Constants
-  
   static NULL = new Ability(
         "Null",
         new Targeter(
@@ -680,7 +641,7 @@ export class Ability {
         (card: Creature, playerId: number) => {
           card.addEffect(this.DAMAGE_CREATURE_1.effect);
           if(this.DAMAGE_CREATURE_1.healthCost > 0) {
-            Game.getInstance().getPlayerById(playerId).hp -= this.DAMAGE_CREATURE_1.healthCost;
+            //Game.getInstance().getPlayerById(playerId).hp -= this.DAMAGE_CREATURE_1.healthCost;
           }
         },
       );
@@ -874,7 +835,7 @@ export class Card {
     this.cardType = cardType;
     this.cost = cost;
     this.landscapeType = landscapeType;
-    this.turnPlayed = Game.getInstance().currentTurn;
+    this.turnPlayed = 0;//Game.getInstance().currentTurn;
     this.ability = ability;
     this.isReady = true;
     this.targetEventFunc = targetEventFunc;
@@ -1125,7 +1086,7 @@ export class Creature extends Card {
     0,
     0,
   );
-    
+
   static DARK_ANGEL = new Creature(
     "Dark Angel",
     "",
@@ -1190,9 +1151,9 @@ export class Building extends Card {
   }
 
   static addGetTargetEventListener(
-    eventCallback: EventListenerOrEventListenerObject,
+    eventCallback: EventListenerOrEventListenerObject, game: Game
   ) {
-    Game.getInstance().addEventListener("getTargetForBuilding", eventCallback);
+    game.addEventListener("getTargetForBuilding", eventCallback);
   }
 
   override play(pos: BoardPos) {
@@ -1244,9 +1205,9 @@ export class Spell extends Card {
   }
 
   static addGetTargetEventListener(
-    eventCallback: EventListenerOrEventListenerObject,
+    eventCallback: EventListenerOrEventListenerObject, game: Game
   ) {
-    Game.getInstance().addEventListener("getTargetForSpell", eventCallback);
+    game.addEventListener("getTargetForSpell", eventCallback);
   }
 
   override play(pos: BoardPos) {
@@ -1277,9 +1238,9 @@ export class Landscape extends Card {
   }
 
   static addGetTargetEventListener(
-    eventCallback: EventListenerOrEventListenerObject,
+    eventCallback: EventListenerOrEventListenerObject, game: Game
   ) {
-    Game.getInstance().addEventListener("getTargetForLandscape", eventCallback);
+    game.addEventListener("getTargetForLandscape", eventCallback);
   }
 
   override play(pos: BoardPos) {
@@ -1331,9 +1292,14 @@ export class Game extends EventTarget {
 
   // static instance = new Game(); // This throws an error because the full Game class isn't parsed at the time of Game creation.
 
-  // static getInstance(): Game {
-  //   return Game.instance;
-  // }
+  static getInstance(): Game {
+    if(GameInstance instanceof Game) {
+      return GameInstance;
+    }else {
+      GameInstance = new Game();
+      return GameInstance;
+    }
+  }
 
   addEventListener(
     event: string,
@@ -1376,3 +1342,5 @@ export class Game extends EventTarget {
     }
   }
 }
+
+var GameInstance: Game | null = null;
