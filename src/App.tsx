@@ -1,4 +1,4 @@
-import { ReactNode, useState } from "react";
+import { ReactNode, createContext, useContext, useState } from "react";
 import placeholderSVGURL from "./assets/placeholder.svg";
 import { Game, Creature, Building } from "./model";
 
@@ -160,7 +160,7 @@ function HandOfCards({ game }: { game: Game }) {
     let card = playerHand[i];
     // not even sure if this if statement would even work. Will have to ask Jacob about it or
     // test it with backends code
-    if (card.constructor.name == "Creature") {
+    if (card instanceof Creature) {
       //red underline is due to game.players[i].hand being an array of type Card[]. the supertype
       //card does not have attack or defense
       shownHand.push(
@@ -290,7 +290,7 @@ function Board({ game }: { game: Game }) {
   let p1Board = [];
   let p2Board = [];
   //Looping through board to display it
-  for (let i = 0; i > 4; i++) {
+  for (let i = 0; i < 4; i++) {
     p1Board.push(
       LandscapeCard({
         creature: game.board.getBoardPosByOwnerId(0, i)?.creature,
@@ -365,6 +365,7 @@ function LandscapeCard({
     </div>
   );
 }
+
 /**
  * Block that shows players hp, username, and actions
  * @param game object (probably temporarily) and a player id (0 or 1)
@@ -463,6 +464,7 @@ function PhaseButton({imagePath}: {imagePath: string}){
 }
 function App() {
   const[begin, setBegin] = useState(false);
+
   let h = function(){
     setBegin(true);
   }
