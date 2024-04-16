@@ -111,11 +111,35 @@ function CreatureComponent({
 }
 
 /**
+ * Displays card shape with a number on it indicating how many cards are in the pile. This one has onclick to allow player to draw
+ * @returns returns markup displaying what i wrote just above
+ */
+function Deck() {
+  let player = gameOb.currentPlayer;
+  let handleDraw = function () { 
+    if(player.actions < 1){
+      player.drawCard(1);
+      player.actions -= 1;
+    }
+    else{
+      log.push(<div>{player.username} attempted to draw, but does not have enough actions.</div>)
+    }
+  };
+  return (
+    <div className="card_shape flex h-screen hover:border-red-800" onClick={handleDraw}>
+      <div className="text-center text-7xl m-auto">
+        <div className="">{player.deck.length}</div>
+      </div>
+    </div>
+  );
+}
+
+/**
  * Displays card shape with a number on it indicating how many cards are in the pile.
  * @param size, a number that represents number of cards in pile
  * @returns returns markup displaying what i wrote just above
  */
-function PileOfCards({ size }: { size: number }) {
+function DiscardPile({ size }: { size: number }) {
   return (
     <div className="card_shape flex h-screen hover:border-red-800">
       <div className="text-center text-7xl m-auto">
@@ -353,8 +377,9 @@ function PlayerDisplay({game, playerID}: {game: Game, playerID: number}){
       <div className="flex flex-col">
         <h1>{player.username}username</h1>
       
-      HP: {player.hp}
-      Actions: {player.actions}
+        HP: {player.hp}
+        <br></br>
+        Actions: {player.actions}
       </div>
       
     </div>
@@ -366,7 +391,8 @@ function PlayerDisplay({game, playerID}: {game: Game, playerID: number}){
  */
 function GameBoard(){
   return(
-    <div>
+    <div  className="flex justify-center items-center h-screen p-4">
+      <div>
       {/*Gonna need to comment much of this just so we're aware of what is happening in some of these.*/}
       {/*This div is a row that shows a players stats and then their hand of cards*/}
       <div className="flex flex-row items-center">
@@ -377,8 +403,8 @@ function GameBoard(){
       <div className="flex justify-center items-center gap-4">
         {/*This column shows a deck and discard pile*/}
         <div className="flex flex-col">
-            <PileOfCards size={40}></PileOfCards>
-            <PileOfCards size={5}></PileOfCards>
+            <Deck></Deck>
+            <DiscardPile size={5}></DiscardPile>
         </div>
         {/*The board between two columns*/}
         <Board game={gameOb} />
@@ -386,8 +412,8 @@ function GameBoard(){
         <div className="flex flex-row gap-4">
           {/*The first column shows the deck and discard pile (like the one you saw earlier*/}
           <div className="flex flex-col">
-            <PileOfCards size={5}></PileOfCards>
-            <PileOfCards size={40}></PileOfCards>
+            <DiscardPile size={5}></DiscardPile>
+            <Deck></Deck>
           </div>
           {/*This column shows the game log text bot and the button for moving phases below it*/}
           <div className="flex flex-col justify-center items-center gap-20">
@@ -401,8 +427,8 @@ function GameBoard(){
         <PlayerDisplay game={gameOb} playerID={0}></PlayerDisplay>
       </div>
       
+      </div>
     </div>
-    
   );
 }
 /**
@@ -419,6 +445,8 @@ function GameLog(){
       Turn: {gameOb.currentTurn}
       <br></br>
       Phase: {gameOb.turnPhase}
+      <br></br>
+      Turn Player: {gameOb.currentPlayer.username}
     </div>
     </> 
   )
@@ -429,16 +457,25 @@ function GameLog(){
  */
 function PhaseButton({imagePath}: {imagePath: string}){
   return(
-    <button><img src={imagePath} 
+    <button onClick={gameOb.enterNextPhase}><img src={imagePath} 
     width="100" height="100"></img></button>
   )
 }
 function App() {
+  const[begin, setBegin] = useState(false);
+  let h = function(){
+    setBegin(true);
+  }
+  let page=<></>
+  if(begin){
+    page=<GameBoard></GameBoard>
+  }
+  else{ 
+    page=<DeckSelectScreen handle={h}></DeckSelectScreen>
+  }
   return (
     <>
-      <div className="flex justify-center items-center h-screen p-4">
-        <GameBoard />
-      </div>
+      {page}
     </>
   );
 }
@@ -446,3 +483,32 @@ function App() {
 const gameOb = new Game();
 
 export default App;
+
+
+function ListOfDecks(){
+  return(
+    <div>
+      <label>Choose a deck:</label>
+        <select>
+          <option>Deck 1</option>
+          <option>Deck 2</option>
+        </select>
+    </div>
+  )
+}
+
+function DeckSelectScreen({handle}: {handle: Function}){
+  return(
+    <div className="flex flex-col">
+      <h1 className="text-2xl flex flex-row justify-center">
+        CARD BATTLES
+      </h1>
+      <div className="flex flex-row justify-center gap-10">
+      <ListOfDecks></ListOfDecks>
+      <button onClick={handle}>Begin</button>
+      <ListOfDecks></ListOfDecks>
+      </div>
+    </div>
+    
+  )
+}
