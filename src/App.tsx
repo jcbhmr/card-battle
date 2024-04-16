@@ -2,7 +2,11 @@ import { ReactNode, useState } from "react";
 import placeholderSVGURL from "./assets/placeholder.svg";
 import { Game, Creature, Building } from "./model";
 
-//let testCreature = new Creature("", "", 1, "", null, 2, 3);
+let log = [];
+log.push(<div>Player 1 activated "Spell name!"</div>);
+log.push(<div>Player 2 activated "Spell name!"</div>);
+log.push(<div>Player 1 summoned "Monster name!"</div>);
+log.push(<div>Player 2 summoned "Monster name!"</div>);
 
 /**
  * v0 by Vercel.
@@ -114,7 +118,7 @@ function CreatureComponent({
 function PileOfCards({ size }: { size: number }) {
   return (
     <div className="card_shape flex h-screen hover:border-red-800">
-      <div className="text-center text-9xl m-auto">
+      <div className="text-center text-7xl m-auto">
         <div className="">{size}</div>
       </div>
     </div>
@@ -139,7 +143,7 @@ function HandOfCards({ game }: { game: Game }) {
         CreatureComponent({
           cardName: card.name,
           cardText: card.flavorText,
-          actionCost: card.cost,
+          actionCost: card.getCost(),
           landscapeType: card.landscapeType,
           attack: card.attack,
           defense: card.defense,
@@ -151,7 +155,7 @@ function HandOfCards({ game }: { game: Game }) {
         CardComponent({
           cardName: card.name,
           cardText: card.flavorText,
-          actionCost: card.cost,
+          actionCost: card.getCost(),
           landscapeType: card.landscapeType,
           imagePath: "",
         }),
@@ -312,7 +316,7 @@ function LandscapeCard({
     c = CreatureComponent({
       cardName: creature.name,
       cardText: creature.flavorText,
-      actionCost: creature.cost,
+      actionCost: creature.getCost(),
       landscapeType: creature.landscapeType,
       attack: creature.attack,
       defense: creature.defense,
@@ -324,11 +328,12 @@ function LandscapeCard({
     b = CardComponent({
       cardName: building.name,
       cardText: building.flavorText,
-      actionCost: building.cost,
+      actionCost: building.getCost(),
       landscapeType: building.landscapeType,
       imagePath: "",
     });
   }
+
   return (
     <div className="landscape_shape flex justify-center items-center">
       {c}
@@ -337,16 +342,90 @@ function LandscapeCard({
   );
 }
 
+function PlayerDisplay({game, playerID}: {game: Game, playerID: number}){
+  let player = game.getPlayerById(playerID);
+  return(
+    <div className="player_display">
+      <div className="flex flex-col">
+        <h1>{player.username}username</h1>
+      
+      HP: {player.hp}
+      Actions: {player.actions}
+      </div>
+      
+    </div>
+  )
+}
+
+function GameBoard(){
+  return(
+    <div>
+      {/* */}
+      <div className="flex flex-row items-center">
+        <PlayerDisplay game={gameOb} playerID={0}></PlayerDisplay>
+        <HandOfCards game={gameOb}></HandOfCards>
+      </div>
+      <div>
+
+      </div>
+      <div className="flex justify-center items-center gap-4">
+      <div className="flex flex-col">
+          <PileOfCards size={40}></PileOfCards>
+          <PileOfCards size={5}></PileOfCards>
+        </div>
+        <Board game={gameOb} />
+        <div className="flex flex-row gap-4">
+          <div className="flex flex-col">
+            <PileOfCards size={5}></PileOfCards>
+            <PileOfCards size={40}></PileOfCards>
+          </div>
+          <div className="flex flex-col justify-center items-center gap-20">
+            <GameLog></GameLog>
+            <MyButton></MyButton>
+          </div>
+          
+        </div>
+        
+      </div>
+      <div className="flex flex-row justify-right items-center">
+        <HandOfCards game={gameOb}></HandOfCards>
+        <PlayerDisplay game={gameOb} playerID={0}></PlayerDisplay>
+      </div>
+      
+    </div>
+    
+  );
+}
+/**
+ * 
+ * @returns markup that displays the gamelog in the browser
+ */
+function GameLog(){
+  return( 
+      <p className="game_log">
+        {log}
+    </p>
+    
+    
+  )
+}
+
+function MyButton(){
+  return(
+    <button><img src="https://th.bing.com/th/id/R.64cd05752ba370bda27cbcfa260693ce?rik=UMwRwhskWbPISQ&pid=ImgRaw&r=0" 
+    width="100" height="100"></img></button>
+  )
+}
 function App() {
   return (
     <>
       <div className="flex justify-center items-center h-screen p-4">
-        <PileOfCards size={1} />
+        <GameBoard />
       </div>
     </>
   );
 }
 
-const game = new Game();
+const gameOb = new Game();
 
 export default App;
