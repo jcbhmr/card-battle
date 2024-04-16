@@ -1,6 +1,7 @@
 import { ReactNode, createContext, useContext, useState } from "react";
 import placeholderSVGURL from "./assets/placeholder.svg";
 import { Game, Creature, Building } from "./model";
+import { n } from "vitest/dist/reporters-MmQN-57K.js";
 
 var log = [];
 log.push(<div>Player 1 activated "Spell name!"</div>);
@@ -114,8 +115,8 @@ function CreatureComponent({
  * Displays card shape with a number on it indicating how many cards are in the pile. This one has onclick to allow player to draw
  * @returns returns markup displaying what i wrote just above
  */
-function Deck() {
-  let player = gameOb.currentPlayer;
+function Deck({game}: {game:Game}) {
+  let player = game.currentPlayer;
   let handleDraw = function () { 
     if(player.actions < 1){
       player.drawCard(1);
@@ -153,16 +154,13 @@ function DiscardPile({ size }: { size: number }) {
  * @author Tanner Brown
  * @returns Array of CardComponents/CreatureComponents
  */
-function HandOfCards({ game }: { game: Game }) {
-  let playerHand = game.players[0].hand;
+function HandOfCards({ game, player}: { game: Game, player: number }) {
+  let playerHand = game.players[player].hand;
   let shownHand = [];
   for (let i = 0; i < playerHand.length; i++) {
     let card = playerHand[i];
-    // not even sure if this if statement would even work. Will have to ask Jacob about it or
-    // test it with backends code
+
     if (card instanceof Creature) {
-      //red underline is due to game.players[i].hand being an array of type Card[]. the supertype
-      //card does not have attack or defense
       shownHand.push(
         CreatureComponent({
           cardName: card.name,
@@ -336,7 +334,7 @@ function LandscapeCard({
   let c = <></>;
   let b = <></>;
   // check if creature is undefined
-  if (creature) {
+  if (creature?.name==null) {
     c = CreatureComponent({
       cardName: creature.name,
       cardText: creature.flavorText,
@@ -348,7 +346,7 @@ function LandscapeCard({
     });
   }
   // check if building is undefined
-  if (building) {
+  if (building?.name==null) {
     b = CardComponent({
       cardName: building.name,
       cardText: building.flavorText,
@@ -390,42 +388,44 @@ function PlayerDisplay({game, playerID}: {game: Game, playerID: number}){
  * This is like the big daddy of the components. This makes up pretty much the entire game. Shows players board, hp, hands, etc etc. 
  * @returns Markup to display the game
  */
-function GameBoard(){
+function GameBoard({game}: {game: Game}){
+  let player1 = game.getPlayerById(0);
+  let player2 = game.getPlayerById(1);
   return(
     <div  className="flex justify-center items-center h-screen p-4">
       <div>
       {/*Gonna need to comment much of this just so we're aware of what is happening in some of these.*/}
       {/*This div is a row that shows a players stats and then their hand of cards*/}
       <div className="flex flex-row items-center">
-        <PlayerDisplay game={gameOb} playerID={0}></PlayerDisplay>
-        <HandOfCards game={gameOb}></HandOfCards>
+        <PlayerDisplay game={game} playerID={0}></PlayerDisplay>
+        <HandOfCards player={game.getPlayerById(0)} game={game}></HandOfCards>
       </div>
       {/*This div pretty large. It's where discard piles, decks, and the actual board goes*/}
       <div className="flex justify-center items-center gap-4">
         {/*This column shows a deck and discard pile*/}
         <div className="flex flex-col">
-            <Deck></Deck>
+            <Deck game={game}></Deck>
             <DiscardPile size={5}></DiscardPile>
         </div>
         {/*The board between two columns*/}
-        <Board game={gameOb} />
+        <Board game={game} />
         {/*This is a row of two columns*/}
         <div className="flex flex-row gap-4">
           {/*The first column shows the deck and discard pile (like the one you saw earlier*/}
           <div className="flex flex-col">
             <DiscardPile size={5}></DiscardPile>
-            <Deck></Deck>
+            <Deck game={game}></Deck>
           </div>
           {/*This column shows the game log text bot and the button for moving phases below it*/}
           <div className="flex flex-col justify-center items-center gap-20">
-            <GameLog></GameLog>
-            <PhaseButton imagePath="https://th.bing.com/th/id/R.64cd05752ba370bda27cbcfa260693ce?rik=UMwRwhskWbPISQ&pid=ImgRaw&r=0"></PhaseButton>
+            <GameLog game={game}></GameLog>
+            <PhaseButton game={game} imagePath="https://th.bing.com/th/id/R.64cd05752ba370bda27cbcfa260693ce?rik=UMwRwhskWbPISQ&pid=ImgRaw&r=0"></PhaseButton>
           </div>        
         </div>
       </div>
       <div className="flex flex-row justify-right items-center">
-        <HandOfCards game={gameOb}></HandOfCards>
-        <PlayerDisplay game={gameOb} playerID={0}></PlayerDisplay>
+        <HandOfCards game={game}></HandOfCards>
+        <PlayerDisplay game={game} playerID={0}></PlayerDisplay>
       </div>
       
       </div>
@@ -436,18 +436,18 @@ function GameBoard(){
  * has a block of scrollable text showing player actions and shows turn and phase
  * @returns markup that displays the gamelog in the browser
  */
-function GameLog(){
+function GameLog({game}: {game: Game}){
   return(
     <>
     <div className="game_log">
         {log}
     </div>
     <div className="text-3xl">
-      Turn: {gameOb.currentTurn}
+      Turn: {game.currentTurn}
       <br></br>
-      Phase: {gameOb.turnPhase}
+      Phase: {game.turnPhase}
       <br></br>
-      Turn Player: {gameOb.currentPlayer.username}
+      Turn Player: {game.currentPlayer.username}
     </div>
     </> 
   )
@@ -456,21 +456,21 @@ function GameLog(){
  * Button that will control moving between phases.
  * @returns button that looks like an image
  */
-function PhaseButton({imagePath}: {imagePath: string}){
+function PhaseButton({game, imagePath}: {game: Game, imagePath: string}){
   return(
-    <button onClick={gameOb.enterNextPhase}><img src={imagePath} 
+    <button onClick={game.enterNextPhase}><img src={imagePath} 
     width="100" height="100"></img></button>
   )
 }
 function App() {
   const[begin, setBegin] = useState(false);
-
+  let game=new Game();
   let h = function(){
     setBegin(true);
   }
   let page=<></>
   if(begin){
-    page=<GameBoard></GameBoard>
+    page=<GameBoard game={game}></GameBoard>
   }
   else{ 
     page=<DeckSelectScreen handle={h}></DeckSelectScreen>
@@ -482,7 +482,7 @@ function App() {
   );
 }
 
-const gameOb = new Game();
+
 
 export default App;
 
