@@ -2,7 +2,7 @@ import { ReactNode, useState } from "react";
 import placeholderSVGURL from "./assets/placeholder.svg";
 import { Game, Creature, Building } from "./model";
 
-let log = [];
+var log = [];
 log.push(<div>Player 1 activated "Spell name!"</div>);
 log.push(<div>Player 2 activated "Spell name!"</div>);
 log.push(<div>Player 1 summoned "Monster name!"</div>);
@@ -341,7 +341,11 @@ function LandscapeCard({
     </div>
   );
 }
-
+/**
+ * Block that shows players hp, username, and actions
+ * @param game object (probably temporarily) and a player id (0 or 1)
+ * @returns markup that shows what I just wrote above
+ */
 function PlayerDisplay({game, playerID}: {game: Game, playerID: number}){
   let player = game.getPlayerById(playerID);
   return(
@@ -356,36 +360,41 @@ function PlayerDisplay({game, playerID}: {game: Game, playerID: number}){
     </div>
   )
 }
-
+/**
+ * This is like the big daddy of the components. This makes up pretty much the entire game. Shows players board, hp, hands, etc etc. 
+ * @returns Markup to display the game
+ */
 function GameBoard(){
   return(
     <div>
-      {/* */}
+      {/*Gonna need to comment much of this just so we're aware of what is happening in some of these.*/}
+      {/*This div is a row that shows a players stats and then their hand of cards*/}
       <div className="flex flex-row items-center">
         <PlayerDisplay game={gameOb} playerID={0}></PlayerDisplay>
         <HandOfCards game={gameOb}></HandOfCards>
       </div>
-      <div>
-
-      </div>
+      {/*This div pretty large. It's where discard piles, decks, and the actual board goes*/}
       <div className="flex justify-center items-center gap-4">
-      <div className="flex flex-col">
-          <PileOfCards size={40}></PileOfCards>
-          <PileOfCards size={5}></PileOfCards>
+        {/*This column shows a deck and discard pile*/}
+        <div className="flex flex-col">
+            <PileOfCards size={40}></PileOfCards>
+            <PileOfCards size={5}></PileOfCards>
         </div>
+        {/*The board between two columns*/}
         <Board game={gameOb} />
+        {/*This is a row of two columns*/}
         <div className="flex flex-row gap-4">
+          {/*The first column shows the deck and discard pile (like the one you saw earlier*/}
           <div className="flex flex-col">
             <PileOfCards size={5}></PileOfCards>
             <PileOfCards size={40}></PileOfCards>
           </div>
+          {/*This column shows the game log text bot and the button for moving phases below it*/}
           <div className="flex flex-col justify-center items-center gap-20">
             <GameLog></GameLog>
-            <MyButton></MyButton>
-          </div>
-          
+            <PhaseButton imagePath="https://th.bing.com/th/id/R.64cd05752ba370bda27cbcfa260693ce?rik=UMwRwhskWbPISQ&pid=ImgRaw&r=0"></PhaseButton>
+          </div>        
         </div>
-        
       </div>
       <div className="flex flex-row justify-right items-center">
         <HandOfCards game={gameOb}></HandOfCards>
@@ -397,22 +406,30 @@ function GameBoard(){
   );
 }
 /**
- * 
+ * has a block of scrollable text showing player actions and shows turn and phase
  * @returns markup that displays the gamelog in the browser
  */
 function GameLog(){
-  return( 
-      <p className="game_log">
+  return(
+    <>
+    <div className="game_log">
         {log}
-    </p>
-    
-    
+    </div>
+    <div className="text-3xl">
+      Turn: {gameOb.currentTurn}
+      <br></br>
+      Phase: {gameOb.turnPhase}
+    </div>
+    </> 
   )
 }
-
-function MyButton(){
+/**
+ * Button that will control moving between phases.
+ * @returns button that looks like an image
+ */
+function PhaseButton({imagePath}: {imagePath: string}){
   return(
-    <button><img src="https://th.bing.com/th/id/R.64cd05752ba370bda27cbcfa260693ce?rik=UMwRwhskWbPISQ&pid=ImgRaw&r=0" 
+    <button><img src={imagePath} 
     width="100" height="100"></img></button>
   )
 }
