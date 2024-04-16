@@ -1397,9 +1397,16 @@ export class Game extends AbstractGame {
       this.switchTurns(this.currentPlayer.id);
     }
   }
-
+    /**
+   * Tanner here. Not my place to edit back-end's code, but switchTurns was breaking my tests with front-end due to a bug with it.
+   * To my understanding, players[0] correlates to player 1, and players[1] correlates to player 2. It is also to my understanding that their id correlates to 
+   * their place in the players array as well. Anyways, the bug with the above function is that there wasn't a >= sign in the if statement; just a > sign. Thus, 
+   * during the switch from p2 to p1, currentPlayerId + 1 would be 2, and thus would not correctly switch turns to player[0] (player 1). Instead, we would make
+   * currentPlayer equal the player at player[2], but there is no player at position 2 so it would returned undefined and break stuff. 
+   * @param currentPlayerId 
+   */
   switchTurns(currentPlayerId: number) {
-    if (currentPlayerId + 1 > this.players.length) {
+    if (currentPlayerId + 1 >= this.players.length) {
       this.currentPlayer = this.players[0];
     } else {
       this.currentPlayer = this.players[currentPlayerId + 1];

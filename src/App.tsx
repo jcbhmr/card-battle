@@ -1,6 +1,6 @@
 import { ReactNode, createContext, useContext, useState } from "react";
 import placeholderSVGURL from "./assets/placeholder.svg";
-import { Game, Creature, Building } from "./model";
+import { Game, Creature, Building, Player, Ability, Targeter, Card } from "./model";
 import { n } from "vitest/dist/reporters-MmQN-57K.js";
 
 var log = [];
@@ -8,6 +8,8 @@ log.push(<div>Player 1 activated "Spell name!"</div>);
 log.push(<div>Player 2 activated "Spell name!"</div>);
 log.push(<div>Player 1 summoned "Monster name!"</div>);
 log.push(<div>Player 2 summoned "Monster name!"</div>);
+
+
 
 /**
  * v0 by Vercel.
@@ -115,8 +117,7 @@ function CreatureComponent({
  * Displays card shape with a number on it indicating how many cards are in the pile. This one has onclick to allow player to draw
  * @returns returns markup displaying what i wrote just above
  */
-function Deck({game}: {game:Game}) {
-  let player = game.currentPlayer;
+function Deck({player}: {player:Player}) {
   let handleDraw = function () { 
     if(player.actions < 1){
       player.drawCard(1);
@@ -154,8 +155,8 @@ function DiscardPile({ size }: { size: number }) {
  * @author Tanner Brown
  * @returns Array of CardComponents/CreatureComponents
  */
-function HandOfCards({ game, player}: { game: Game, player: number }) {
-  let playerHand = game.players[player].hand;
+function HandOfCards({player}: { player: Player }) {
+  let playerHand = player.hand;
   let shownHand = [];
   for (let i = 0; i < playerHand.length; i++) {
     let card = playerHand[i];
@@ -184,7 +185,7 @@ function HandOfCards({ game, player}: { game: Game, player: number }) {
       );
     }
   }
-  return <div className="flex flex-row">{shownHand}</div>;
+  return <div className="flex flex-row gap-2">{shownHand}</div>;
 }
 
 function AppBoard() {
@@ -369,8 +370,7 @@ function LandscapeCard({
  * @param game object (probably temporarily) and a player id (0 or 1)
  * @returns markup that shows what I just wrote above
  */
-function PlayerDisplay({game, playerID}: {game: Game, playerID: number}){
-  let player = game.getPlayerById(playerID);
+function PlayerDisplay({game, player}: {game: Game, player: Player}){
   return(
     <div className="player_display">
       <div className="flex flex-col">
@@ -389,6 +389,11 @@ function PlayerDisplay({game, playerID}: {game: Game, playerID: number}){
  * @returns Markup to display the game
  */
 function GameBoard({game}: {game: Game}){
+  //States:
+  const [turn, setTurn] = useState(game.currentTurn);
+  const [phase, setPhase]=useState(game.turnPhase);
+  const [currentPlayer, setCurrentPlayer] = useState(game.currentPlayer);
+  
   let player1 = game.getPlayerById(0);
   let player2 = game.getPlayerById(1);
   return(
@@ -396,15 +401,15 @@ function GameBoard({game}: {game: Game}){
       <div>
       {/*Gonna need to comment much of this just so we're aware of what is happening in some of these.*/}
       {/*This div is a row that shows a players stats and then their hand of cards*/}
-      <div className="flex flex-row items-center">
-        <PlayerDisplay game={game} playerID={0}></PlayerDisplay>
-        <HandOfCards player={game.getPlayerById(0)} game={game}></HandOfCards>
+      <div className="flex flex-row justify-center items-center">
+        <HandOfCards player={player2} ></HandOfCards>
       </div>
       {/*This div pretty large. It's where discard piles, decks, and the actual board goes*/}
       <div className="flex justify-center items-center gap-4">
         {/*This column shows a deck and discard pile*/}
-        <div className="flex flex-col">
-            <Deck game={game}></Deck>
+        <div className="flex flex-col gap-10">
+          <PlayerDisplay game={game} player={player2}></PlayerDisplay>
+            <Deck player={player2}></Deck>
             <DiscardPile size={5}></DiscardPile>
         </div>
         {/*The board between two columns*/}
@@ -412,20 +417,21 @@ function GameBoard({game}: {game: Game}){
         {/*This is a row of two columns*/}
         <div className="flex flex-row gap-4">
           {/*The first column shows the deck and discard pile (like the one you saw earlier*/}
-          <div className="flex flex-col">
+          <div className="flex flex-col gap-10">
             <DiscardPile size={5}></DiscardPile>
-            <Deck game={game}></Deck>
+            <Deck player={player1}></Deck>
+            <PlayerDisplay game={game} player={player1}></PlayerDisplay>
           </div>
           {/*This column shows the game log text bot and the button for moving phases below it*/}
           <div className="flex flex-col justify-center items-center gap-20">
-            <GameLog game={game}></GameLog>
-            <PhaseButton game={game} imagePath="https://th.bing.com/th/id/R.64cd05752ba370bda27cbcfa260693ce?rik=UMwRwhskWbPISQ&pid=ImgRaw&r=0"></PhaseButton>
+            <GameLog turn={turn} phase={phase} currentPlayer={currentPlayer}></GameLog>
+            <PhaseButton game={game} imagePath="https://th.bing.com/th/id/R.64cd05752ba370bda27cbcfa260693ce?rik=UMwRwhskWbPISQ&pid=ImgRaw&r=0"
+            setCurrentPlayer={setCurrentPlayer} setPhase={setPhase} setTurn={setTurn}></PhaseButton>
           </div>        
         </div>
       </div>
-      <div className="flex flex-row justify-right items-center">
-        <HandOfCards game={game}></HandOfCards>
-        <PlayerDisplay game={game} playerID={0}></PlayerDisplay>
+      <div className="flex flex-row justify-center items-center">
+        <HandOfCards player={player1}></HandOfCards>
       </div>
       
       </div>
@@ -436,18 +442,18 @@ function GameBoard({game}: {game: Game}){
  * has a block of scrollable text showing player actions and shows turn and phase
  * @returns markup that displays the gamelog in the browser
  */
-function GameLog({game}: {game: Game}){
+function GameLog({turn, phase, currentPlayer}: {turn: number, phase: number, currentPlayer: Player}){
   return(
     <>
     <div className="game_log">
         {log}
     </div>
     <div className="text-3xl">
-      Turn: {game.currentTurn}
+      Turn: {turn}
       <br></br>
-      Phase: {game.turnPhase}
+      Phase: {phase}
       <br></br>
-      Turn Player: {game.currentPlayer.username}
+      Turn Player: {currentPlayer.username}
     </div>
     </> 
   )
@@ -456,9 +462,16 @@ function GameLog({game}: {game: Game}){
  * Button that will control moving between phases.
  * @returns button that looks like an image
  */
-function PhaseButton({game, imagePath}: {game: Game, imagePath: string}){
+function PhaseButton({game, imagePath, setPhase, setTurn, setCurrentPlayer}: {game: Game, imagePath: string, setPhase: React.Dispatch<React.SetStateAction<number>>,
+   setTurn: React.Dispatch<React.SetStateAction<number>>, setCurrentPlayer: React.Dispatch<React.SetStateAction<Player>>}){
+  function handle(){
+    game.enterNextPhase();
+    setPhase(game.turnPhase);
+    setTurn(game.currentTurn);
+    setCurrentPlayer(game.currentPlayer);
+  }
   return(
-    <button onClick={game.enterNextPhase}><img src={imagePath} 
+    <button onClick={handle}><img src={imagePath} 
     width="100" height="100"></img></button>
   )
 }
