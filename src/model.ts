@@ -1412,6 +1412,7 @@ export class Game extends AbstractGame {
       this.currentPlayer = this.players[currentPlayerId + 1];
     }
     this.resetCards(this.currentPlayer.id);
+    this.currentTurn++;
   }
 
   resetCards(playerId: number) {
