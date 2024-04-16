@@ -1,0 +1,6 @@
+# https://github.com/apps/settings
+repository:
+  name: card-battle
+  description: 🃏 Local multiplayer card combat
+  homepage: https://jcbhmr.me/card-battle
+  topics: javascript, game, card-game, combat, web-game, local-multiplayer, 2player, vite, two-player-game, card-battle
