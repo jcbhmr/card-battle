@@ -347,6 +347,7 @@ export class Effect {
   disables: boolean;
   readiesBeforeBattle: boolean;
   cardsDrawn: (_pos: BoardPos) => number;
+  cardsDiscarded: (_pos: BoardPos) => number;
   cardsRevealed: (_pos: BoardPos) => number;
   playablePredicate: (_pos: BoardPos) => boolean;
   effectDuration: number;
@@ -384,6 +385,9 @@ export class Effect {
     this.disables = false;
     this.readiesBeforeBattle = false;
     this.cardsDrawn = (_pos: BoardPos) => {
+      return 0;
+    };
+    this.cardsDiscarded = (_pos: BoardPos) => {
       return 0;
     };
     this.cardsRevealed = (_pos: BoardPos) => {
@@ -451,6 +455,11 @@ export class Effect {
 
   setCardsDrawn(cards: (_pos: BoardPos) => number) {
     this.cardsDrawn = cards;
+    return this;
+  }
+
+  setCardsDiscarded(cards: (_pos: BoardPos) => number) {
+    this.cardsDiscarded = cards;
     return this;
   }
 
