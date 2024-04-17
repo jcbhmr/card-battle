@@ -1,5 +1,3 @@
-//import { Abilities, Creatures, Buildings, Spells, Effects } from "./singletons";
-
 //============================================================== Enums ==============================================================
 export const TurnPhases = {
   Play: 0,
@@ -70,7 +68,7 @@ export class Targeter {
   laneTargeter: number;
   needsPlayerSelection: boolean;
   numberPlayerSelections: number;
-  selectionPredicate: Function | null;
+  selectionPredicate: (_lane: BoardPos) => boolean;
   targetType: number;
 
   constructor(
@@ -78,7 +76,7 @@ export class Targeter {
     laneTargeter: number,
     needsPlayerSelection: boolean,
     numberPlayerSelections: number,
-    selectionPredicate: Function | null,
+    selectionPredicate: (_lane: BoardPos) => boolean,
     targetType: number,
   ) {
     this.playerTargeter = playerTargeter;
@@ -350,7 +348,7 @@ export class Effect {
   readiesBeforeBattle: boolean;
   cardsDrawn: (_pos: BoardPos) => number;
   cardsRevealed: (_pos: BoardPos) => number;
-  playablePredicate: Function | null;
+  playablePredicate: (_pos: BoardPos) => boolean;
   effectDuration: number;
   effectUpdateType: number;
 
@@ -391,7 +389,7 @@ export class Effect {
     this.cardsRevealed = (_pos: BoardPos) => {
       return 0;
     };
-    this.playablePredicate = null;
+    this.playablePredicate = (_pos: BoardPos) => {return true};
     this.effectDuration = EffectDuration.Instant;
     this.effectUpdateType = EffectUpdateType.EnterPlay;
   }
@@ -461,7 +459,7 @@ export class Effect {
     return this;
   }
 
-  setPlayablePredicate(predicate: Function | null) {
+  setPlayablePredicate(predicate: (_pos: BoardPos) => boolean) {
     this.playablePredicate = predicate;
     return this;
   }
@@ -779,7 +777,7 @@ export class SidedBoard {
   lanes: Map<number, BoardPos[]>;
 
   constructor() {
-    this.lanes = new Map();
+    this.lanes = new Map<number, BoardPos[]>();
   }
 
   addPlayer(playerId: number) {
@@ -810,7 +808,7 @@ export class SidedBoard {
   ): BoardPos[] | null {
     var side: BoardPos[] | undefined = this.getSideByOwnerId(ownerId);
     var adjacent: BoardPos[] = [];
-    if (side != undefined) {
+    if (typeof(side) != "undefined") {
       for (var i = 0; i < side.length; i++) {
         if (side[i].posId == boardPos.posId) {
           if (i + 1 < side.length && i + 1 > 0) {
@@ -839,6 +837,7 @@ export class Card {
   ability: Ability;
   ownerId: number | null = null;
   currentOwnerId: number | null = null;
+  imageURL: string = "";
   private cost: number;
   private isReady: boolean;
   private location: BoardPos | string = CardLocations.Deck;
@@ -863,10 +862,16 @@ export class Card {
     this.isReady = true;
     this.targetEventFunc = targetEventFunc;
   }
-  //
+
+  setImageUrl(URL: string): Card {
+    this.imageURL = URL;
+    return this;
+  }
+  
   getCost() {
     return this.cost;
   }
+
   setCost(cost: number) {
     this.cost = cost;
     this.displayCard();
@@ -1040,6 +1045,10 @@ export class Card {
       new CustomEvent("displayCard", { detail: this }),
     );
   }
+
+  clone(): Card {
+    return new Card(this.name, this.flavorText, this.cardType, this.cost, this.landscapeType, this.ability, this.targetEventFunc);
+  }
 }
 
 export class Creature extends Card {
@@ -1068,6 +1077,21 @@ export class Creature extends Card {
     eventCallback: EventListenerOrEventListenerObject,
   ): void {
     Game.getInstance().addEventListener("getTargetForCreature", eventCallback);
+  }
+
+  Attack(Target: Creature | Player) {
+    if (Target instanceof Creature) {
+      Target.defense -= this.attack;
+      if (Target.defense <= 0) {
+        Target.death();
+      }
+      this.defense -= Target.attack;
+      if (this.defense <= 0) {
+        this.death();
+      }
+    } else {
+      Target.hp -= this.attack;
+    }
   }
 
   override play(pos: BoardPos) {
@@ -1106,6 +1130,10 @@ export class Creature extends Card {
     }
   }
 
+  override clone(): Creature {
+    return new Creature(this.name, this.flavorText, this.getCost(), this.landscapeType, this.ability, this.attack, this.defense, this.targetEventFunc);
+  }
+
   //Creature Constants
   static NULL = new Creature(
     "Null",
@@ -1116,57 +1144,6 @@ export class Creature extends Card {
     0,
     0,
   );
-
-  static DARK_ANGEL = new Creature(
-    "Dark Angel",
-    "",
-    1,
-    LandscapeType.Swamp,
-    new Ability(
-      "+1 Attack for every 5 cards in your discard pile.",
-      new Targeter(
-        PlayerTargeter.Self,
-        LaneTargeter.None,
-        false,
-        0,
-        null,
-        TargetType.DiscardPile,
-      ),
-      new Effect()
-        .setAttackBonus((pos: BoardPos) => {
-          if (
-            pos.creature != Creature.NULL &&
-            pos.creature.currentOwnerId != null
-          ) {
-            return 1; //Game.getInstance().getPlayerById(pos.creature.currentOwnerId).discardPile.length / 5;
-          } else {
-            return 0;
-          }
-        })
-        .setEffectDuration(EffectDuration.Round)
-        .setEffectUpdateType(EffectUpdateType.Discard),
-      0,
-      Ability.NULL,
-      Ability.NULL,
-    ),
-    0,
-    5,
-  );
-
-  Attack(Target: Creature | Player) {
-    if (Target instanceof Creature) {
-      Target.defense -= this.attack;
-      if (Target.defense <= 0) {
-        Target.death();
-      }
-      this.defense -= Target.attack;
-      if (this.defense <= 0) {
-        this.death();
-      }
-    } else {
-      Target.hp -= this.attack;
-    }
-  }
 }
 
 export class Building extends Card {
@@ -1221,6 +1198,10 @@ export class Building extends Card {
       }
     }
   }
+  
+  override clone(): Building {
+    return new Building(this.name, this.flavorText, this.getCost(), this.landscapeType, this.ability, this.targetEventFunc);
+  }
 
   //Building Constants
   static NULL = new Building(
@@ -1255,6 +1236,10 @@ export class Spell extends Card {
   override play(pos: BoardPos) {
     //TODO
     return false;
+  }
+
+  override clone(): Spell {
+    return new Spell(this.name, this.flavorText, this.getCost(), this.landscapeType, this.ability, this.targetEventFunc);
   }
 
   //Spell Constants
@@ -1321,6 +1306,8 @@ export class AbstractGame extends EventTarget {
   turnTimer: number = 0;
   currentPlayer: Player = new Player(0);
   turnPhase: number = 0;
+  players: Player[] = [];
+  board: SidedBoard = new SidedBoard();
 
   constructor() {
     super();
