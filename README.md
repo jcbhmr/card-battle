@@ -39,8 +39,7 @@ This is Jacob's list of cool tech tools that were shown off at some point in tea
 - **[v0](https://v0.dev/):** AI code generator focused on React & Tailwind CSS
 - **[ChatGPT](https://chat.openai.com/):** General purpose AI chatbot that can generate code.
 - **[Gemini](https://gemini.google.com/):** Alternative to ChatGPT that supports image inputs on the free tier.
-- **[DALLE2](https://labs.openai.com/):** OpenAI's image generator AI. Free credits until April 1st.
-- **[Craiyon](https://www.craiyon.com/):** Completely free no signup image generator AI. Inferior to DALLE2.
+- **[Craiyon](https://www.craiyon.com/):** Completely free no signup image generator AI.
 - **[Tailwind CSS](https://tailwindcss.com/):** Put your CSS in your HTML instead of fragile linking to another file.
 - **[React](https://react.dev/):** The biggest JavaScript UI framework right now.
 - **[Prettier](https://prettier.io/):** The most popular JavaScript ecosystem code formatter.
