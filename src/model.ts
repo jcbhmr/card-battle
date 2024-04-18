@@ -1,3 +1,5 @@
+import { get } from "./CardMap";
+
 //============================================================== Enums ==============================================================
 export const TurnPhases = {
   Play: 0,
@@ -1424,3 +1426,4 @@ export class Game extends AbstractGame {
     }
   }
 }
+

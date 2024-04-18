@@ -1,7 +1,7 @@
 import { ReactNode, createContext, useContext, useState } from "react";
 import placeholderSVGURL from "./assets/placeholder.svg";
 import { Game, Creature, Building, Player, Ability, Targeter, Card } from "./model";
-import { n } from "vitest/dist/reporters-MmQN-57K.js";
+import { get } from "./CardMap"
 
 var log = [];
 log.push(<div>Player 1 activated "Spell name!"</div>);
@@ -337,22 +337,22 @@ function LandscapeCard({
   // check if creature is undefined
   if (creature?.name==null) {
     c = CreatureComponent({
-      cardName: creature.name,
-      cardText: creature.flavorText,
-      actionCost: creature.getCost(),
-      landscapeType: creature.landscapeType,
-      attack: creature.attack,
-      defense: creature.defense,
+      cardName: creature!.name,
+      cardText: creature!.flavorText,
+      actionCost: creature!.getCost(),
+      landscapeType: creature!.landscapeType,
+      attack: creature!.attack,
+      defense: creature!.defense,
       imagePath: "",
     });
   }
   // check if building is undefined
   if (building?.name==null) {
     b = CardComponent({
-      cardName: building.name,
-      cardText: building.flavorText,
-      actionCost: building.getCost(),
-      landscapeType: building.landscapeType,
+      cardName: building!.name,
+      cardText: building!.flavorText,
+      actionCost: building!.getCost(),
+      landscapeType: building!.landscapeType,
       imagePath: "",
     });
   }
@@ -383,6 +383,19 @@ function PlayerDisplay({game, player}: {game: Game, player: Player}){
       
     </div>
   )
+}
+function getDemoPlayer(player: Player){
+  player.deck.push(get("Dark Angel")!);
+  player.deck.push(get("Dark Angel")!);
+  player.deck.push(get("Dark Angel")!);
+  player.deck.push(get("Dark Angel")!);
+  player.deck.push(get("Dark Angel")!);
+
+  player.hand.push(get("Dark Angel")!);
+  player.hand.push(get("Dark Angel")!);
+  player.hand.push(get("Dark Angel")!);
+  player.hand.push(get("Dark Angel")!);
+  player.hand.push(get("Dark Angel")!);
 }
 /**
  * This is like the big daddy of the components. This makes up pretty much the entire game. Shows players board, hp, hands, etc etc. 
@@ -477,12 +490,15 @@ function PhaseButton({game, imagePath, setPhase, setTurn, setCurrentPlayer}: {ga
 }
 function App() {
   const[begin, setBegin] = useState(false);
-  let game=new Game();
   let h = function(){
     setBegin(true);
   }
   let page=<></>
   if(begin){
+    let game=new Game();
+    getDemoPlayer(game.players[0]);
+    getDemoPlayer(game.players[1]);
+    console.log(game);
     page=<GameBoard game={game}></GameBoard>
   }
   else{ 
