@@ -395,7 +395,9 @@ export class Effect {
     this.cardsRevealed = (_pos: BoardPos) => {
       return 0;
     };
-    this.playablePredicate = (_pos: BoardPos) => {return true};
+    this.playablePredicate = (_pos: BoardPos) => {
+      return true;
+    };
     this.effectDuration = EffectDuration.Instant;
     this.effectUpdateType = EffectUpdateType.EnterPlay;
   }
@@ -819,7 +821,7 @@ export class SidedBoard {
   ): BoardPos[] | null {
     var side: BoardPos[] | undefined = this.getSideByOwnerId(ownerId);
     var adjacent: BoardPos[] = [];
-    if (typeof(side) != "undefined") {
+    if (typeof side != "undefined") {
       for (var i = 0; i < side.length; i++) {
         if (side[i].posId == boardPos.posId) {
           if (i + 1 < side.length && i + 1 > 0) {
@@ -878,7 +880,7 @@ export class Card {
     this.imageURL = URL;
     return this;
   }
-  
+
   getCost() {
     return this.cost;
   }
@@ -1058,7 +1060,15 @@ export class Card {
   }
 
   clone(): Card {
-    return new Card(this.name, this.flavorText, this.cardType, this.cost, this.landscapeType, this.ability, this.targetEventFunc);
+    return new Card(
+      this.name,
+      this.flavorText,
+      this.cardType,
+      this.cost,
+      this.landscapeType,
+      this.ability,
+      this.targetEventFunc,
+    );
   }
 }
 
@@ -1142,7 +1152,16 @@ export class Creature extends Card {
   }
 
   override clone(): Creature {
-    return new Creature(this.name, this.flavorText, this.getCost(), this.landscapeType, this.ability, this.attack, this.defense, this.targetEventFunc);
+    return new Creature(
+      this.name,
+      this.flavorText,
+      this.getCost(),
+      this.landscapeType,
+      this.ability,
+      this.attack,
+      this.defense,
+      this.targetEventFunc,
+    );
   }
 
   //Creature Constants
@@ -1209,9 +1228,16 @@ export class Building extends Card {
       }
     }
   }
-  
+
   override clone(): Building {
-    return new Building(this.name, this.flavorText, this.getCost(), this.landscapeType, this.ability, this.targetEventFunc);
+    return new Building(
+      this.name,
+      this.flavorText,
+      this.getCost(),
+      this.landscapeType,
+      this.ability,
+      this.targetEventFunc,
+    );
   }
 
   //Building Constants
@@ -1250,7 +1276,14 @@ export class Spell extends Card {
   }
 
   override clone(): Spell {
-    return new Spell(this.name, this.flavorText, this.getCost(), this.landscapeType, this.ability, this.targetEventFunc);
+    return new Spell(
+      this.name,
+      this.flavorText,
+      this.getCost(),
+      this.landscapeType,
+      this.ability,
+      this.targetEventFunc,
+    );
   }
 
   //Spell Constants
@@ -1340,7 +1373,6 @@ export class AbstractGame extends EventTarget {
   resetCards(_playerId: number) {}
 
   playCard(_card: Card) {}
-
 }
 
 export class Game extends AbstractGame {
@@ -1363,7 +1395,7 @@ export class Game extends AbstractGame {
     this.turnPhase = TurnPhases.Play;
   }
 
-  static GameInstance : AbstractGame = new AbstractGame();
+  static GameInstance: AbstractGame = new AbstractGame();
 
   static getInstance(): AbstractGame {
     return Game.GameInstance;
@@ -1395,13 +1427,13 @@ export class Game extends AbstractGame {
       this.switchTurns(this.currentPlayer.id);
     }
   }
-    /**
+  /**
    * Tanner here. Not my place to edit back-end's code, but switchTurns was breaking my tests with front-end due to a bug with it.
-   * To my understanding, players[0] correlates to player 1, and players[1] correlates to player 2. It is also to my understanding that their id correlates to 
-   * their place in the players array as well. Anyways, the bug with the above function is that there wasn't a >= sign in the if statement; just a > sign. Thus, 
+   * To my understanding, players[0] correlates to player 1, and players[1] correlates to player 2. It is also to my understanding that their id correlates to
+   * their place in the players array as well. Anyways, the bug with the above function is that there wasn't a >= sign in the if statement; just a > sign. Thus,
    * during the switch from p2 to p1, currentPlayerId + 1 would be 2, and thus would not correctly switch turns to player[0] (player 1). Instead, we would make
-   * currentPlayer equal the player at player[2], but there is no player at position 2 so it would returned undefined and break stuff. 
-   * @param currentPlayerId 
+   * currentPlayer equal the player at player[2], but there is no player at position 2 so it would returned undefined and break stuff.
+   * @param currentPlayerId
    */
   switchTurns(currentPlayerId: number) {
     if (currentPlayerId + 1 >= this.players.length) {
@@ -1426,4 +1458,3 @@ export class Game extends AbstractGame {
     }
   }
 }
-
