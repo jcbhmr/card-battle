@@ -1,6 +1,7 @@
 import { expect, test, assert } from "vitest";
-import { Game, AbstractGame, Card, Creature } from "./model.ts";
-import { get as getCardFromCardMap } from "./CardMap.ts";
+import { Game, AbstractGame } from "./model.ts";
+import { Card, Creature } from "./engine/card.ts";
+import { get as getCardFromCardMap } from "./engine/CardMap.ts";
 
 test("new game works", () => {
   assert(Game.getInstance() instanceof AbstractGame);

@@ -9,7 +9,7 @@ import {
   Targeter,
   Card,
 } from "./model";
-import { get } from "./CardMap";
+import { get } from "./engine/CardMap";
 
 var log = [];
 log.push(<div>Player 1 activated "Spell name!"</div>);
