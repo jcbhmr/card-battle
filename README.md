@@ -45,3 +45,4 @@ This is Jacob's list of cool tech tools that were shown off at some point in tea
 - **[Prettier](https://prettier.io/):** The most popular JavaScript ecosystem code formatter.
 - **[Vitest](https://vitest.dev/):** Vite-based testing framework. Supports TypeScript out of the box.
 - **[shadcn/ui](https://ui.shadcn.com/):** Premade components to copy-paste into your React+TailwindCSS project.
+- **[Greptile](https://greptile.com/):** Give ChatGPT the context of your entire GitHub repository.
