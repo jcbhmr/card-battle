@@ -29,10 +29,10 @@ export function addUrl(name: string, Url: string): void {
   }
 }
 
-export function get(name: string): Card | null {
+export function get(name: string): Card {
   var card: Card | undefined = cardMap.get(name);
   if (typeof card == "undefined") {
-    return null;
+    return Card.NULL;
   } else {
     return card.clone();
   }

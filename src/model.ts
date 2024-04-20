@@ -307,7 +307,7 @@ export class Player {
 
       this.actions += effect.actionBonus.call(null, pos);
       this.cardDiscount += effect.cardDiscount.call(null, pos);
-      this.drawCard(effect.cardsDrawn.call(null, pos));
+      this.drawCard(effect.cardsDrawn.call(null, pos), false);
     }
   }
 
@@ -322,7 +322,7 @@ export class Player {
     Game.getInstance().dispatchEvent(new DiscardCardEvent(this.discardPile[discardIndex], this.id));
   }
 
-  drawCard(amount: number) {
+  drawCard(amount: number, useAction: boolean) {
     for (let i = 0; i < amount; i++) {
       if (this.deck.length >= 0) {
         const drawnCard = this.deck.pop();
@@ -330,6 +330,9 @@ export class Player {
           this.hand.push(drawnCard);
           if (drawnCard.ability.init != Ability.NULL_EVENT_FUNC) {
             drawnCard.ability.init(drawnCard);
+          }
+          if(useAction) {
+            this.actions -= amount;
           }
           Game.getInstance().dispatchEvent(new DrawCardEvent(drawnCard, this.id));
         }
@@ -422,7 +425,7 @@ export class BoardPos {
       effect.cardDiscount.call(null, this);
     Game.getInstance()
       .getPlayerById(this.ownerId)
-      .drawCard(effect.cardsDrawn.call(null, this));
+      .drawCard(effect.cardsDrawn.call(null, this), false);
   }
 
   removeEffect(effect: Effect) {
@@ -526,13 +529,17 @@ export class AbstractGame extends EventTarget {
     return new Player(0);
   }
 
+  getOtherPlayer(_playerId: number) {
+    return new Player(0);
+  }
+
   enterNextPhase() {}
 
   switchTurns(_currentPlayerId: number) {}
 
   resetCards(_playerId: number) {}
 
-  playCard(_card: Card) {}
+  playCard(_card: Card, _playerId: number) {}
 }
 
 export class Game extends AbstractGame {
@@ -580,6 +587,10 @@ export class Game extends AbstractGame {
     return this.players[playerId];
   }
 
+  getOtherPlayer(playerId: number) {
+    return this.players[(playerId + 1)%this.players.length];
+  }
+
   enterNextPhase() {
     this.turnPhase++;
     if (this.turnPhase > TurnPhases.Battle) {
@@ -603,8 +614,9 @@ export class Game extends AbstractGame {
     });
   }
 
-  playCard(card: Card): boolean {
-    if (this.turnPhase != TurnPhases.Play) {
+  playCard(card: Card, playerId: number): boolean {
+    if (this.turnPhase != TurnPhases.Play || 
+      (Game.getInstance().getPlayerById(playerId) != null && Game.getInstance().getPlayerById(playerId).actions >= card.getCost())) {
       return false;
     }
 
@@ -617,18 +629,18 @@ export class Game extends AbstractGame {
               if (pos.building != Building.NULL) {
                 return false;
               } else {
-                if (card.play(pos, Game.getInstance().currentPlayer.id)) {
+                if (card.play(pos, playerId)) {
                   return Game.getInstance().dispatchEvent(
                     new PlayCardEvent(
                       card,
-                      Game.getInstance().currentPlayer.id,
+                      playerId,
                     ),
                   );
                 }
                 return false;
               }
             },
-            Game.getInstance().currentPlayer.id,
+            playerId,
             Targeter.PLAY_BUILDING_TARGETER,
           ),
         );
@@ -640,18 +652,18 @@ export class Game extends AbstractGame {
               if (pos.creature != Creature.NULL) {
                 return false;
               } else {
-                if (card.play(pos, Game.getInstance().currentPlayer.id)) {
+                if (card.play(pos, playerId)) {
                   return Game.getInstance().dispatchEvent(
                     new PlayCardEvent(
                       card,
-                      Game.getInstance().currentPlayer.id,
+                      playerId,
                     ),
                   );
                 }
                 return false;
               }
             },
-            Game.getInstance().currentPlayer.id,
+            playerId,
             Targeter.PLAY_CREATURE_TARGETER,
           ),
         );
@@ -663,18 +675,18 @@ export class Game extends AbstractGame {
               if (pos.landscape != LandscapeType.NULL) {
                 return false;
               } else {
-                if (card.play(pos, Game.getInstance().currentPlayer.id)) {
+                if (card.play(pos, playerId)) {
                   return Game.getInstance().dispatchEvent(
                     new PlayCardEvent(
                       card,
-                      Game.getInstance().currentPlayer.id,
+                      playerId,
                     ),
                   );
                 }
                 return false;
               }
             },
-            Game.getInstance().currentPlayer.id,
+            playerId,
             Targeter.PLAY_LANDSCAPE_TARGETER,
           ),
         );
@@ -683,14 +695,14 @@ export class Game extends AbstractGame {
           new GetBoardPosTargetEvent(
             GetCardTargetEvent,
             (pos: BoardPos) => {
-              if (card.play(pos, Game.getInstance().currentPlayer.id)) {
+              if (card.play(pos, playerId)) {
                 return Game.getInstance().dispatchEvent(
-                  new PlayCardEvent(card, Game.getInstance().currentPlayer.id),
+                  new PlayCardEvent(card, playerId),
                 );
               }
               return false;
             },
-            Game.getInstance().currentPlayer.id,
+            playerId,
             Targeter.PLAY_SPELL_TARGETER,
           ),
         );

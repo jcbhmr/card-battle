@@ -242,6 +242,9 @@ export class Card {
       this.ability,
     );
   }
+
+  //Null Card Constant
+  static NULL = new Card("Null", "You shouldn't be seeing this!", 99, 0, LandscapeType.NULL, Ability.NULL);
 }
 
 export class Creature extends Card {
@@ -279,9 +282,12 @@ export class Creature extends Card {
     }
   }
 
-  override play(pos: BoardPos) {
+  override play(pos: BoardPos, playerId: number) {
     if (pos.creature == Creature.NULL) {
-      return pos.setCreature(this);
+      if(pos.setCreature(this)) {
+        Game.getInstance().getPlayerById(playerId).actions -= this.getCost();
+        return true;
+      }
     }
     return false;
   }
@@ -350,9 +356,12 @@ export class Building extends Card {
     super(name, flavorText, CardType.Building, cost, landscapeType, ability);
   }
 
-  override play(pos: BoardPos) {
+  override play(pos: BoardPos, playerId: number) {
     if (pos.building == Building.NULL) {
-      return pos.setBuilding(this);
+      if(pos.setBuilding(this)) {
+        Game.getInstance().getPlayerById(playerId).actions -= this.getCost();
+        return true;
+      }
     }
     return false;
   }
@@ -414,9 +423,11 @@ export class Spell extends Card {
     super(name, flavorText, CardType.Spell, cost, landscapeType, ability);
   }
 
-  override play(_pos: BoardPos) {
+  override play(_pos: BoardPos, playerId: number) {
     this.activateAbility();
-    return false;
+    Game.getInstance().getPlayerById(playerId).discardPile.push(this)
+    Game.getInstance().getPlayerById(playerId).actions -= this.getCost();
+    return true;
   }
 
   override clone(): Spell {
