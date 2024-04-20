@@ -2,13 +2,11 @@ import { ReactNode, createContext, useContext, useState } from "react";
 import placeholderSVGURL from "./assets/placeholder.svg";
 import {
   Game,
-  Creature,
-  Building,
   Player,
-  Ability,
   Targeter,
-  Card,
 } from "./model";
+import { Creature, Building, Card } from "./engine/card";
+import { Ability } from "./engine/ability";
 import { get } from "./engine/CardMap";
 
 var log = [];
