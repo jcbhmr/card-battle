@@ -27,28 +27,31 @@ log.push(<div>Player 2 summoned "Monster name!"</div>);
  * imagePath: the location of the image for the card. this is made for spell/building cards
  */
 function CardComponent({
-  cardName,
-  cardText,
-  actionCost,
-  landscapeType,
-  imagePath,
+  card,
   children,
 }: {
-  cardName: string;
-  cardText: string;
-  actionCost: number;
-  landscapeType: string;
-  imagePath: string;
+  card: Card | Creature;
   children?: ReactNode;
 }) {
+  function handleClick(){
+    if(card instanceof Creature){
+      //summon card
+    }
+    else if (card instanceof Building){
+      //place building
+    }
+    else{
+      //activate spell
+    }
+  }
   return (
-    <div className="card_shape overflow-auto">
+    <div className="card_shape overflow-auto" onClick={handleClick}>
       <div className="flex aspect-16/9">
         <img
-          alt={cardName}
+          alt={card.name}
           className="object-cover"
           height={135}
-          src={imagePath}
+          src={card.imageURL}
           style={{
             aspectRatio: "240/135",
             objectFit: "cover",
@@ -57,11 +60,11 @@ function CardComponent({
         />
       </div>
       <div className="flex-1 p-4 grid gap-2">
-        <h2 className="text-lg font-bold tracking-tight">{cardName}</h2>
-        <p className="text-sm line-clamp-3">{cardText}</p>
+        <h2 className="text-lg font-bold tracking-tight">{card.name}</h2>
+        <p className="text-sm line-clamp-3">{card.flavorText}</p>
         <div className="text-xs">
           <div>
-            AC: {actionCost} Type: {landscapeType}{" "}
+            AC: {card.getCost()} Type: {card.landscapeType}{" "}
           </div>
           <div></div>
 
@@ -82,35 +85,19 @@ function CardComponent({
  * @returns CardComponent, but with attack/defense values
  */
 function CreatureComponent({
-  cardName,
-  cardText,
-  actionCost,
-  landscapeType,
-  attack,
-  defense,
-  imagePath,
+    card
 }: {
-  cardName: string;
-  cardText: string;
-  actionCost: number;
-  landscapeType: string;
-  attack: number;
-  defense: number;
-  imagePath: string;
+  card: Creature;
 }) {
   let child = (
     <>
-      <div>Attack: {attack}</div>
-      <div>Defense: {defense}</div>
+      <div>Attack: {card.attack}</div>
+      <div>Defense: {card.defense}</div>
     </>
   );
   return (
     <CardComponent
-      cardName={cardName}
-      cardText={cardText}
-      actionCost={actionCost}
-      landscapeType={landscapeType}
-      imagePath={imagePath}
+      card={card}
     >
       {child}
     </CardComponent>
@@ -165,29 +152,19 @@ function DiscardPile({ size }: { size: number }) {
  */
 function HandOfCards({ playerHand }: { playerHand: Card[] }) {
   let shownHand = [];
+  
   for (let i = 0; i < playerHand.length; i++) {
-    let card = playerHand[i];
-
-    if (card instanceof Creature) {
+    let currentCard = playerHand[i];
+    if (currentCard instanceof Creature) {
       shownHand.push(
         CreatureComponent({
-          cardName: card.name,
-          cardText: card.flavorText,
-          actionCost: card.getCost(),
-          landscapeType: card.landscapeType,
-          attack: card.attack,
-          defense: card.defense,
-          imagePath: "",
+          card: currentCard,
         }),
       );
     } else {
       shownHand.push(
         CardComponent({
-          cardName: card.name,
-          cardText: card.flavorText,
-          actionCost: card.getCost(),
-          landscapeType: card.landscapeType,
-          imagePath: "",
+          card: currentCard
         }),
       );
     }
@@ -252,25 +229,11 @@ function LandscapeCard({
   let b = <></>;
   // check if creature is undefined
   if (creature?.name == null) {
-    c = CreatureComponent({
-      cardName: creature!.name,
-      cardText: creature!.flavorText,
-      actionCost: creature!.getCost(),
-      landscapeType: creature!.landscapeType,
-      attack: creature!.attack,
-      defense: creature!.defense,
-      imagePath: "",
-    });
+    c = CreatureComponent({card: creature});
   }
   // check if building is undefined
   if (building?.name == null) {
-    b = CardComponent({
-      cardName: building!.name,
-      cardText: building!.flavorText,
-      actionCost: building!.getCost(),
-      landscapeType: building!.landscapeType,
-      imagePath: "",
-    });
+    b = CardComponent({card: building});
   }
 
   return (
