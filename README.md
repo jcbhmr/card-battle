@@ -34,6 +34,7 @@ This is Jacob's list of cool tech tools that were shown off at some point in tea
 - **[StackBlitz](https://stackblitz.com/):** No-configuration Node.js dev env for frontend & light backend.
 - **[Excalidraw](https://excalidraw.com/):** Great for low pressure crude sketches and diagrams when you need digital pen & paper.
 - **[XState](https://github.com/statelyai/xstate):** Makes diagrams, simulations, and more out of your state machine code!
+- **[Stately.ai editor](https://stately.ai/editor):** The company behind XState also makes a visual flowchart editor.
 - **[Vite](https://vitejs.dev/):** The current best frontend build system.
 - **[TypeScript](https://www.typescriptlang.org/):** The best way to write JavaScript with type declarations.
 - **[v0](https://v0.dev/):** AI code generator focused on React & Tailwind CSS
