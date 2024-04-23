@@ -1,4 +1,5 @@
 import { Game, BoardPos, CardType, Player, LandscapeType } from "../model.ts";
+import { DisplayCardEvent } from "./event.ts";
 
 export const GetCardTargetEvent: string = "getCardTarget";
 
@@ -187,7 +188,7 @@ export class Card {
   displayCard() {
     //Was drawCard, name changed for clarity
     Game.getInstance().dispatchEvent(
-      new CustomEvent("displayCard", { detail: this }),
+      new DisplayCardEvent(),
     );
   }
 
@@ -202,7 +203,9 @@ export class Card {
   }
 
   //Null Card Constant
-  static NULL = new Card("Null", "You shouldn't be seeing this!", 99, 0, LandscapeType.NULL);
+  static getNull(): Card {
+    return new Card("Null", "You shouldn't be seeing this!", 99, 0, LandscapeType.NULL);
+  }
 }
 
 export class Creature extends Card {
@@ -240,7 +243,7 @@ export class Creature extends Card {
   }
 
   override play(pos: BoardPos, playerId: number) {
-    if (pos.creature == Creature.NULL) {
+    if (pos.creature == Creature.getNull()) {
       if(pos.setCreature(this)) {
         Game.getInstance().getPlayerById(playerId).actions -= this.getCost();
         return true;
@@ -261,86 +264,16 @@ export class Creature extends Card {
   }
 
   //Creature Constants
-  static NULL = new Creature(
-    "Null",
-    "You shouldn't be seeing this!",
-    0,
-    LandscapeType.NULL,
-    0,
-    0,
-  );
-}
-
-export class Building extends Card {
-  constructor(
-    name: string,
-    flavorText: string,
-    cost: number,
-    landscapeType: string,
-  ) {
-    super(name, flavorText, CardType.Building, cost, landscapeType);
-  }
-
-  override play(pos: BoardPos, playerId: number) {
-    if (pos.building == Building.NULL) {
-      if(pos.setBuilding(this)) {
-        Game.getInstance().getPlayerById(playerId).actions -= this.getCost();
-        return true;
-      }
-    }
-    return false;
-  }
-
-  override clone(): Building {
-    return new Building(
-      this.name,
-      this.flavorText,
-      this.getCost(),
-      this.landscapeType,
+  static getNull(): Creature {
+    return new Creature(
+      "Null",
+      "You shouldn't be seeing this!",
+      0,
+      LandscapeType.NULL,
+      0,
+      0,
     );
   }
-
-  //Building Constants
-  static NULL = new Building(
-    "Null",
-    "You shouldn't be seeing this!",
-    0,
-    LandscapeType.NULL,
-  );
-}
-
-export class Spell extends Card {
-  constructor(
-    name: string,
-    flavorText: string,
-    cost: number,
-    landscapeType: string,
-  ) {
-    super(name, flavorText, CardType.Spell, cost, landscapeType);
-  }
-
-  override play(_pos: BoardPos, playerId: number) {
-    Game.getInstance().getPlayerById(playerId).discardPile.push(this)
-    Game.getInstance().getPlayerById(playerId).actions -= this.getCost();
-    return true;
-  }
-
-  override clone(): Spell {
-    return new Spell(
-      this.name,
-      this.flavorText,
-      this.getCost(),
-      this.landscapeType,
-    );
-  }
-
-  //Spell Constants
-  static NULL = new Spell(
-    "Null",
-    "You shouldn't be seeing this!",
-    0,
-    LandscapeType.NULL,
-  );
 }
 
 // By having this class, the front end can render these like they're in your hand when the game starts so you can choose where your landscapes belong

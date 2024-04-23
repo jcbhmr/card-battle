@@ -129,3 +129,9 @@ export class CardDeathEvent extends Event {
     this.executorId = executorId;
   }
 }
+
+export class DisplayCardEvent extends Event {
+  constructor() {
+    super("displayCard");
+  }
+}

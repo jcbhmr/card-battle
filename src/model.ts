@@ -2,8 +2,6 @@ import {
   Card,
   Creature,
   Landscape,
-  Spell,
-  Building,
   GetCardTargetEvent,
 } from "./engine/card.ts";
 import {
@@ -43,8 +41,7 @@ export const CardType = {
 export const LaneTargeter = {
   None: 0,
   SingleLane: 1,
-  AdjacentLanes: 2,
-  AllLanes: 3,
+  AllLanes: 2,
 };
 
 export const PlayerTargeter = {
@@ -97,28 +94,8 @@ export class Targeter {
     true,
     1,
     (lane: BoardPos) => {
-      return lane.creature == Creature.NULL;
+      return lane.creature == Creature.getNull();
     },
-    TargetType.BoardPos,
-  );
-
-  static PLAY_BUILDING_TARGETER = new Targeter(
-    PlayerTargeter.Self,
-    LaneTargeter.SingleLane,
-    true,
-    1,
-    (lane: BoardPos) => {
-      return lane.building == Building.NULL;
-    },
-    TargetType.BoardPos,
-  );
-
-  static PLAY_SPELL_TARGETER = new Targeter(
-    PlayerTargeter.Self,
-    LaneTargeter.None,
-    true,
-    1,
-    Targeter.ANY_PREDICATE,
     TargetType.BoardPos,
   );
 
@@ -173,21 +150,6 @@ export class Targeter {
           }
           return lanes;
         }
-      case LaneTargeter.AdjacentLanes:
-        var lanes: BoardPos[] | undefined =
-          Game.getInstance().board.getSideByOwnerId(player);
-        if (typeof lanes == "undefined") {
-          return null;
-        } else {
-          for (var i = 0; i < lanes.length; i++) {
-            var pos: BoardPos = lanes[i];
-            var predicate: boolean = this.selectionPredicate?.call(null, pos);
-            if (!predicate) {
-              lanes.splice(i, 1);
-            }
-          }
-          return lanes;
-        }
       case LaneTargeter.SingleLane:
         var lanes: BoardPos[] | undefined =
           Game.getInstance().board.getSideByOwnerId(player);
@@ -219,13 +181,8 @@ export class Targeter {
     for (var i = 0; i < validPos.length; i++) {
       var pos: BoardPos = validPos[i];
       switch (this.targetType) {
-        case TargetType.Building:
-          if (pos.building == Building.NULL) {
-            validPos.splice(i, 1);
-          }
-          break;
         case TargetType.Creature:
-          if (pos.creature == Creature.NULL) {
+          if (pos.creature == Creature.getNull()) {
             validPos.splice(i, 1);
           }
           break;
@@ -254,15 +211,6 @@ export class Targeter {
         var lanes: BoardPos[] | undefined =
           Game.getInstance().board.getSideByOwnerId(player);
         return typeof lanes == "undefined" ? null : lanes;
-      case LaneTargeter.AdjacentLanes:
-        if (selection == null) {
-          return null;
-        }
-
-        return Game.getInstance().board.getAllAdjacentBoardPos(
-          player,
-          selection,
-        );
       case LaneTargeter.SingleLane:
         if (selection != null) {
           return null;
@@ -330,19 +278,17 @@ export class BoardPos {
   posId: number;
   ownerId: number;
   creature: Creature;
-  building: Building;
   landscape: string;
 
   constructor(ownerId: number) {
     this.posId = BoardPos.boardIdCounter++;
     this.ownerId = ownerId;
-    this.creature = Creature.NULL;
-    this.building = Building.NULL;
+    this.creature = Creature.getNull();
     this.landscape = LandscapeType.NULL;
   }
 
   setCreature(card: Creature) {
-    if (this.creature == Creature.NULL) {
+    if (this.creature == Creature.getNull()) {
       this.creature = card;
       return true;
     }
@@ -350,20 +296,7 @@ export class BoardPos {
   }
 
   removeCreature() {
-    this.creature = Creature.NULL;
-    return true;
-  }
-
-  setBuilding(card: Building) {
-    if (this.building == Building.NULL) {
-      this.building = card;
-      return true;
-    }
-    return false;
-  }
-
-  removeBuilding() {
-    this.building = Building.NULL;
+    this.creature = Creature.getNull();
     return true;
   }
 
@@ -408,29 +341,6 @@ export class SidedBoard {
     } else {
       return null;
     }
-  }
-
-  getAllAdjacentBoardPos(
-    ownerId: number,
-    boardPos: BoardPos,
-  ): BoardPos[] | null {
-    var side: BoardPos[] | undefined = this.getSideByOwnerId(ownerId);
-    var adjacent: BoardPos[] = [];
-    if (typeof side != "undefined") {
-      for (var i = 0; i < side.length; i++) {
-        if (side[i].posId == boardPos.posId) {
-          if (i + 1 < side.length && i + 1 > 0) {
-            adjacent.push(side[i + 1]);
-          }
-          if (i - 1 < side.length && i - 0 > 0) {
-            adjacent.push(side[i - 1]);
-          }
-          adjacent.push(side[i]);
-          return adjacent;
-        }
-      }
-    }
-    return null;
   }
 }
 
@@ -537,7 +447,6 @@ export class Game extends AbstractGame {
   resetCards(playerId: number) {
     this.board.getSideByOwnerId(playerId)?.map((boardPos) => {
       boardPos.creature.setIsReady(true);
-      boardPos.building.setIsReady(true);
     });
   }
 
@@ -553,7 +462,7 @@ export class Game extends AbstractGame {
           new GetBoardPosTargetEvent(
             GetCardTargetEvent,
             (pos: BoardPos) => {
-              if (pos.creature != Creature.NULL) {
+              if (pos.creature != Creature.getNull()) {
                 return false;
               } else {
                 if (card.play(pos, playerId)) {

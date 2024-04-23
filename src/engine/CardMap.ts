@@ -7,7 +7,7 @@ import {
   BoardPos,
   Game,
 } from "../model.ts";
-import { Card, Creature, Building, Spell, Landscape } from "./card.ts";
+import { Card, Creature, Landscape } from "./card.ts";
 
 var cardMap: Map<string, Card> = new Map<string, Card>();
 
@@ -27,7 +27,7 @@ export function addUrl(name: string, Url: string): void {
 export function get(name: string): Card {
   var card: Card | undefined = cardMap.get(name);
   if (typeof card == "undefined") {
-    return Card.NULL;
+    return Card.getNull();
   } else {
     return card.clone();
   }

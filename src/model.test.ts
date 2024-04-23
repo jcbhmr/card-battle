@@ -25,26 +25,17 @@ test("Game is Playable", () => {
   getCardFromCardMap("Bog Bum"), getCardFromCardMap("Fly Swatter"), getCardFromCardMap("Dark Angel"), getCardFromCardMap("Bog Bum"), 
   getCardFromCardMap("Fly Swatter"), getCardFromCardMap("Dark Angel"), getCardFromCardMap("Bog Bum"), getCardFromCardMap("Fly Swatter")];
 
-  assert(deck1.map((card: Card) => {return card != Card.NULL}));
+  assert(deck1.map((card: Card) => {return card != Card.getNull()}));
 
   var deck2: Card[] = [getCardFromCardMap("Dark Angel"), getCardFromCardMap("Bog Bum"), getCardFromCardMap("Fly Swatter"), getCardFromCardMap("Dark Angel"), 
   getCardFromCardMap("Bog Bum"), getCardFromCardMap("Fly Swatter"), getCardFromCardMap("Dark Angel"), getCardFromCardMap("Bog Bum"), 
   getCardFromCardMap("Fly Swatter"), getCardFromCardMap("Dark Angel"), getCardFromCardMap("Bog Bum"), getCardFromCardMap("Fly Swatter")];
 
-  assert(deck2.map((card: Card) => {return card != Card.NULL}));
+  assert(deck2.map((card: Card) => {return card != Card.getNull()}));
 
   var swampLand: Landscape = new Landscape("Swamp", "Goopy!", LandscapeType.Swamp);
 
-  Game.getInstance().addEventListener(GetCardTargetEvent, (evt: Event) => {
-    if(evt instanceof GetBoardPosTargetEvent) {
-      if(evt.targeter != null) {
-        var validPos: BoardPos[] | null = evt.targeter.getValidTargets(Card.NULL, evt.executorId);
-        if(validPos != null) {
-          evt.execute(validPos[randomInt(0, validPos.length)]);
-        }
-      }
-    }
-  });
+  Game.startNewGame();
 
   //Game Test
   Game.getInstance().board.getSideByOwnerId(0)?.map((pos: BoardPos) => {pos.setLandscape(swampLand)});
@@ -79,8 +70,8 @@ test("Game is Playable", () => {
     for(var j = 0; j < mySide.length; j++) {
       var myPos: BoardPos = mySide[j];
       var theirPos: BoardPos = theirSide[j];
-      if(myPos.creature != Creature.NULL) {
-         if(theirPos.creature == Creature.NULL) {
+      if(myPos.creature != Creature.getNull()) {
+         if(theirPos.creature == Creature.getNull()) {
           myPos.creature.Attack(theirPos.creature);
          }else {
           myPos.creature.Attack(Game.getInstance().getOtherPlayer(Game.getInstance().currentPlayer.id));
