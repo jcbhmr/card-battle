@@ -338,6 +338,20 @@ export class Player {
         }
       }
     }
+
+  }
+  /**
+   * function that is called when a player uses an action to draw for turn. 
+   * @returns boolean based on whether the player had enough actions to draw
+   */
+  drawCardUsingAction(){
+    if(this.actions >= 1){
+      this.drawCard(1, true)
+      return true;
+    }
+    else{
+      return false;
+    }
   }
 }
 

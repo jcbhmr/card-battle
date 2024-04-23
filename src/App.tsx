@@ -121,18 +121,16 @@ function CreatureComponent({
  * Displays card shape with a number on it indicating how many cards are in the pile. This one has onclick to allow player to draw
  * @returns returns markup displaying what i wrote just above
  */
-function Deck({ player }: { player: Player }) {
+function Deck({ player, handState }: { player: Player, handState: React.Dispatch<React.SetStateAction<number>>}) {
   let handleDraw = function () {
-    if (player.actions < 1) {
-      player.drawCard(1);
-      player.actions -= 1;
-    } else {
+    if (!player.drawCardUsingAction()) {
       log.push(
         <div>
           {player.username} attempted to draw, but does not have enough actions.
         </div>,
       );
-    }
+    } 
+    handState(player.hand);
   };
   return (
     <div
@@ -196,97 +194,6 @@ function HandOfCards({ player }: { player: Player }) {
     }
   }
   return <div className="flex flex-row gap-2">{shownHand}</div>;
-}
-
-function AppBoard() {
-  return (
-    <div className="grid grid-cols-1 gap-4 border-yellow-800">
-      <div className="space-y-4">
-        <div className="flex items-center space-x-4">
-          <div className="grid grid-cols-4 items-start gap-4">
-            <div className="w-full aspect-[1.4] rounded-lg overflow-hidden">
-              <img
-                alt="Card 1"
-                className="aspect-[1.4] object-cover border border-gray-100 dark:border-gray-800"
-                height={150}
-                src={placeholderSVGURL}
-                width={150}
-              />
-            </div>
-            <div className="w-full aspect-[1.4] rounded-lg overflow-hidden">
-              <img
-                alt="Card 2"
-                className="aspect-[1.4] object-cover border border-gray-100 dark:border-gray-800"
-                height={150}
-                src={placeholderSVGURL}
-                width={150}
-              />
-            </div>
-            <div className="w-full aspect-[1.4] rounded-lg overflow-hidden">
-              <img
-                alt="Card 3"
-                className="aspect-[1.4] object-cover border border-gray-100 dark:border-gray-800"
-                height={150}
-                src={placeholderSVGURL}
-                width={150}
-              />
-            </div>
-            <div className="w-full aspect-[1.4] rounded-lg overflow-hidden">
-              <img
-                alt="Card 4"
-                className="aspect-[1.4] object-cover border border-gray-100 dark:border-gray-800"
-                height={150}
-                src={placeholderSVGURL}
-                width={150}
-              />
-            </div>
-          </div>
-        </div>
-      </div>
-      <div className="space-y-4">
-        <div className="flex items-center space-x-4">
-          <div className="grid grid-cols-4 items-start gap-4">
-            <div className="w-full aspect-[1.4] rounded-lg overflow-hidden">
-              <img
-                alt="Card 1"
-                className="aspect-[1.4] object-cover border border-gray-100 dark:border-gray-800"
-                height={150}
-                src={placeholderSVGURL}
-                width={150}
-              />
-            </div>
-            <div className="w-full aspect-[1.4] rounded-lg overflow-hidden">
-              <img
-                alt="Card 2"
-                className="aspect-[1.4] object-cover border border-gray-100 dark:border-gray-800"
-                height={150}
-                src={placeholderSVGURL}
-                width={150}
-              />
-            </div>
-            <div className="w-full aspect-[1.4] rounded-lg overflow-hidden">
-              <img
-                alt="Card 3"
-                className="aspect-[1.4] object-cover border border-gray-100 dark:border-gray-800"
-                height={150}
-                src={placeholderSVGURL}
-                width={150}
-              />
-            </div>
-            <div className="w-full aspect-[1.4] rounded-lg overflow-hidden">
-              <img
-                alt="Card 4"
-                className="aspect-[1.4] object-cover border border-gray-100 dark:border-gray-800"
-                height={150}
-                src={placeholderSVGURL}
-                width={150}
-              />
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
 }
 
 /**
@@ -414,7 +321,8 @@ function GameBoard({ game }: { game: Game }) {
   const [turn, setTurn] = useState(game.currentTurn);
   const [phase, setPhase] = useState(game.turnPhase);
   const [currentPlayer, setCurrentPlayer] = useState(game.currentPlayer);
-
+  const [hand1, setCurrentHand1] = useState(game.players[0].hand);
+  const [hand2, setCurrentHand2] = useState(game.players[1].hand);
   let player1 = game.getPlayerById(0);
   let player2 = game.getPlayerById(1);
   return (
@@ -430,7 +338,7 @@ function GameBoard({ game }: { game: Game }) {
           {/*This column shows a deck and discard pile*/}
           <div className="flex flex-col gap-10">
             <PlayerDisplay game={game} player={player2}></PlayerDisplay>
-            <Deck player={player2}></Deck>
+            <Deck player={player2} handState={setCurrentHand2}></Deck>
             <DiscardPile size={5}></DiscardPile>
           </div>
           {/*The board between two columns*/}
@@ -440,7 +348,7 @@ function GameBoard({ game }: { game: Game }) {
             {/*The first column shows the deck and discard pile (like the one you saw earlier*/}
             <div className="flex flex-col gap-10">
               <DiscardPile size={5}></DiscardPile>
-              <Deck player={player1}></Deck>
+              <Deck player={player1} handState={setCurrentHand1}></Deck>
               <PlayerDisplay game={game} player={player1}></PlayerDisplay>
             </div>
             {/*This column shows the game log text bot and the button for moving phases below it*/}
