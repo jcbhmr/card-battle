@@ -464,6 +464,14 @@ export class Game extends AbstractGame {
       boardPos.creature.setIsReady(true);
     });
   }
+  /**
+   * summons a creature to the side of player id at position number 
+   */
+  summonCard(playerId: number, position: number, card: Creature){
+    let player = this.getPlayerById(playerId);
+    let pos = this.board.getBoardPosByOwnerId(playerId, position);
+    pos.creature=card;
+  }
 
   playCard(card: Card, playerId: number): boolean {
     if (this.turnPhase != TurnPhases.Play || 
