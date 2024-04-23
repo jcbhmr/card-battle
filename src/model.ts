@@ -98,7 +98,7 @@ export class Targeter {
     true,
     1,
     (lane: BoardPos) => {
-      return lane.creature == Creature.NULL;
+      return lane.creature == Creature.getNull();
     },
     TargetType.BoardPos,
   );
@@ -109,7 +109,7 @@ export class Targeter {
     true,
     1,
     (lane: BoardPos) => {
-      return lane.building == Building.NULL;
+      return lane.building == Building.getNull();
     },
     TargetType.BoardPos,
   );
@@ -221,12 +221,12 @@ export class Targeter {
       var pos: BoardPos = validPos[i];
       switch (this.targetType) {
         case TargetType.Building:
-          if (pos.building == Building.NULL) {
+          if (pos.building == Building.getNull()) {
             validPos.splice(i, 1);
           }
           break;
         case TargetType.Creature:
-          if (pos.creature == Creature.NULL) {
+          if (pos.creature == Creature.getNull()) {
             validPos.splice(i, 1);
           }
           break;
@@ -328,8 +328,8 @@ export class Player {
         const drawnCard = this.deck.pop();
         if (typeof drawnCard != "undefined") {
           this.hand.push(drawnCard);
-          if (drawnCard.ability.init != Ability.NULL_EVENT_FUNC) {
-            drawnCard.ability.init(drawnCard);
+          if (drawnCard.ability?.init != Ability.NULL_EVENT_FUNC) {
+            drawnCard.ability?.init(drawnCard);
           }
           if(useAction) {
             this.actions -= amount;
@@ -354,14 +354,14 @@ export class BoardPos {
   constructor(ownerId: number) {
     this.posId = BoardPos.boardIdCounter++;
     this.ownerId = ownerId;
-    this.creature = Creature.NULL;
-    this.building = Building.NULL;
+    this.creature = Creature.getNull();
+    this.building = Building.getNull();
     this.landscape = LandscapeType.NULL;
     this.activeEffects = []; // effectively used as active landscape effects
   }
 
   setCreature(card: Creature) {
-    if (this.creature == Creature.NULL) {
+    if (this.creature == Creature.getNull()) {
       this.creature = card;
       return true;
     }
@@ -369,12 +369,12 @@ export class BoardPos {
   }
 
   removeCreature() {
-    this.creature = Creature.NULL;
+    this.creature = Creature.getNull();
     return true;
   }
 
   setBuilding(card: Building) {
-    if (this.building == Building.NULL) {
+    if (this.building == Building.getNull()) {
       this.building = card;
       return true;
     }
@@ -382,7 +382,7 @@ export class BoardPos {
   }
 
   removeBuilding() {
-    this.building = Building.NULL;
+    this.building = Building.getNull();
     return true;
   }
 
@@ -401,13 +401,13 @@ export class BoardPos {
 
   addEffect(effect: Effect) {
     this.activeEffects.push(effect);
-    if (this.creature != Creature.NULL) {
+    if (this.creature != Creature.getNull()) {
       this.creature.attack += effect.attackBonus.call(null, this);
       this.creature.defense -= effect.damage.call(null, this);
       this.creature.defense += effect.defenseBonus.call(null, this);
       this.creature.setIsReady(!effect.disables);
     }
-    if (this.building != Building.NULL) {
+    if (this.building != Building.getNull()) {
       this.building.setIsReady(!effect.disables);
     }
 
@@ -429,14 +429,14 @@ export class BoardPos {
   }
 
   removeEffect(effect: Effect) {
-    if (effect == Effect.NULL) {
+    if (effect == Effect.getNull()) {
       return false;
     }
 
     if (this.hasEffect(effect)) {
       for (var i = 0; i < this.activeEffects.length; i++) {
         if (this.activeEffects[i] == effect) {
-          this.activeEffects[i] == Effect.NULL;
+          this.activeEffects[i] == Effect.getNull();
         }
       }
       return true;
@@ -626,7 +626,7 @@ export class Game extends AbstractGame {
           new GetBoardPosTargetEvent(
             GetCardTargetEvent,
             (pos: BoardPos) => {
-              if (pos.building != Building.NULL) {
+              if (pos.building != Building.getNull()) {
                 return false;
               } else {
                 if (card.play(pos, playerId)) {
@@ -649,7 +649,7 @@ export class Game extends AbstractGame {
           new GetBoardPosTargetEvent(
             GetCardTargetEvent,
             (pos: BoardPos) => {
-              if (pos.creature != Creature.NULL) {
+              if (pos.creature != Creature.getNull()) {
                 return false;
               } else {
                 if (card.play(pos, playerId)) {
@@ -672,7 +672,7 @@ export class Game extends AbstractGame {
           new GetBoardPosTargetEvent(
             GetCardTargetEvent,
             (pos: BoardPos) => {
-              if (pos.landscape != LandscapeType.NULL) {
+              if (pos.landscape != LandscapeType.getNull()) {
                 return false;
               } else {
                 if (card.play(pos, playerId)) {

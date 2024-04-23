@@ -25,20 +25,22 @@ test("Game is Playable", () => {
   getCardFromCardMap("Bog Bum"), getCardFromCardMap("Fly Swatter"), getCardFromCardMap("Dark Angel"), getCardFromCardMap("Bog Bum"), 
   getCardFromCardMap("Fly Swatter"), getCardFromCardMap("Dark Angel"), getCardFromCardMap("Bog Bum"), getCardFromCardMap("Fly Swatter")];
 
-  assert(deck1.map((card: Card) => {return card != Card.NULL}));
+  assert(deck1.map((card: Card) => {return card != Card.getNull()}));
 
   var deck2: Card[] = [getCardFromCardMap("Dark Angel"), getCardFromCardMap("Bog Bum"), getCardFromCardMap("Fly Swatter"), getCardFromCardMap("Dark Angel"), 
   getCardFromCardMap("Bog Bum"), getCardFromCardMap("Fly Swatter"), getCardFromCardMap("Dark Angel"), getCardFromCardMap("Bog Bum"), 
   getCardFromCardMap("Fly Swatter"), getCardFromCardMap("Dark Angel"), getCardFromCardMap("Bog Bum"), getCardFromCardMap("Fly Swatter")];
 
-  assert(deck2.map((card: Card) => {return card != Card.NULL}));
+  assert(deck2.map((card: Card) => {return card != Card.getNull()}));
 
   var swampLand: Landscape = new Landscape("Swamp", "Goopy!", LandscapeType.Swamp);
 
+  Game.startNewGame();
+  
   Game.getInstance().addEventListener(GetCardTargetEvent, (evt: Event) => {
     if(evt instanceof GetBoardPosTargetEvent) {
       if(evt.targeter != null) {
-        var validPos: BoardPos[] | null = evt.targeter.getValidTargets(Card.NULL, evt.executorId);
+        var validPos: BoardPos[] | null = evt.targeter.getValidTargets(Card.getNull(), evt.executorId);
         if(validPos != null) {
           evt.execute(validPos[randomInt(0, validPos.length)]);
         }
@@ -52,7 +54,7 @@ test("Game is Playable", () => {
   var player0Side: BoardPos[] | undefined = Game.getInstance().board.getSideByOwnerId(0);
   expect(typeof player0Side != "undefined" && player0Side[0].landscape == LandscapeType.Swamp);
 
-  assert(Game.getInstance().currentPlayer == Game.getInstance().getPlayerById(0));
+  expect(Game.getInstance().currentPlayer).toEqual(Game.getInstance().getPlayerById(0));
 
   Game.getInstance().currentPlayer.deck = deck1;
   Game.getInstance().currentPlayer.drawCard(6, false);
@@ -66,10 +68,15 @@ test("Game is Playable", () => {
   Game.getInstance().enterNextPhase();
 
   var mySide: BoardPos[] | undefined = Game.getInstance().board.getSideByOwnerId(Game.getInstance().currentPlayer.id);
+  // console.log(mySide, Game.getInstance().currentPlayer.id)
+  console.log(Game.getInstance().board.lanes)
   var theirSide: BoardPos[] | undefined = Game.getInstance().board.getSideByOwnerId(Game.getInstance().getOtherPlayer(Game.getInstance().currentPlayer.id).id)
   
-  assert(typeof(mySide) != "undefined" && typeof(theirSide) != "undefined");
-  assert(mySide.length == theirSide.length);
+  // assert(typeof(mySide) != "undefined" && typeof(theirSide) != "undefined");
+  expect(typeof mySide).not.toBe("undefined")
+  expect(typeof theirSide).not.toBe("undefined")
+  // assert(mySide.length == theirSide.length);
+  expect(mySide?.length).toBe(theirSide?.length)
 
   //Not going to worry about testing with abilities right now, we can test that in another Test() call
   Game.getInstance().enterNextPhase();
@@ -79,8 +86,8 @@ test("Game is Playable", () => {
     for(var j = 0; j < mySide.length; j++) {
       var myPos: BoardPos = mySide[j];
       var theirPos: BoardPos = theirSide[j];
-      if(myPos.creature != Creature.NULL) {
-         if(theirPos.creature == Creature.NULL) {
+      if(myPos.creature != Creature.getNull()) {
+         if(theirPos.creature == Creature.getNull()) {
           myPos.creature.Attack(theirPos.creature);
          }else {
           myPos.creature.Attack(Game.getInstance().getOtherPlayer(Game.getInstance().currentPlayer.id));

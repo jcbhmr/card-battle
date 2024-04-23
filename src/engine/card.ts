@@ -244,7 +244,9 @@ export class Card {
   }
 
   //Null Card Constant
-  static NULL = new Card("Null", "You shouldn't be seeing this!", 99, 0, LandscapeType.NULL, Ability.NULL);
+  static getNull() {
+    return new Card("Null", "You shouldn't be seeing this!", 99, 0, LandscapeType.NULL, Ability.getNull());
+  }
 }
 
 export class Creature extends Card {
@@ -316,7 +318,7 @@ export class Creature extends Card {
           effect.cardDiscount.call(null, loc);
         Game.getInstance()
           .getPlayerById(this.currentOwnerId)
-          .drawCard(effect.cardsDrawn.call(null, loc));
+          .drawCard(effect.cardsDrawn.call(null, loc), false);
       }
     }
   }
@@ -334,15 +336,17 @@ export class Creature extends Card {
   }
 
   //Creature Constants
-  static NULL = new Creature(
-    "Null",
-    "You shouldn't be seeing this!",
-    0,
-    LandscapeType.NULL,
-    Ability.NULL,
-    0,
-    0,
-  );
+  static getNull(): Creature {
+    return new Creature(
+      "Null",
+      "You shouldn't be seeing this!",
+      0,
+      LandscapeType.NULL,
+      Ability.getNull(),
+      0,
+      0,
+    );
+  }
 }
 
 export class Building extends Card {
@@ -387,7 +391,7 @@ export class Building extends Card {
           effect.cardDiscount.call(null, loc);
         Game.getInstance()
           .getPlayerById(this.currentOwnerId)
-          .drawCard(effect.cardsDrawn.call(null, loc));
+          .drawCard(effect.cardsDrawn.call(null, loc), false);
       }
     }
   }
@@ -403,13 +407,15 @@ export class Building extends Card {
   }
 
   //Building Constants
-  static NULL = new Building(
-    "Null",
-    "You shouldn't be seeing this!",
-    0,
-    LandscapeType.NULL,
-    Ability.NULL,
-  );
+  static getNull(): Building {
+    return new Building(
+      "Null",
+      "You shouldn't be seeing this!",
+      0,
+      LandscapeType.NULL,
+      Ability.getNull(),
+    );
+  }
 }
 
 export class Spell extends Card {
@@ -441,19 +447,21 @@ export class Spell extends Card {
   }
 
   //Spell Constants
-  static NULL = new Spell(
-    "Null",
-    "You shouldn't be seeing this!",
-    0,
-    LandscapeType.NULL,
-    Ability.NULL,
-  );
+  static getNull(): Spell {
+    return new Spell(
+      "Null",
+      "You shouldn't be seeing this!",
+      0,
+      LandscapeType.NULL,
+      Ability.getNull(),
+    );
+  }
 }
 
 // By having this class, the front end can render these like they're in your hand when the game starts so you can choose where your landscapes belong
 export class Landscape extends Card {
   constructor(name: string, flavorText: string, landscapeType: string) {
-    super(name, flavorText, CardType.Landscape, 0, landscapeType, Ability.NULL);
+    super(name, flavorText, CardType.Landscape, 0, landscapeType, Ability.getNull());
   }
 
   static addGetTargetEventListener(
@@ -491,7 +499,7 @@ export class Landscape extends Card {
           effect.cardDiscount.call(null, loc);
         Game.getInstance()
           .getPlayerById(this.currentOwnerId)
-          .drawCard(effect.cardsDrawn.call(null, loc));
+          .drawCard(effect.cardsDrawn.call(null, loc), false);
       }
     }
   }

@@ -180,12 +180,13 @@ export class Effect {
 
   //Effect Constants
   static NULL: Effect = new Effect();
+
   static FROZEN: Effect = new Effect()
-    .setDisables()
-    .setPlayablePredicate(
-      (lane: BoardPos) =>
-        lane.activeEffects.length > 0 && lane.hasEffect(Effect.FROZEN),
-    );
+  .setDisables()
+  .setPlayablePredicate(
+    (lane: BoardPos) =>
+      lane.activeEffects.length > 0 && lane.hasEffect(Effect.FROZEN),
+  );
 }
 
 export class Ability {
@@ -211,18 +212,8 @@ export class Ability {
     this.effect = effect;
     this.healthCost = healthCost;
     this.init = init;
-
-    //Just a check to make sure that no orAbility or andAbility is actually assigned null but uses the null ability instead
-    if (orAbility == null) {
-      this.orAbility = Ability.NULL;
-    } else {
-      this.orAbility = orAbility;
-    }
-    if (andAbility == null) {
-      this.andAbility = Ability.NULL;
-    } else {
-      this.andAbility = andAbility;
-    }
+    this.orAbility = orAbility;
+    this.andAbility = andAbility;
   }
 
   static addGetAbilityTargetEventListener(
@@ -304,6 +295,7 @@ export class Ability {
               }
             } else {
               // Targets is BoardPos[]
+              console.log(this.targeter.targetType);
               if (this.targeter.targetType == TargetType.Creature) {
                 targets.map((pos: BoardPos) => {
                   pos.creature.addEffect(this.effect);
@@ -373,67 +365,72 @@ export class Ability {
   };
 
   //Ability Constants
-  static NULL = new Ability(
-    "Null",
-    new Targeter(
-      PlayerTargeter.Self,
-      LaneTargeter.None,
-      false,
+  static getNull(): Ability {
+    return new Ability(
+      "Null",
+      new Targeter(
+        PlayerTargeter.Self,
+        LaneTargeter.None,
+        false,
+        0,
+        Targeter.ANY_PREDICATE,
+        TargetType.Player,
+      ),
+      Effect.NULL,
       0,
-      Targeter.ANY_PREDICATE,
-      TargetType.Player,
-    ),
-    Effect.NULL,
-    0,
-    null,
-    null,
-  );
+      null,
+      null,
+    );
+  }
 
-  //Note that the predicate here is useless and is here for syntax. This should be checked when looking at the targers for lane, player, and type.
-  //A useful predicate would be something like (lane) => lane.creature.defense > 2 or (lane) => lane.creature.hasEffect == Effects.FROZEN
-  static DAMAGE_ALL_1 = new Ability(
-    "Deal 1 damage to every creature in every lane.",
-    new Targeter(
-      PlayerTargeter.Opponent,
-      LaneTargeter.AllLanes,
-      false,
+  static getDamageAll(damage: number): Ability {
+    return new Ability(
+      "Deal 1 damage to every creature in every lane.",
+      new Targeter(
+        PlayerTargeter.Opponent,
+        LaneTargeter.AllLanes,
+        false,
+        0,
+        (lane: BoardPos) => lane.creature != Creature.getNull(),
+        TargetType.Creature,
+      ),
+      new Effect()
+        .setDamage(() => {
+          return damage;
+        })
+        .setEffectDuration(EffectDuration.Instant)
+        .setEffectUpdateType(EffectUpdateType.EnterPlay),
       0,
-      (lane: BoardPos) => lane.creature != Creature.NULL,
-      TargetType.Creature,
-    ),
-    new Effect()
-      .setDamage(() => {
-        return 1;
-      })
-      .setEffectDuration(EffectDuration.Instant)
-      .setEffectUpdateType(EffectUpdateType.EnterPlay),
-    0,
-    Ability.NULL,
-    Ability.NULL,
-  );
+      Ability.getNull(),
+      Ability.getNull(),
+    );
+  }
 
-  static ON_PLAY_DAMAGE_CREATURE_1 = new Ability(
-    "Deal 1 damage to any creature in any lane.",
-    new Targeter(
-      PlayerTargeter.Opponent,
-      LaneTargeter.SingleLane,
-      true,
-      1,
-      (lane: BoardPos) => lane.creature != Creature.NULL,
-      TargetType.Creature,
-    ),
-    new Effect()
-      .setDamage(() => {
-        return 1;
-      })
-      .setEffectDuration(EffectDuration.Instant)
-      .setEffectUpdateType(EffectUpdateType.EnterPlay),
-    0,
-    Ability.NULL,
-    Ability.NULL,
-    (caller: Card) => {
-      caller.ability.activate(caller);
-      return true;
-    },
-  );
+  static getOnPlayDamageCreature(damage: number): Ability {
+    return new Ability(
+      "Deal 1 damage to any creature in any lane.",
+      new Targeter(
+        PlayerTargeter.Opponent,
+        LaneTargeter.SingleLane,
+        true,
+        1,
+        (lane: BoardPos) => lane.creature != Creature.getNull(),
+        TargetType.Creature,
+      ),
+      new Effect()
+        .setDamage(() => {
+          return damage;
+        })
+        .setEffectDuration(EffectDuration.Instant)
+        .setEffectUpdateType(EffectUpdateType.EnterPlay),
+      0,
+      Ability.getNull(),
+      Ability.getNull(),
+      (caller: Card) => {
+        caller.ability.activate(caller);
+        return true;
+      },
+    );
+  }
+
 }
