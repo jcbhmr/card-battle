@@ -166,6 +166,34 @@ put(
   ),
 );
 
+put(
+  "Unicylops",
+  new Creature("Unicylops", "", 2, LandscapeType.Swamp, Ability.NULL, 7, 3),
+);
+put(
+  "Man Witch",
+  new Creature("Man Witch", "", 2, LandscapeType.Swamp, Ability.NULL, 4, 4),
+);
+
+put(
+  "Furious Hen",
+  new Creature("Furious Hen", "", 1, LandscapeType.Candylands, Ability.NULL, 2, 7),
+);
+
+put(
+  "Furious Rooster",
+  new Creature("Furious Rooster", "", 1, LandscapeType.Candylands, Ability.NULL, 4, 4),
+);
+
+put(
+  "Papercut Tiger",
+  new Creature("Papercut Tiger", "", 1, LandscapeType.Candylands, Ability.NULL, 2, 5),
+);
+
+put(
+  "Cottonpult",
+  new Creature("Cottonpult","",2, LandscapeType.Candylands,Ability.NULL,6,6),
+);
 //=====================================================================================================================================================
 //                                                                BUILDINGS
 //=====================================================================================================================================================
