@@ -297,19 +297,6 @@ export class Player {
     this.cardDiscount = 0;
   }
 
-  addEffect(effect: Effect) {
-    var pos: BoardPos | null = Game.getInstance().board.getBoardPosByOwnerId(this.id, 0)
-    if(pos != null) {
-      effect.conditionsApplied.call(null, pos).map((effect: Effect) => {
-        this.addEffect(effect);
-      });
-
-      this.actions += effect.actionBonus.call(null, pos);
-      this.cardDiscount += effect.cardDiscount.call(null, pos);
-      this.drawCard(effect.cardsDrawn.call(null, pos), false);
-    }
-  }
-
   discard(index: number = -1) {
     if (index == -1) {
       index = Math.floor(Math.random() * this.hand.length);
@@ -345,7 +332,6 @@ export class BoardPos {
   creature: Creature;
   building: Building;
   landscape: string;
-  activeEffects: Effect[];
 
   constructor(ownerId: number) {
     this.posId = BoardPos.boardIdCounter++;
@@ -353,7 +339,6 @@ export class BoardPos {
     this.creature = Creature.NULL;
     this.building = Building.NULL;
     this.landscape = LandscapeType.NULL;
-    this.activeEffects = []; // effectively used as active landscape effects
   }
 
   setCreature(card: Creature) {
@@ -393,60 +378,6 @@ export class BoardPos {
   removeLandscape() {
     this.landscape = LandscapeType.NULL;
     return true;
-  }
-
-  addEffect(effect: Effect) {
-    this.activeEffects.push(effect);
-    if (this.creature != Creature.NULL) {
-      this.creature.attack += effect.attackBonus.call(null, this);
-      this.creature.defense -= effect.damage.call(null, this);
-      this.creature.defense += effect.defenseBonus.call(null, this);
-      this.creature.setIsReady(!effect.disables);
-    }
-    if (this.building != Building.NULL) {
-      this.building.setIsReady(!effect.disables);
-    }
-
-    effect.conditionsApplied.call(null, this).map((effect: Effect) => {
-      this.addEffect(effect);
-    });
-    effect.conditionsApplied.call(null, this).map((effect: Effect) => {
-      this.removeEffect(effect);
-    });
-
-    //We have absolutely no way to reveal cards for effect.cardsRevealed at the moment, will probably be removed.
-    Game.getInstance().getPlayerById(this.ownerId).actions +=
-      effect.actionBonus.call(null, this);
-    Game.getInstance().getPlayerById(this.ownerId).cardDiscount +=
-      effect.cardDiscount.call(null, this);
-    Game.getInstance()
-      .getPlayerById(this.ownerId)
-      .drawCard(effect.cardsDrawn.call(null, this), false);
-  }
-
-  removeEffect(effect: Effect) {
-    if (effect == Effect.NULL) {
-      return false;
-    }
-
-    if (this.hasEffect(effect)) {
-      for (var i = 0; i < this.activeEffects.length; i++) {
-        if (this.activeEffects[i] == effect) {
-          this.activeEffects[i] == Effect.NULL;
-        }
-      }
-      return true;
-    }
-    return false;
-  }
-
-  hasEffect(effect: Effect) {
-    for (var i = 0; i < this.activeEffects.length; i++) {
-      if (this.activeEffects[i] == effect) {
-        return true;
-      }
-    }
-    return false;
   }
 }
 
