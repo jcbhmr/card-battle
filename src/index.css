@@ -111,8 +111,7 @@
 .landscape_shape {
   flex-direction: column;
   border-radius: 0.5rem;
-  border-width: 2px;
-  border-color: black;
+  border-width: 5px;
   width: 200px;
   height: 300px;
   display: flex;

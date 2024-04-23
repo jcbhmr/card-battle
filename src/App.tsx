@@ -30,13 +30,15 @@ log.push(<div>Player 2 summoned "Monster name!"</div>);
 function CardComponent({
   card,
   children,
+  state
 }: {
   card: Card | Creature;
   children?: ReactNode;
+  state: React.Dispatch<React.SetStateAction<boolean>>
 }) {
   function handleClick(){
     if(card instanceof Creature){
-      //summon card
+      state(true);
     }
     // else if (card instanceof Building){
     //   //place building
@@ -86,9 +88,11 @@ function CardComponent({
  * @returns CardComponent, but with attack/defense values
  */
 function CreatureComponent({
-    card
+    card,
+    state
 }: {
-  card: Creature;
+  card: Creature,
+  state: React.Dispatch<React.SetStateAction<boolean>>
 }) {
   let child = (
     <>
@@ -99,6 +103,7 @@ function CreatureComponent({
   return (
     <CardComponent
       card={card}
+      state={state}
     >
       {child}
     </CardComponent>
@@ -111,9 +116,7 @@ function CreatureComponent({
  */
 function Deck({ player, handState }: { player: Player, handState: React.Dispatch<React.SetStateAction<Card[]>>}) {
   let handleDraw = function () {
-    console.log("test")
     let boolean = player.drawCardUsingAction();
-    console.log(boolean)
     handState(player.hand);
     if (!boolean) {
       console.log("it was false!!!")
@@ -156,7 +159,7 @@ function DiscardPile({ size }: { size: number }) {
  * @author Tanner Brown
  * @returns Array of CardComponents/CreatureComponents
  */
-function HandOfCards({ playerHand }: { playerHand: Card[] }) {
+function HandOfCards({ playerHand, stateChange}: { playerHand: Card[], stateChange: React.Dispatch<React.SetStateAction<boolean>>}) {
   let shownHand = [];
   
   for (let i = 0; i < playerHand.length; i++) {
@@ -165,15 +168,18 @@ function HandOfCards({ playerHand }: { playerHand: Card[] }) {
       shownHand.push(
         CreatureComponent({
           card: currentCard,
+          state: stateChange
         }),
       );
     } else {
       shownHand.push(
         CardComponent({
-          card: currentCard
+          card: currentCard,
+          state: stateChange
         }),
       );
     }
+    
   }
   return <div className="flex flex-row gap-2">{shownHand}</div>;
 }
@@ -184,15 +190,17 @@ function HandOfCards({ playerHand }: { playerHand: Card[] }) {
  * creature, building in the array inside of each landscape inside of a larger board.
  * @returns markup that displays the board.
  */
-function Board({ game }: { game: Game }) {
+function Board({ game, summonState }: { game: Game, summonState: boolean }) {
   let p1Board = [];
   let p2Board = [];
   //Looping through board to display it
   for (let i = 0; i < 4; i++) {
     p1Board.push(
       LandscapeCard({
-        creature: game.board.getBoardPosByOwnerId(0, i)?.creature
+        creature: game.board.getBoardPosByOwnerId(0, i)?.creature,
         //building: game.board.getBoardPosByOwnerId(0, i)?.building,
+        summonState: summonState
+
       }),
     );
 
@@ -200,6 +208,7 @@ function Board({ game }: { game: Game }) {
       LandscapeCard({
         creature: game.board.getBoardPosByOwnerId(1, i)?.creature,
         //building: game.board.getBoardPosByOwnerId(1, i)?.building,
+        summonState: summonState
       }),
     );
   }
@@ -226,9 +235,11 @@ function Board({ game }: { game: Game }) {
 function LandscapeCard({
   //building,
   creature,
+  summonState
 }: {
   //building: Building | undefined;
   creature: Creature | undefined;
+  summonState: boolean
 }) {
   //c is creature, b is building. default values are empty tags (is that what they're called?)
   let c = <></>;
@@ -241,9 +252,16 @@ function LandscapeCard({
   // if (building?.name == null) {
   //   b = CardComponent({card: building});
   // }
-
+  let cname = "landscape_shape flex justify-center items-center border-indigo-800"
+  if(summonState){
+    cname="landscape_shape flex justify-center items-center border-red-800";
+    
+  }
+  else{
+    
+  }
   return (
-    <div className="landscape_shape flex justify-center items-center">
+    <div className={cname}>
       {c}
       {/* {b} */}
     </div>
@@ -291,15 +309,18 @@ function GameBoard({ game }: { game: Game }) {
   const [currentPlayer, setCurrentPlayer] = useState(game.currentPlayer);
   const [hand1, setCurrentHand1] = useState(game.players[0].hand);
   const [hand2, setCurrentHand2] = useState(game.players[1].hand);
+  const [summoningCard, setSummoningCard] = useState(false);
+
   let player1 = game.getPlayerById(0);
   let player2 = game.getPlayerById(1);
+
   return (
     <div className="flex justify-center items-center h-screen p-4">
       <div>
         {/*Gonna need to comment much of this just so we're aware of what is happening in some of these.*/}
         {/*This div is a row that shows a players stats and then their hand of cards*/}
         <div className="flex flex-row justify-center items-center">
-          <HandOfCards playerHand={hand2}></HandOfCards>
+          <HandOfCards playerHand={hand2}> stateChange={setSummoningCard}</HandOfCards>
         </div>
         {/*This div pretty large. It's where discard piles, decks, and the actual board goes*/}
         <div className="flex justify-center items-center gap-4">
@@ -310,13 +331,13 @@ function GameBoard({ game }: { game: Game }) {
             <DiscardPile size={5}></DiscardPile>
           </div>
           {/*The board between two columns*/}
-          <Board game={game} />
+          <Board game={game } summonState={summoningCard} />
           {/*This is a row of two columns*/}
           <div className="flex flex-row gap-4">
             {/*The first column shows the deck and discard pile (like the one you saw earlier*/}
             <div className="flex flex-col gap-10">
               <DiscardPile size={5}></DiscardPile>
-              <Deck player={player1} handState={setCurrentHand1}></Deck>
+              <Deck player={player1}  handState={setCurrentHand1}></Deck>
               <PlayerDisplay game={game} player={player1}></PlayerDisplay>
             </div>
             {/*This column shows the game log text bot and the button for moving phases below it*/}
@@ -337,7 +358,7 @@ function GameBoard({ game }: { game: Game }) {
           </div>
         </div>
         <div className="flex flex-row justify-center items-center">
-          <HandOfCards playerHand={hand1}></HandOfCards>
+          <HandOfCards playerHand={hand1} stateChange={setSummoningCard}></HandOfCards>
         </div>
       </div>
     </div>
