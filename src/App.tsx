@@ -121,7 +121,7 @@ function CreatureComponent({
  * Displays card shape with a number on it indicating how many cards are in the pile. This one has onclick to allow player to draw
  * @returns returns markup displaying what i wrote just above
  */
-function Deck({ player, handState }: { player: Player, handState: React.Dispatch<React.SetStateAction<number>>}) {
+function Deck({ player, handState }: { player: Player, handState: React.Dispatch<React.SetStateAction<Card[]>>}) {
   let handleDraw = function () {
     if (!player.drawCardUsingAction()) {
       log.push(
@@ -163,8 +163,7 @@ function DiscardPile({ size }: { size: number }) {
  * @author Tanner Brown
  * @returns Array of CardComponents/CreatureComponents
  */
-function HandOfCards({ player }: { player: Player }) {
-  let playerHand = player.hand;
+function HandOfCards({ playerHand }: { playerHand: Card[] }) {
   let shownHand = [];
   for (let i = 0; i < playerHand.length; i++) {
     let card = playerHand[i];
@@ -331,7 +330,7 @@ function GameBoard({ game }: { game: Game }) {
         {/*Gonna need to comment much of this just so we're aware of what is happening in some of these.*/}
         {/*This div is a row that shows a players stats and then their hand of cards*/}
         <div className="flex flex-row justify-center items-center">
-          <HandOfCards player={player2}></HandOfCards>
+          <HandOfCards playerHand={hand2}></HandOfCards>
         </div>
         {/*This div pretty large. It's where discard piles, decks, and the actual board goes*/}
         <div className="flex justify-center items-center gap-4">
@@ -369,7 +368,7 @@ function GameBoard({ game }: { game: Game }) {
           </div>
         </div>
         <div className="flex flex-row justify-center items-center">
-          <HandOfCards player={player1}></HandOfCards>
+          <HandOfCards playerHand={hand1}></HandOfCards>
         </div>
       </div>
     </div>
