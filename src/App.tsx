@@ -3,6 +3,7 @@ import placeholderSVGURL from "./assets/placeholder.svg";
 import {
   Game,
   Player,
+  SidedBoard,
   Targeter,
 } from "./model";
 //import { Creature, Building, Card } from "./engine/card";
@@ -201,7 +202,7 @@ function HandOfCards({ playerHand, stateChange}: { playerHand: Card[], stateChan
  * creature, building in the array inside of each landscape inside of a larger board.
  * @returns markup that displays the board.
  */
-function Board({ game}: { game: Game }) {
+function Board({ game, board}: { game: Game, board: SidedBoard}) {
   let p1Board = [];
   let p2Board = [];
   //Looping through board to display it
@@ -311,6 +312,7 @@ function GameBoard({ game }: { game: Game }) {
   const [hand1, setCurrentHand1] = useState(game.players[0].hand);
   const [hand2, setCurrentHand2] = useState(game.players[1].hand);
   const [summoningCard, setSummoningCard] = useState(-1);
+  const[board, setBoard] = useState(game.board);
 
   let player1 = game.getPlayerById(0);
   let player2 = game.getPlayerById(1);
@@ -335,7 +337,7 @@ function GameBoard({ game }: { game: Game }) {
             <DiscardPile size={5}></DiscardPile>
           </div>
           {/*The board between two columns*/}
-          <Board game={game }/>
+          <Board game={game} board={board}/>
           {/*This is a row of two columns*/}
           <div className="flex flex-row gap-4">
             {/*The first column shows the deck and discard pile (like the one you saw earlier*/}
