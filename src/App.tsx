@@ -5,7 +5,8 @@ import {
   Player,
   Targeter,
 } from "./model";
-import { Creature, Building, Card } from "./engine/card";
+//import { Creature, Building, Card } from "./engine/card";
+import { Creature, Card } from "./engine/card";
 import { Ability } from "./engine/ability";
 import { get } from "./engine/CardMap";
 
@@ -37,12 +38,12 @@ function CardComponent({
     if(card instanceof Creature){
       //summon card
     }
-    else if (card instanceof Building){
-      //place building
-    }
-    else{
-      //activate spell
-    }
+    // else if (card instanceof Building){
+    //   //place building
+    // }
+    // else{
+    //   //activate spell
+    // }
   }
   return (
     <div className="card_shape overflow-auto" onClick={handleClick}>
@@ -110,14 +111,19 @@ function CreatureComponent({
  */
 function Deck({ player, handState }: { player: Player, handState: React.Dispatch<React.SetStateAction<Card[]>>}) {
   let handleDraw = function () {
-    if (!player.drawCardUsingAction()) {
+    console.log("test")
+    let boolean = player.drawCardUsingAction();
+    console.log(boolean)
+    handState(player.hand);
+    if (!boolean) {
+      console.log("it was false!!!")
       log.push(
         <div>
           {player.username} attempted to draw, but does not have enough actions.
         </div>,
       );
     } 
-    handState(player.hand);
+    
   };
   return (
     <div
@@ -185,15 +191,15 @@ function Board({ game }: { game: Game }) {
   for (let i = 0; i < 4; i++) {
     p1Board.push(
       LandscapeCard({
-        creature: game.board.getBoardPosByOwnerId(0, i)?.creature,
-        building: game.board.getBoardPosByOwnerId(0, i)?.building,
+        creature: game.board.getBoardPosByOwnerId(0, i)?.creature
+        //building: game.board.getBoardPosByOwnerId(0, i)?.building,
       }),
     );
 
     p2Board.push(
       LandscapeCard({
         creature: game.board.getBoardPosByOwnerId(1, i)?.creature,
-        building: game.board.getBoardPosByOwnerId(1, i)?.building,
+        //building: game.board.getBoardPosByOwnerId(1, i)?.building,
       }),
     );
   }
@@ -218,10 +224,10 @@ function Board({ game }: { game: Game }) {
  * @returns markup that displays a landscape box with building and creature optionally inside
  */
 function LandscapeCard({
-  building,
+  //building,
   creature,
 }: {
-  building: Building | undefined;
+  //building: Building | undefined;
   creature: Creature | undefined;
 }) {
   //c is creature, b is building. default values are empty tags (is that what they're called?)
@@ -232,14 +238,14 @@ function LandscapeCard({
     c = CreatureComponent({card: creature});
   }
   // check if building is undefined
-  if (building?.name == null) {
-    b = CardComponent({card: building});
-  }
+  // if (building?.name == null) {
+  //   b = CardComponent({card: building});
+  // }
 
   return (
     <div className="landscape_shape flex justify-center items-center">
       {c}
-      {b}
+      {/* {b} */}
     </div>
   );
 }
@@ -400,9 +406,8 @@ function App() {
   let page = <></>;
   if (begin) {
     let game = new Game();
-    getDemoPlayer(game.players[0]);
-    getDemoPlayer(game.players[1]);
-    console.log(game);
+    getDemoPlayer(game.getPlayerById(0))
+    getDemoPlayer(game.getPlayerById(1))
     page = <GameBoard game={game}></GameBoard>;
   } else {
     page = <DeckSelectScreen handle={h}></DeckSelectScreen>;
