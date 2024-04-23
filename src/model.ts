@@ -6,7 +6,6 @@ import {
   Building,
   GetCardTargetEvent,
 } from "./engine/card.ts";
-import { Ability, Effect } from "./engine/ability.ts";
 import {
   GetBoardPosTargetEvent,
   GetPlayerTargetEvent,
@@ -328,9 +327,6 @@ export class Player {
         const drawnCard = this.deck.pop();
         if (typeof drawnCard != "undefined") {
           this.hand.push(drawnCard);
-          if (drawnCard.ability.init != Ability.NULL_EVENT_FUNC) {
-            drawnCard.ability.init(drawnCard);
-          }
           if(useAction) {
             this.actions -= amount;
           }
@@ -621,29 +617,6 @@ export class Game extends AbstractGame {
     }
 
     switch (card.cardType) {
-      case CardType.Building:
-        return this.dispatchEvent(
-          new GetBoardPosTargetEvent(
-            GetCardTargetEvent,
-            (pos: BoardPos) => {
-              if (pos.building != Building.NULL) {
-                return false;
-              } else {
-                if (card.play(pos, playerId)) {
-                  return Game.getInstance().dispatchEvent(
-                    new PlayCardEvent(
-                      card,
-                      playerId,
-                    ),
-                  );
-                }
-                return false;
-              }
-            },
-            playerId,
-            Targeter.PLAY_BUILDING_TARGETER,
-          ),
-        );
       case CardType.Creature:
         return this.dispatchEvent(
           new GetBoardPosTargetEvent(
@@ -688,22 +661,6 @@ export class Game extends AbstractGame {
             },
             playerId,
             Targeter.PLAY_LANDSCAPE_TARGETER,
-          ),
-        );
-      case CardType.Spell:
-        return this.dispatchEvent(
-          new GetBoardPosTargetEvent(
-            GetCardTargetEvent,
-            (pos: BoardPos) => {
-              if (card.play(pos, playerId)) {
-                return Game.getInstance().dispatchEvent(
-                  new PlayCardEvent(card, playerId),
-                );
-              }
-              return false;
-            },
-            playerId,
-            Targeter.PLAY_SPELL_TARGETER,
           ),
         );
     }

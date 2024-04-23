@@ -1,5 +1,4 @@
 import { Game, BoardPos, CardType, Player, LandscapeType } from "../model.ts";
-import { Effect, Ability } from "./ability.ts";
 
 export const GetCardTargetEvent: string = "getCardTarget";
 
@@ -16,14 +15,12 @@ export class Card {
   cardType: number;
   landscapeType: string;
   turnPlayed: number;
-  ability: Ability;
   ownerId: number | null = null;
   currentOwnerId: number | null = null;
   imageURL: string = "";
   private cost: number;
   private isReady: boolean;
   private location: BoardPos | string = CardLocations.Deck;
-  private activeEffects: Effect[] = [];
 
   constructor(
     name: string,
@@ -31,7 +28,6 @@ export class Card {
     cardType: number,
     cost: number,
     landscapeType: string,
-    ability: Ability,
   ) {
     this.name = name;
     this.flavorText = flavorText;
@@ -39,7 +35,6 @@ export class Card {
     this.cost = cost;
     this.landscapeType = landscapeType;
     this.turnPlayed = Game.getInstance().currentTurn;
-    this.ability = ability;
     this.isReady = true;
   }
 
@@ -60,6 +55,7 @@ export class Card {
   getIsReady() {
     return this.isReady;
   }
+
   setIsReady(isReady: boolean) {
     this.isReady = isReady;
     this.displayCard();
@@ -99,43 +95,6 @@ export class Card {
       Game.getInstance().getPlayerById(this.ownerId).discardPile.push(this);
       //this.moveCard(CardLocations.Discard);
     }
-  }
-
-  activateAbility() {
-    if (this.currentOwnerId != null) {
-      this.ability.activate(this);
-    }
-  }
-
-  addEffect(effect: Effect) {
-    this.activeEffects.push(effect);
-    this.displayCard();
-  }
-
-  removeEffect(effect: Effect) {
-    if (effect == Effect.NULL) {
-      return false;
-    }
-
-    if (this.hasEffect(effect)) {
-      for (var i = 0; i < this.activeEffects.length; i++) {
-        if (this.activeEffects[i] == effect) {
-          this.activeEffects[i] == Effect.NULL;
-        }
-      }
-      this.displayCard();
-      return true;
-    }
-    return false;
-  }
-
-  hasEffect(effect: Effect) {
-    for (var i = 0; i < this.activeEffects.length; i++) {
-      if (this.activeEffects[i] == effect) {
-        return true;
-      }
-    }
-    return false;
   }
 
   returnToHand() {
@@ -239,12 +198,11 @@ export class Card {
       this.cardType,
       this.cost,
       this.landscapeType,
-      this.ability,
     );
   }
 
   //Null Card Constant
-  static NULL = new Card("Null", "You shouldn't be seeing this!", 99, 0, LandscapeType.NULL, Ability.NULL);
+  static NULL = new Card("Null", "You shouldn't be seeing this!", 99, 0, LandscapeType.NULL);
 }
 
 export class Creature extends Card {
@@ -257,11 +215,10 @@ export class Creature extends Card {
     flavorText: string,
     cost: number,
     landscapeType: string,
-    ability: Ability,
     attack: number,
     defense: number,
   ) {
-    super(name, flavorText, CardType.Creature, cost, landscapeType, ability);
+    super(name, flavorText, CardType.Creature, cost, landscapeType);
     this.attack = attack;
     this.defense = defense;
     this.maxDefense = defense; // Used when healing a creature so it doesn't overheal, and cards that say things like "if a creature has exactly x damage."
@@ -292,42 +249,12 @@ export class Creature extends Card {
     return false;
   }
 
-  override addEffect(effect: Effect) {
-    super.addEffect(effect);
-    var loc: string | BoardPos = this.getLocation();
-    if (loc instanceof BoardPos) {
-      this.attack += effect.attackBonus.call(null, loc);
-      this.defense -= effect.damage.call(null, loc);
-      this.defense += effect.defenseBonus.call(null, loc);
-      this.setIsReady(effect.disables);
-
-      effect.conditionsApplied.call(null, loc).map((effect: Effect) => {
-        this.addEffect(effect);
-      });
-      effect.conditionsApplied.call(null, loc).map((effect: Effect) => {
-        this.removeEffect(effect);
-      });
-
-      //We have absolutely no way to reveal cards for effect.cardsRevealed at the moment, will probably be removed.
-      if (this.currentOwnerId != null) {
-        Game.getInstance().getPlayerById(this.currentOwnerId).actions +=
-          effect.actionBonus.call(null, loc);
-        Game.getInstance().getPlayerById(this.currentOwnerId).cardDiscount +=
-          effect.cardDiscount.call(null, loc);
-        Game.getInstance()
-          .getPlayerById(this.currentOwnerId)
-          .drawCard(effect.cardsDrawn.call(null, loc));
-      }
-    }
-  }
-
   override clone(): Creature {
     return new Creature(
       this.name,
       this.flavorText,
       this.getCost(),
       this.landscapeType,
-      this.ability,
       this.attack,
       this.defense,
     );
@@ -339,7 +266,6 @@ export class Creature extends Card {
     "You shouldn't be seeing this!",
     0,
     LandscapeType.NULL,
-    Ability.NULL,
     0,
     0,
   );
@@ -351,9 +277,8 @@ export class Building extends Card {
     flavorText: string,
     cost: number,
     landscapeType: string,
-    ability: Ability,
   ) {
-    super(name, flavorText, CardType.Building, cost, landscapeType, ability);
+    super(name, flavorText, CardType.Building, cost, landscapeType);
   }
 
   override play(pos: BoardPos, playerId: number) {
@@ -366,39 +291,12 @@ export class Building extends Card {
     return false;
   }
 
-  override addEffect(effect: Effect) {
-    super.addEffect(effect);
-    var loc: string | BoardPos = this.getLocation();
-    if (loc instanceof BoardPos) {
-      this.setIsReady(effect.disables);
-
-      effect.conditionsApplied.call(null, loc).map((effect: Effect) => {
-        this.addEffect(effect);
-      });
-      effect.conditionsApplied.call(null, loc).map((effect: Effect) => {
-        this.removeEffect(effect);
-      });
-
-      //We have absolutely no way to reveal cards for effect.cardsRevealed at the moment, will probably be removed.
-      if (this.currentOwnerId != null) {
-        Game.getInstance().getPlayerById(this.currentOwnerId).actions +=
-          effect.actionBonus.call(null, loc);
-        Game.getInstance().getPlayerById(this.currentOwnerId).cardDiscount +=
-          effect.cardDiscount.call(null, loc);
-        Game.getInstance()
-          .getPlayerById(this.currentOwnerId)
-          .drawCard(effect.cardsDrawn.call(null, loc));
-      }
-    }
-  }
-
   override clone(): Building {
     return new Building(
       this.name,
       this.flavorText,
       this.getCost(),
       this.landscapeType,
-      this.ability,
     );
   }
 
@@ -408,7 +306,6 @@ export class Building extends Card {
     "You shouldn't be seeing this!",
     0,
     LandscapeType.NULL,
-    Ability.NULL,
   );
 }
 
@@ -418,13 +315,11 @@ export class Spell extends Card {
     flavorText: string,
     cost: number,
     landscapeType: string,
-    ability: Ability,
   ) {
-    super(name, flavorText, CardType.Spell, cost, landscapeType, ability);
+    super(name, flavorText, CardType.Spell, cost, landscapeType);
   }
 
   override play(_pos: BoardPos, playerId: number) {
-    this.activateAbility();
     Game.getInstance().getPlayerById(playerId).discardPile.push(this)
     Game.getInstance().getPlayerById(playerId).actions -= this.getCost();
     return true;
@@ -436,7 +331,6 @@ export class Spell extends Card {
       this.flavorText,
       this.getCost(),
       this.landscapeType,
-      this.ability,
     );
   }
 
@@ -446,14 +340,13 @@ export class Spell extends Card {
     "You shouldn't be seeing this!",
     0,
     LandscapeType.NULL,
-    Ability.NULL,
   );
 }
 
 // By having this class, the front end can render these like they're in your hand when the game starts so you can choose where your landscapes belong
 export class Landscape extends Card {
   constructor(name: string, flavorText: string, landscapeType: string) {
-    super(name, flavorText, CardType.Landscape, 0, landscapeType, Ability.NULL);
+    super(name, flavorText, CardType.Landscape, 0, landscapeType);
   }
 
   static addGetTargetEventListener(
@@ -468,31 +361,5 @@ export class Landscape extends Card {
       return pos.setLandscape(this);
     }
     return false;
-  }
-
-  override addEffect(effect: Effect) {
-    super.addEffect(effect);
-    var loc: string | BoardPos = this.getLocation();
-    if (loc instanceof BoardPos) {
-      this.setIsReady(effect.disables);
-
-      effect.conditionsApplied.call(null, loc).map((effect: Effect) => {
-        this.addEffect(effect);
-      });
-      effect.conditionsApplied.call(null, loc).map((effect: Effect) => {
-        this.removeEffect(effect);
-      });
-
-      //We have absolutely no way to reveal cards for effect.cardsRevealed at the moment, will probably be removed.
-      if (this.currentOwnerId != null) {
-        Game.getInstance().getPlayerById(this.currentOwnerId).actions +=
-          effect.actionBonus.call(null, loc);
-        Game.getInstance().getPlayerById(this.currentOwnerId).cardDiscount +=
-          effect.cardDiscount.call(null, loc);
-        Game.getInstance()
-          .getPlayerById(this.currentOwnerId)
-          .drawCard(effect.cardsDrawn.call(null, loc));
-      }
-    }
   }
 }
