@@ -94,21 +94,18 @@ export class Card {
   death() {
     if (this.ownerId != null) {
       Game.getInstance().getPlayerById(this.ownerId).discardPile.push(this);
-      //this.moveCard(CardLocations.Discard);
+      this.moveCard(CardLocations.Discard);
     }
   }
 
   returnToHand() {
     if (this.ownerId != null) {
       Game.getInstance().getPlayerById(this.ownerId).hand.push(this);
-      // this.moveCard(CardLocations.Hand);
+      this.moveCard(CardLocations.Hand);
     }
   }
 
   moveCard(newLocation: string | BoardPos) {
-    Game.getInstance().dispatchEvent(
-      new CustomEvent("removeCard", { detail: this }),
-    )
     //REMOVING CARD
     if (this.location instanceof BoardPos) {
       //Type safe check for removeCreature()
@@ -117,9 +114,9 @@ export class Card {
         case 'Creature':
           this.location.removeCreature();
           break;
-        case 'Building':
-          this.location.removeBuilding();
-          break;
+        //case 'Building':
+          //this.location.removeBuilding();
+          //break;
       }
     } else {
       switch(this.location){
@@ -152,9 +149,9 @@ export class Card {
         case 'Creature':
           this.location.setCreature(this);
           break;
-        case 'Building':
-          this.location.setBuilding(this);
-          break;
+        //case 'Building':
+          //this.location.setBuilding(this);
+          //break;
       }
     } else {
       switch(this.location){
