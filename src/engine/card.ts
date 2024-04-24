@@ -105,85 +105,82 @@ export class Card {
     }
   }
 
-  // moveCard(newLocation: string | BoardPos) {
-  //   Game.getInstance().dispatchEvent(
-  //     new CustomEvent("removeCard", { detail: this }),
-  //   );
-
-  //   //REMOVING CARD
-  //   if (this.location instanceof BoardPos) {
-  //     //Type safe check for removeCreature()
-  //     var type = this.constructor.name;
-  //     switch(type){
-  //       case 'Creature':
-  //         this.location.removeCreature();
-  //         break;
-  //       case 'Building':
-  //         this.location.removeBuilding();
-  //         break;
-  //     }
-  //   } else {
-  //     switch(this.location){
-  //       case CardLocations.Deck:
-  //         if(this.ownerId != null){
-  //           var deck = Game.getInstance().getPlayerById(this.ownerId).deck;
-  //           deck.splice(deck.indexOf(this), 1);
-  //         }
-  //         break;
-  //       case CardLocations.Hand:
-  //         if(this.ownerId != null){
-  //           var hand = Game.getInstance().getPlayerById(this.ownerId).hand;
-  //           hand.splice(hand.indexOf(this), 1);
-  //         }
-  //         break;
-  //       case CardLocations.Discard:
-  //         if(this.ownerId != null){
-  //           var discardPile = Game.getInstance().getPlayerById(this.ownerId).discardPile;
-  //           discardPile.splice(discardPile.indexOf(this), 1);
-  //         }
-  //         break
-  //     }
-  //   }
-
-  //   this.location = newLocation;
-
-  //   //ADDING CARD
-  //   if (this.location instanceof BoardPos) {
-  //     //Type safe check for removeCreature()
-  //     var type = this.constructor.name;
-  //     switch(type){
-  //       case 'Creature':
-  //         this.location.setCreature(this);
-  //         break;
-  //       case 'Building':
-  //         this.location.setBuilding(this);
-  //         break;
-  //     }
-  //   } else {
-  //     switch(this.location){
-  //       case CardLocations.Deck:
-  //         if(this.ownerId != null){
-  //           var deck = Game.getInstance().getPlayerById(this.ownerId).deck;
-  //           deck.push(this);
-  //         }
-  //         break;
-  //       case CardLocations.Hand:
-  //         if(this.ownerId != null){
-  //           var hand = Game.getInstance().getPlayerById(this.ownerId).hand;
-  //           hand.push(this);
-  //         }
-  //         break;
-  //       case CardLocations.Discard:
-  //         if(this.ownerId != null){
-  //           var discardPile = Game.getInstance().getPlayerById(this.ownerId).discardPile;
-  //           discardPile.push(this);
-  //         }
-  //         break;
-  //     }
-  //   }
-
-  //   this.displayCard();
-  // }
+  moveCard(newLocation: string | BoardPos) {
+    Game.getInstance().dispatchEvent(
+      new CustomEvent("removeCard", { detail: this }),
+    )
+    //REMOVING CARD
+    if (this.location instanceof BoardPos) {
+      //Type safe check for removeCreature()
+      var type = this.constructor.name;
+      switch(type){
+        case 'Creature':
+          this.location.removeCreature();
+          break;
+        case 'Building':
+          this.location.removeBuilding();
+          break;
+      }
+    } else {
+      switch(this.location){
+        case CardLocations.Deck:
+          if(this.ownerId != null){
+            var deck = Game.getInstance().getPlayerById(this.ownerId).deck;
+            deck.splice(deck.indexOf(this), 1);
+          }
+          break;
+        case CardLocations.Hand:
+          if(this.ownerId != null){
+            var hand = Game.getInstance().getPlayerById(this.ownerId).hand;
+            hand.splice(hand.indexOf(this), 1);
+          }
+          break;
+        case CardLocations.Discard:
+          if(this.ownerId != null){
+            var discardPile = Game.getInstance().getPlayerById(this.ownerId).discardPile;
+            discardPile.splice(discardPile.indexOf(this), 1);
+          }
+          break
+      }
+     
+    this.location = newLocation
+    //ADDING CARD
+    if (this.location instanceof BoardPos) {
+      //Type safe check for removeCreature()
+      var type = this.constructor.name;
+      switch(type){
+        case 'Creature':
+          this.location.setCreature(this);
+          break;
+        case 'Building':
+          this.location.setBuilding(this);
+          break;
+      }
+    } else {
+      switch(this.location){
+        case CardLocations.Deck:
+          if(this.ownerId != null){
+            var deck = Game.getInstance().getPlayerById(this.ownerId).deck;
+            deck.push(this);
+          }
+          break;
+        case CardLocations.Hand:
+          if(this.ownerId != null){
+            var hand = Game.getInstance().getPlayerById(this.ownerId).hand;
+            hand.push(this);
+          }
+          break;
+        case CardLocations.Discard:
+          if(this.ownerId != null){
+            var discardPile = Game.getInstance().getPlayerById(this.ownerId).discardPile;
+            discardPile.push(this);
+          }
+          break;
+        }
+      }
+    }
+    this.displayCard();
+  }
 
   displayCard() {
     //Was drawCard, name changed for clarity
