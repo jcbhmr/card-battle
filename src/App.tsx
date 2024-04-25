@@ -468,6 +468,7 @@ function GameBoard({ game }: { game: Game }) {
                 setCurrentPlayer={setCurrentPlayer}
                 setPhase={setPhase}
                 setTurn={setTurn}
+                setSummoning={setSummoningCard}
               ></PhaseButton>
             </div>
           </div>
@@ -546,17 +547,20 @@ function PhaseButton({
   setPhase,
   setTurn,
   setCurrentPlayer,
+  setSummoning
 }: {
   game: Game;
   imagePath: string;
   setPhase: React.Dispatch<React.SetStateAction<number>>;
   setTurn: React.Dispatch<React.SetStateAction<number>>;
   setCurrentPlayer: React.Dispatch<React.SetStateAction<Player>>;
+  setSummoning: React.Dispatch<React.SetStateAction<number>>
 }) {
   function handle() {
     game.enterNextPhase();
     setPhase(game.turnPhase);
     setTurn(game.currentTurn);
+    setSummoning(-1);
     setCurrentPlayer(game.currentPlayer);
   }
   return (
