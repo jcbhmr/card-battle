@@ -426,10 +426,10 @@ function GameBoard({ game }: { game: Game }) {
   }
   else if(phase==1){
     if(currentPlayer.id==0){
-      buttons1 = <AttackingButtons player={player1}></AttackingButtons>
+      buttons1 = <AttackingButtons player={player1} game={game} setBoardState={setBoard} ></AttackingButtons>
     }
     else{
-      buttons2 = <AttackingButtons player={player2}></AttackingButtons>
+      buttons2 = <AttackingButtons player={player2} game={game} setBoardState={setBoard}></AttackingButtons>
     }
   }
   
@@ -521,11 +521,12 @@ function SummoningButtons({cardPos, game, setSummonState, hand, setHandState, se
    
   )
 }
-function AttackingButtons({player}: {player: Player}){
+function AttackingButtons({player, game, setBoardState}: {player: Player, game: Game, setBoardState: any}){
   let playerid = player.id;
   
   function handle(boardPos: number, playerid: number){
-    //game.board.getBoardPosByOwnerId(playerid, boardPos);
+    game.simulateCombat(boardPos, playerid);
+    setBoardState(game.getBoard());
   }
   return (
   <div className="flex flex-row justify-center items-center gap-20">

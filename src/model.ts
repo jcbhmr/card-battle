@@ -503,15 +503,12 @@ export class Game extends AbstractGame {
    * players discard pile.
    */
   simulateCombat(column: number, currentPlayerId: number){
-    //since board is separate from player we have to assign both player and pos
     let pos1 = this.board.getBoardPosByOwnerId(currentPlayerId, column);
     let pos2 = this.board.getBoardPosByOwnerId(this.getOtherPlayer(currentPlayerId).id, column);
 
-    let player1 = this.getPlayerById(currentPlayerId);
-    let player2 = this.getPlayerById(this.getOtherPlayer(currentPlayerId).id);
     // i know this is a lot of variable declarations but it makes the code 10000x more readable so
     let c1 = pos1?.creature;
-    let c2 = pos1?.creature;
+    let c2 = pos2?.creature;
     //check if monster is ready
     if(c1?.getIsReady()){
       if(c2?.name==="Null"){//here we attack directly
@@ -527,6 +524,7 @@ export class Game extends AbstractGame {
           c1.death();
         }
       }
+      c1.setIsReady(false);
     }
   }
 
