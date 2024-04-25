@@ -205,10 +205,10 @@ return (
  * Displays card shape with a number on it indicating how many cards are in the pile. This one has onclick to allow player to draw
  * @returns returns markup displaying what i wrote just above
  */
-function Deck({ player, setGameState, game}: { player: Player, setGameState: any, game: Game}) {
+function Deck({ player, handState, hand}: { player: Player, hand: Card[], handState: React.Dispatch<React.SetStateAction<Card[]>>}) {
   let handleDraw = function () {
     let boolean = player.drawCardUsingAction();
-    setGameState(game);
+    handState(player.hand);
     if (!boolean) {
       console.log("it was false!!!")
       log.push(
@@ -253,7 +253,7 @@ function DiscardPile({ size }: { size: number }) {
 function HandOfCards({ playerHand, stateChange, currentPlayer, ownerPlayer, phase}: 
   { playerHand: Card[], stateChange: React.Dispatch<React.SetStateAction<number>>, currentPlayer: Player, ownerPlayer: Player, phase: number}) {
   let shownHand = [];
-  console.log(playerHand)
+  
   for (let i = 0; i < playerHand.length; i++) {
     let currentCard = playerHand[i];
     if (currentCard instanceof Creature) {
@@ -291,10 +291,10 @@ function HandOfCards({ playerHand, stateChange, currentPlayer, ownerPlayer, phas
  * creature, building in the array inside of each landscape inside of a larger board.
  * @returns markup that displays the board.
  */
-function Board({ game, }: { game: Game}) {
+function Board({ game, board}: { game: Game, board: SidedBoard}) {
   let p1Board = [];
   let p2Board = [];
-  let board = game.board;
+  let t = board.getSideByOwnerId(0);
   //Looping through board to display it
   for (let i = 0; i < 4; i++) {
     p1Board.push(
@@ -384,13 +384,13 @@ function PlayerDisplay({ game, player }: { game: Game; player: Player }) {
 function getDemoPlayer(player: Player) {
   player.deck.push(get("Dark Angel")!);
   player.deck.push(get("Dark Angel")!);
- // player.deck.push(get("Dark Angel")!);
+  player.deck.push(get("Dark Angel")!);
   player.deck.push(get("Dark Angel")!);
   player.deck.push(get("Dark Angel")!);
 
   player.hand.push(get("Dark Angel")!);
   player.hand.push(get("Dark Angel")!);
- // player.hand.push(get("Dark Angel")!);
+  player.hand.push(get("Dark Angel")!);
   player.hand.push(get("Dark Angel")!);
   player.hand.push(get("Dark Angel")!);
 }
@@ -398,35 +398,38 @@ function getDemoPlayer(player: Player) {
  * This is like the big daddy of the components. This makes up pretty much the entire game. Shows players board, hp, hands, etc etc.
  * @returns Markup to display the game
  */
-function GameBoard({ game, setGameState }: { game: Game, setGameState: React.Dispatch<React.SetStateAction<Game>> }) {
+function GameBoard({ game }: { game: Game }) {
   //States:
-  
+  const [turn, setTurn] = useState(game.currentTurn);
+  const [phase, setPhase] = useState(game.turnPhase);
+  const [currentPlayer, setCurrentPlayer] = useState(game.currentPlayer);
+  const [hand1, setCurrentHand1] = useState(game.players[0].hand);
+  const [hand2, setCurrentHand2] = useState(game.players[1].hand);
   const [summoningCard, setSummoningCard] = useState(-1);
-  //const[board, setBoard] = useState(game.board);
-  console.log(setGameState);
+  const[board, setBoard] = useState(game.board);
 
   let player1 = game.getPlayerById(0);
   let player2 = game.getPlayerById(1);
   let buttons1 = (<></>)
   let buttons2 = (<></>)
-  if(game.turnPhase==0){
+  if(phase==0){
     if(summoningCard+1){
-      if(game.currentPlayer.id==0){
-        buttons1 = <SummoningButtons playerid={0} cardPos ={summoningCard} setSummonState={setSummoningCard} game={game} 
-        hand={game.players[0].hand} setGame={setGameState} ></SummoningButtons>
+      if(currentPlayer.id==0){
+        buttons1 = <SummoningButtons playerid={0} cardPos ={summoningCard} setSummonState={setSummoningCard} game={game} hand={hand1} setHandState={setCurrentHand1} 
+      setBoardState={setBoard} board={board}></SummoningButtons>
       }
       else{
-        buttons2 = <SummoningButtons playerid={1} cardPos ={summoningCard} setSummonState={setSummoningCard} 
-        game={game} hand={game.players[1].hand} setGame={setGameState}  ></SummoningButtons>
+        buttons2 = <SummoningButtons playerid={1} cardPos ={summoningCard} setSummonState={setSummoningCard} game={game} hand={hand2} setHandState={setCurrentHand2} 
+      setBoardState={setBoard} board={board}></SummoningButtons>
       }
     }
   }
-  else if(game.turnPhase==1){
-    if(game.currentPlayer.id==0){
-      buttons1 = <AttackingButtons player={player1} game={game} setGame={setGameState} ></AttackingButtons>
+  else if(phase==1){
+    if(currentPlayer.id==0){
+      buttons1 = <AttackingButtons player={player1} game={game} setBoardState={setBoard} ></AttackingButtons>
     }
     else{
-      buttons2 = <AttackingButtons player={player2} game={game} setGame={setGameState}></AttackingButtons>
+      buttons2 = <AttackingButtons player={player2} game={game} setBoardState={setBoard}></AttackingButtons>
     }
   }
   
@@ -440,7 +443,7 @@ function GameBoard({ game, setGameState }: { game: Game, setGameState: React.Dis
           <br></br>
           <br></br>
           <div className="flex flex-row justify-center items-center">
-            <HandOfCards playerHand={game.players[1].hand} stateChange={setSummoningCard} currentPlayer={game.currentPlayer} ownerPlayer={player2} phase={game.turnPhase}></HandOfCards>
+            <HandOfCards playerHand={hand2} stateChange={setSummoningCard} currentPlayer={currentPlayer} ownerPlayer={player2} phase={phase}></HandOfCards>
           </div>
           {buttons2}
         </div>
@@ -449,29 +452,32 @@ function GameBoard({ game, setGameState }: { game: Game, setGameState: React.Dis
           {/*This column shows a deck and discard pile*/}
           <div className="flex flex-col gap-10">
             <PlayerDisplay game={game} player={player2}></PlayerDisplay>
-            <Deck player={game.players[1]}  setGameState={setGameState} game={game}></Deck>
+            <Deck player={player2} hand={hand2} handState={setCurrentHand2}></Deck>
             <DiscardPile size={5}></DiscardPile>
           </div>
           {/*The board between two columns*/}
-          <Board game={game}/>
+          <Board game={game} board={board}/>
           {/*This is a row of two columns*/}
           <div className="flex flex-row gap-4">
             {/*The first column shows the deck and discard pile (like the one you saw earlier*/}
             <div className="flex flex-col gap-10">
               <DiscardPile size={5}></DiscardPile>
-              <Deck player={game.players[0]}  setGameState={setGameState} game={game}></Deck>
+              <Deck player={player1} hand={hand1} handState={setCurrentHand1}></Deck>
               <PlayerDisplay game={game} player={player1}></PlayerDisplay>
             </div>
             {/*This column shows the game log text bot and the button for moving phases below it*/}
             <div className="flex flex-col justify-center items-center gap-20">
               <GameLog
-                game={game}
-                setGame={setGameState}
+                turn={turn}
+                phase={phase}
+                currentPlayer={currentPlayer}
               ></GameLog>
               <PhaseButton
                 game={game}
                 imagePath="https://th.bing.com/th/id/R.64cd05752ba370bda27cbcfa260693ce?rik=UMwRwhskWbPISQ&pid=ImgRaw&r=0"
-                setGame={setGameState}
+                setCurrentPlayer={setCurrentPlayer}
+                setPhase={setPhase}
+                setTurn={setTurn}
                 setSummoning={setSummoningCard}
               ></PhaseButton>
             </div>
@@ -481,19 +487,20 @@ function GameBoard({ game, setGameState }: { game: Game, setGameState: React.Dis
         {buttons1}
         </div>
         <div className="flex flex-row justify-center items-center">
-        <HandOfCards playerHand={game.players[0].hand} stateChange={setSummoningCard} currentPlayer={game.currentPlayer} ownerPlayer={player1} phase={game.turnPhase}></HandOfCards>
+          <HandOfCards playerHand={hand1} stateChange={setSummoningCard} currentPlayer={currentPlayer} ownerPlayer={player1} phase={phase}></HandOfCards>
         </div>
       </div>
     </div>
   );
 }
 
-function SummoningButtons({cardPos, game, setSummonState, hand, setGame, playerid}: {cardPos: number, game: Game, setSummonState: any, 
-  hand: Card[], setGame: any, playerid: number}){
-
+function SummoningButtons({cardPos, game, setSummonState, hand, setHandState, setBoardState, playerid}: {cardPos: number, game: Game, setSummonState: any, 
+  hand: Card[], setHandState: any, setBoardState: any, board: any, playerid: number}){
   function handle(boardPos: number, playerid: number){
     game.summonCardFromHand(playerid,boardPos, cardPos)
-    setGame(game);
+    setHandState(hand);
+    console.log(hand.length)
+    setBoardState(game.getBoard());
     setSummonState(-1);
   }
   return(
@@ -514,12 +521,12 @@ function SummoningButtons({cardPos, game, setSummonState, hand, setGame, playeri
    
   )
 }
-function AttackingButtons({player, game, setGame}: {player: Player, game: Game, setGame: any}){
+function AttackingButtons({player, game, setBoardState}: {player: Player, game: Game, setBoardState: any}){
   let playerid = player.id;
   
   function handle(boardPos: number, playerid: number){
     game.simulateCombat(boardPos, playerid);
-    setGame(game);
+    setBoardState(game.getBoard());
   }
   return (
   <div className="flex flex-row justify-center items-center gap-20">
@@ -543,31 +550,33 @@ function AttackingButtons({player, game, setGame}: {player: Player, game: Game, 
  * @returns markup that displays the gamelog in the browser
  */
 function GameLog({
-  game,
-  setGame
+  turn,
+  phase,
+  currentPlayer,
 }: {
-  game: Game,
-  setGame: any
+  turn: number;
+  phase: number;
+  currentPlayer: Player;
 }) {
   let phaseName;
-  if(game.turnPhase==0){
+  if(phase==0){
     phaseName="Main phase";
   }
-  else if(game.turnPhase==1){
+  else if(phase==1){
     phaseName="Battle phase";
   }
-  else if(game.turnPhase==2){
+  else if(phase==2){
     phaseName="End phase";
   }
   return (
     <>
       <div className="game_log">{log}</div>
       <div className="text-3xl">
-        Turn: {game.turnPhase}
+        Turn: {turn}
         <br></br>
         Phase: {phaseName}
         <br></br>
-        Turn Player: {game.currentPlayer.username}
+        Turn Player: {currentPlayer.username}
       </div>
     </>
   );
@@ -579,18 +588,24 @@ function GameLog({
 function PhaseButton({
   game,
   imagePath,
-  setGame,
+  setPhase,
+  setTurn,
+  setCurrentPlayer,
   setSummoning
 }: {
   game: Game;
   imagePath: string;
-  setGame: any,
+  setPhase: React.Dispatch<React.SetStateAction<number>>;
+  setTurn: React.Dispatch<React.SetStateAction<number>>;
+  setCurrentPlayer: React.Dispatch<React.SetStateAction<Player>>;
   setSummoning: React.Dispatch<React.SetStateAction<number>>
 }) {
   function handle() {
     game.enterNextPhase();
-    setGame(game);
+    setPhase(game.turnPhase);
+    setTurn(game.currentTurn);
     setSummoning(-1);
+    setCurrentPlayer(game.currentPlayer);
   }
   return (
     <button onClick={handle}>
@@ -600,15 +615,15 @@ function PhaseButton({
 }
 function App() {
   const [begin, setBegin] = useState(false);
-  const [game, setGame] = useState(new Game());
   let h = function () {
     setBegin(true);
   };
   let page = <></>;
   if (begin) {
+    let game = new Game();
     getDemoPlayer(game.getPlayerById(0))
     getDemoPlayer(game.getPlayerById(1))
-    page = <GameBoard game={game} gameState={setGame} ></GameBoard>;
+    page = <GameBoard game={game}></GameBoard>;
   } else {
     page = <DeckSelectScreen handle={h}></DeckSelectScreen>;
   }
