@@ -357,8 +357,6 @@ export class SidedBoard {
       return null;
     }
   }
-
-  
 }
 
 //============================================================== Game ==============================================================
@@ -457,7 +455,6 @@ export class Game extends AbstractGame {
   switchTurns() {
     this.currentTurn++;
     this.currentPlayer = this.players[this.currentTurn%this.players.length]
-    this.currentPlayer.actions=2;
     this.resetCards(this.currentPlayer.id);
     this.dispatchEvent(new SwitchTurnsEvent(this.currentTurn));
   }
@@ -470,62 +467,10 @@ export class Game extends AbstractGame {
   /**
    * summons a creature to the side of player id at position number 
    */
-  summonCard(playerId: number, position: number, card: Creature, player: Player){
-    let pos = this.board.getBoardPosByOwnerId(playerId, position);
-    if(pos?.creature.name === "Null"){
-      pos.creature=card;
-    } 
-    else{//replacing monster with new card
-      card.death();
-      pos.creature=card;
-    }
-    
-  }
-  /**
-   * basic helper function i made that removes card from players hand and places it on board
-   * @param playerId 
-   * @param boardPosition 
-   * @param handPosition 
-   */
-  summonCardFromHand(playerId: number, boardPosition: number, handPosition: number){
+  summonCard(playerId: number, position: number, card: Creature){
     let player = this.getPlayerById(playerId);
-    let card = player.hand[handPosition];
-    if(player.actions >= card.getCost()){
-      player.actions -= card.getCost();
-      player.hand.splice(handPosition, 1);
-      this.summonCard(playerId, boardPosition, card, player);
-    }
-  }
-  /**
-   * function that lets me (front-end) do combat. pretty much, the turn players monster attacks and then we do different things based on if they control a monster or
-   * not. if they do not control a monster then we just attack the enemy players life directly. otherwise, turn players monster attacks the other players monster and
-   * the other players monster reciprocates. we then check to see if either creature was destroyed in the battle and, if they did, we move them to their respective
-   * players discard pile.
-   */
-  simulateCombat(column: number, currentPlayerId: number){
-    let pos1 = this.board.getBoardPosByOwnerId(currentPlayerId, column);
-    let pos2 = this.board.getBoardPosByOwnerId(this.getOtherPlayer(currentPlayerId).id, column);
-
-    // i know this is a lot of variable declarations but it makes the code 10000x more readable so
-    let c1 = pos1?.creature;
-    let c2 = pos2?.creature;
-    //check if monster is ready
-    if(c1?.getIsReady()){
-      if(c2?.name==="Null"){//here we attack directly
-        this.getOtherPlayer(currentPlayerId).hp -= c1.attack;
-      }
-      else{
-        c2.defense -= c1.attack;
-        c1.defense -= c2.attack;
-        if(c2?.defense <= 0){
-          c2?.death();
-        }
-        if(c1.defense <= 0){
-          c1.death();
-        }
-      }
-      c1.setIsReady(false);
-    }
+    let pos = this.board.getBoardPosByOwnerId(playerId, position);
+    pos.creature=card;
   }
 
   playCard(card: Card, playerId: number): boolean {
