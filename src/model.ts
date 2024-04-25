@@ -479,6 +479,7 @@ export class Game extends AbstractGame {
    * @param boardPosition 
    * @param handPosition 
    */
+
   summonCardFromHand(playerId: number, boardPosition: number, handPosition: number){
     let player = this.getPlayerById(playerId);
     let card = player.hand[handPosition];
@@ -518,6 +519,7 @@ export class Game extends AbstractGame {
       }
       c1.setIsReady(false);
     }
+
   }
   playCard(card: Card, playerId: number): boolean {
     if (this.turnPhase != TurnPhases.Play || 
