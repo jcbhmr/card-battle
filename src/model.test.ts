@@ -40,8 +40,8 @@ test("Game is Playable", () => {
   //Game Test
   Game.getInstance().board.getSideByOwnerId(0)?.map((pos: BoardPos) => {pos.setLandscape(swampLand)});
 
-  var player0Side: BoardPos[] | undefined = Game.getInstance().board.getSideByOwnerId(0);
-  expect(typeof player0Side != "undefined" && player0Side[0].landscape == LandscapeType.Swamp);
+  var player0Side: BoardPos[] | undefined = Game.getInstance().board.getSideByOwnerId(1);
+  expect(typeof player0Side != "undefined" && player0Side[1].landscape == LandscapeType.Swamp);
 
   assert(Game.getInstance().currentPlayer == Game.getInstance().getPlayerById(0));
 
@@ -51,6 +51,9 @@ test("Game is Playable", () => {
   assert(Game.getInstance().currentPlayer.hand.length == 6);
 
   for(var i = 0; i < 25; i++) {
+    console.log("Current player's hand: ");
+    Game.getInstance().currentPlayer.hand.map((card: Card) => console.log(card.name))
+    
   Game.getInstance().currentPlayer.hand.map((card: Card) => {if(card.cardType != CardType.Spell) {Game.getInstance().playCard(card, Game.getInstance().currentPlayer.id)}});
 
   assert(Game.getInstance().currentPlayer.actions >= 0);
@@ -61,9 +64,12 @@ test("Game is Playable", () => {
   
   assert(typeof(mySide) != "undefined" && typeof(theirSide) != "undefined");
   assert(mySide.length == theirSide.length);
-
+    for(var j = 0; j < mySide.length; j++) {
+      console.log("My Side: " + mySide[j].creature.name + ", ");
+      console.log("Their Side: " + theirSide[j].creature.name + ", ");
+    }
   //Not going to worry about testing with abilities right now, we can test that in another Test() call
-  Game.getInstance().enterNextPhase();
+  // Game.getInstance().enterNextPhase();
 
   //Do attacks
   if(typeof(mySide) != "undefined" && typeof(theirSide) != "undefined") {
@@ -81,7 +87,7 @@ test("Game is Playable", () => {
   }
 
   if(Game.getInstance().getOtherPlayer(Game.getInstance().currentPlayer.id).hp <= 0) {
-    log("Player " + Game.getInstance().currentPlayer.id + " has won the game!");
+    console.log("Player " + Game.getInstance().currentPlayer.id + " has won the game!");
     break;
   }
 }
