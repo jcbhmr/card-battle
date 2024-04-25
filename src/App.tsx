@@ -33,16 +33,28 @@ function CardComponent({
   card,
   children,
   state,
-  position
+  position,
+  currentPlayer,
+  ownerPlayer,
+  phase
 }: {
   card: Card | Creature;
   children?: ReactNode;
   state: React.Dispatch<React.SetStateAction<number>>,
   position: number
+  currentPlayer: Player,
+  ownerPlayer: Player,
+  phase: number
 }) {
   function handleClick(){
     if(card instanceof Creature){
-      state(position);
+      if(currentPlayer.id==ownerPlayer.id){
+        if(phase==0){
+          state(position);
+        }
+        
+      }
+      
       // mark pos of hand
     }
     // else if (card instanceof Building){
@@ -85,6 +97,46 @@ function CardComponent({
   );
 }
 
+function CardComponentOnBoard({
+  card,
+  children
+}: {
+  card: Card | Creature;
+  children?: ReactNode;
+}) {
+  return (
+    <button>
+    <div className="card_shape overflow-auto">
+      <div className="flex aspect-16/9">
+        <img
+          alt={card.name}
+          className="object-cover"
+          height={135}
+          src={card.imageURL}
+          style={{
+            aspectRatio: "240/135",
+            objectFit: "cover",
+          }}
+          width={350}
+        />
+      </div>
+      <div className="flex-1 p-4 grid gap-2">
+        <h2 className="text-lg font-bold tracking-tight">{card.name}</h2>
+        <p className="text-sm line-clamp-3">{card.flavorText}</p>
+        <div className="text-xs">
+          <div>
+            AC: {card.getCost()} Type: {card.landscapeType}{" "}
+          </div>
+          <div></div>
+
+          {children}
+        </div>
+      </div>
+    </div>
+    </button>
+  );
+}
+
 /**
  * so basically this is just Card Component, but for creatures. It's kinda like a fucked up version
  * of inheritance for objects. I'm using the children props that Jacob showed me to essentially just
@@ -97,11 +149,17 @@ function CardComponent({
 function CreatureComponent({
     card,
     state,
-    position
+    position,
+    currentPlayer,
+    ownerPlayer,
+    phase
 }: {
   card: Creature,
   state: React.Dispatch<React.SetStateAction<number>>,
-  position: number
+  position: number,
+  currentPlayer: Player,
+  ownerPlayer: Player,
+  phase: number
 }) {
   let child = (
     <>
@@ -114,19 +172,40 @@ function CreatureComponent({
       card={card}
       state={state}
       position={position}
+      ownerPlayer={ownerPlayer}
+      currentPlayer={currentPlayer}
+      phase={phase}
     >
       {child}
     </CardComponent>
   );
 }
 
+function CreatureComponentOnBoard({
+  card
+}: {
+card: Creature
+}) {
+let child = (
+  <>
+    <div>Attack: {card.attack}</div>
+    <div>Defense: {card.defense}</div>
+  </>
+);
+return (
+  <CardComponentOnBoard
+    card={card}
+  >
+    {child}
+  </CardComponentOnBoard>
+);
+}
+
 /**
  * Displays card shape with a number on it indicating how many cards are in the pile. This one has onclick to allow player to draw
  * @returns returns markup displaying what i wrote just above
  */
-
 function Deck({ player, setGameState, game}: { player: Player, setGameState: any, game: Game}) {
-
   let handleDraw = function () {
     let boolean = player.drawCardUsingAction();
     setGameState(game);
@@ -171,7 +250,8 @@ function DiscardPile({ size }: { size: number }) {
  * @author Tanner Brown
  * @returns Array of CardComponents/CreatureComponents
  */
-function HandOfCards({ playerHand, stateChange}: { playerHand: Card[], stateChange: React.Dispatch<React.SetStateAction<number>>}) {
+function HandOfCards({ playerHand, stateChange, currentPlayer, ownerPlayer, phase}: 
+  { playerHand: Card[], stateChange: React.Dispatch<React.SetStateAction<number>>, currentPlayer: Player, ownerPlayer: Player, phase: number}) {
   let shownHand = [];
   console.log(playerHand)
   for (let i = 0; i < playerHand.length; i++) {
@@ -181,7 +261,11 @@ function HandOfCards({ playerHand, stateChange}: { playerHand: Card[], stateChan
         CreatureComponent({
           card: currentCard,
           state: stateChange,
-          position: i
+          position: i,
+          ownerPlayer: ownerPlayer,
+          currentPlayer: currentPlayer,
+          phase: phase
+          
         }),
       );
     } else {
@@ -189,7 +273,10 @@ function HandOfCards({ playerHand, stateChange}: { playerHand: Card[], stateChan
         CardComponent({
           card: currentCard,
           state: stateChange,
-          position: i
+          position: i,
+          ownerPlayer: ownerPlayer,
+          currentPlayer: currentPlayer,
+          phase: phase
         }),
       );
     }
@@ -208,19 +295,18 @@ function Board({ game, }: { game: Game}) {
   let p1Board = [];
   let p2Board = [];
   let board = game.board;
-
   //Looping through board to display it
   for (let i = 0; i < 4; i++) {
     p1Board.push(
       LandscapeCard({
-        creature: game.board.getBoardPosByOwnerId(0, i)?.creature,
+        creature: board.getBoardPosByOwnerId(0, i)?.creature,
         //building: game.board.getBoardPosByOwnerId(0, i)?.building
       }),
     );
 
     p2Board.push(
       LandscapeCard({
-        creature: game.board.getBoardPosByOwnerId(1, i)?.creature,
+        creature: board.getBoardPosByOwnerId(1, i)?.creature,
         //building: game.board.getBoardPosByOwnerId(1, i)?.building,
       }),
     );
@@ -231,11 +317,11 @@ function Board({ game, }: { game: Game}) {
       <br></br>
       <div className="flex flex-row justify-between justify-around"> 
         {/**not sure if just printing the array will work*/}
-        {p1Board}
+        {p2Board}
       </div>
       <br></br>
       <div className="flex flex-row justify-between justify-around">
-        {p2Board}
+        {p1Board}
       </div>
       <div>
 
@@ -256,11 +342,15 @@ function LandscapeCard({
   creature: Creature | undefined;
 }) {
   //c is creature, b is building. default values are empty tags (is that what they're called?)
-  let c = <></>;
+  let c;
   let b = <></>;
   // check if creature is undefined
-  if (creature?.name == null) {
-    c = CreatureComponent({card: creature});
+  console.log(creature?.name);
+  if (creature?.name === "Null") {
+    c = (<></>) 
+  }
+  else{
+    c = CreatureComponentOnBoard({card: creature});
   }
   // check if building is undefined
   // if (building?.name == null) {
@@ -308,16 +398,15 @@ function getDemoPlayer(player: Player) {
  * This is like the big daddy of the components. This makes up pretty much the entire game. Shows players board, hp, hands, etc etc.
  * @returns Markup to display the game
  */
-function GameBoard({ game, setGameState }: { game: Game, setGameState: any }) {
+function GameBoard({ game, setGameState }: { game: Game, setGameState: React.Dispatch<React.SetStateAction<Game>> }) {
   //States:
   
   const [summoningCard, setSummoningCard] = useState(-1);
   //const[board, setBoard] = useState(game.board);
-  
+  console.log(setGameState);
 
   let player1 = game.getPlayerById(0);
   let player2 = game.getPlayerById(1);
-
   let buttons1 = (<></>)
   let buttons2 = (<></>)
   if(game.turnPhase==0){
@@ -339,14 +428,14 @@ function GameBoard({ game, setGameState }: { game: Game, setGameState: any }) {
     else{
       buttons2 = <AttackingButtons player={player2} game={game} setGame={setGameState}></AttackingButtons>
     }
-
   }
+  
   return (
     <div className="flex justify-center items-center h-screen p-4">
       <div>
+        {buttons2}
         {/*Gonna need to comment much of this just so we're aware of what is happening in some of these.*/}
         {/*This div is a row that shows a players stats and then their hand of cards*/}
-
         <div className="flex flex-col justify-center items-center gap-4">
           <br></br>
           <br></br>
@@ -354,7 +443,6 @@ function GameBoard({ game, setGameState }: { game: Game, setGameState: any }) {
             <HandOfCards playerHand={game.players[1].hand} stateChange={setSummoningCard} currentPlayer={game.currentPlayer} ownerPlayer={player2} phase={game.turnPhase}></HandOfCards>
           </div>
           {buttons2}
-
         </div>
         {/*This div pretty large. It's where discard piles, decks, and the actual board goes*/}
         <div className="flex justify-center items-center gap-4">
@@ -362,7 +450,6 @@ function GameBoard({ game, setGameState }: { game: Game, setGameState: any }) {
           <div className="flex flex-col gap-10">
             <PlayerDisplay game={game} player={player2}></PlayerDisplay>
             <Deck player={game.players[1]}  setGameState={setGameState} game={game}></Deck>
-
             <DiscardPile size={5}></DiscardPile>
           </div>
           {/*The board between two columns*/}
@@ -372,9 +459,7 @@ function GameBoard({ game, setGameState }: { game: Game, setGameState: any }) {
             {/*The first column shows the deck and discard pile (like the one you saw earlier*/}
             <div className="flex flex-col gap-10">
               <DiscardPile size={5}></DiscardPile>
-
               <Deck player={game.players[0]}  setGameState={setGameState} game={game}></Deck>
-
               <PlayerDisplay game={game} player={player1}></PlayerDisplay>
             </div>
             {/*This column shows the game log text bot and the button for moving phases below it*/}
@@ -388,24 +473,20 @@ function GameBoard({ game, setGameState }: { game: Game, setGameState: any }) {
                 imagePath="https://th.bing.com/th/id/R.64cd05752ba370bda27cbcfa260693ce?rik=UMwRwhskWbPISQ&pid=ImgRaw&r=0"
                 setGame={setGameState}
                 setSummoning={setSummoningCard}
-
               ></PhaseButton>
             </div>
           </div>
         </div>
-        <div className="flex flex-row justify-center items-center">
-        <HandOfCards playerHand={game.players[0].hand} stateChange={setSummoningCard} currentPlayer={game.currentPlayer} ownerPlayer={player2} phase={game.turnPhase}></HandOfCards>
-
-        </div>
         <div className="flex flex-row justify-center items-center gap-10">
-        {buttons}
-
+        {buttons1}
+        </div>
+        <div className="flex flex-row justify-center items-center">
+        <HandOfCards playerHand={game.players[0].hand} stateChange={setSummoningCard} currentPlayer={game.currentPlayer} ownerPlayer={player1} phase={game.turnPhase}></HandOfCards>
         </div>
       </div>
     </div>
   );
 }
-
 
 function SummoningButtons({cardPos, game, setSummonState, hand, setGame, playerid}: {cardPos: number, game: Game, setSummonState: any, 
   hand: Card[], setGame: any, playerid: number}){
@@ -417,10 +498,18 @@ function SummoningButtons({cardPos, game, setSummonState, hand, setGame, playeri
   }
   return(
     <div className="flex flex-row justify-center items-center gap-20">
-       <button type="button" onClick={handle}>Zone 1</button>
-       <button type="button">Zone 1</button>
-       <button type="button">Zone 1</button>
-       <button type="button">Zone 1</button>
+       <button type="button" onClick={function(){
+        handle(0, playerid);
+       }}>Zone 1</button>
+       <button type="button" onClick={function(){
+        handle(1, playerid);
+       }}>Zone 2</button>
+       <button type="button" onClick={function(){
+        handle(2, playerid);
+       }}>Zone 3</button>
+       <button type="button" onClick={function(){
+        handle(3, playerid);
+       }}>Zone 4</button>
     </div>
    
   )
@@ -449,7 +538,6 @@ function AttackingButtons({player, game, setGame}: {player: Player, game: Game, 
     </div>
   )
 }
-
 /**
  * has a block of scrollable text showing player actions and shows turn and phase
  * @returns markup that displays the gamelog in the browser
@@ -461,7 +549,6 @@ function GameLog({
   game: Game,
   setGame: any
 }) {
-
   let phaseName;
   if(game.turnPhase==0){
     phaseName="Main phase";
@@ -472,14 +559,13 @@ function GameLog({
   else if(game.turnPhase==2){
     phaseName="End phase";
   }
-
   return (
     <>
       <div className="game_log">{log}</div>
       <div className="text-3xl">
         Turn: {game.turnPhase}
         <br></br>
-        Phase: {phase}
+        Phase: {phaseName}
         <br></br>
         Turn Player: {game.currentPlayer.username}
       </div>
@@ -505,7 +591,6 @@ function PhaseButton({
     game.enterNextPhase();
     setGame(game);
     setSummoning(-1);
-
   }
   return (
     <button onClick={handle}>
@@ -515,10 +600,9 @@ function PhaseButton({
 }
 function App() {
   const [begin, setBegin] = useState(false);
-  const [game, setGame] = useState<Game>();
+  const [game, setGame] = useState(new Game());
   let h = function () {
     setBegin(true);
-    setGame(new Game())
   };
   let page = <></>;
   if (begin) {
