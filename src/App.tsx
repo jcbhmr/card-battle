@@ -412,17 +412,27 @@ function GameBoard({ game }: { game: Game }) {
   let player2 = game.getPlayerById(1);
   let buttons1 = (<></>)
   let buttons2 = (<></>)
-  if(summoningCard+1){
+  if(phase==0){
+    if(summoningCard+1){
+      if(currentPlayer.id==0){
+        buttons1 = <SummoningButtons playerid={0} cardPos ={summoningCard} setSummonState={setSummoningCard} game={game} hand={hand1} setHandState={setCurrentHand1} 
+      setBoardState={setBoard} board={board}></SummoningButtons>
+      }
+      else{
+        buttons2 = <SummoningButtons playerid={1} cardPos ={summoningCard} setSummonState={setSummoningCard} game={game} hand={hand2} setHandState={setCurrentHand2} 
+      setBoardState={setBoard} board={board}></SummoningButtons>
+      }
+    }
+  }
+  else if(phase==1){
     if(currentPlayer.id==0){
-      buttons1 = <SummoningButtons playerid={0} cardPos ={summoningCard} setSummonState={setSummoningCard} game={game} hand={hand1} setHandState={setCurrentHand1} 
-    setBoardState={setBoard} board={board}></SummoningButtons>
+      buttons1 = <AttackingButtons player={player1}></AttackingButtons>
     }
     else{
-      buttons2 = <SummoningButtons playerid={1} cardPos ={summoningCard} setSummonState={setSummoningCard} game={game} hand={hand2} setHandState={setCurrentHand2} 
-    setBoardState={setBoard} board={board}></SummoningButtons>
+      buttons2 = <AttackingButtons player={player2}></AttackingButtons>
     }
-    
   }
+  
   return (
     <div className="flex justify-center items-center h-screen p-4">
       <div>
@@ -473,11 +483,11 @@ function GameBoard({ game }: { game: Game }) {
             </div>
           </div>
         </div>
-        <div className="flex flex-row justify-center items-center">
-          <HandOfCards playerHand={hand1} stateChange={setSummoningCard} currentPlayer={currentPlayer} ownerPlayer={player1} phase={phase}></HandOfCards>
-        </div>
         <div className="flex flex-row justify-center items-center gap-10">
         {buttons1}
+        </div>
+        <div className="flex flex-row justify-center items-center">
+          <HandOfCards playerHand={hand1} stateChange={setSummoningCard} currentPlayer={currentPlayer} ownerPlayer={player1} phase={phase}></HandOfCards>
         </div>
       </div>
     </div>
@@ -511,6 +521,29 @@ function SummoningButtons({cardPos, game, setSummonState, hand, setHandState, se
    
   )
 }
+function AttackingButtons({player}: {player: Player}){
+  let playerid = player.id;
+  
+  function handle(boardPos: number, playerid: number){
+    //game.board.getBoardPosByOwnerId(playerid, boardPos);
+  }
+  return (
+  <div className="flex flex-row justify-center items-center gap-20">
+       <button type="button" onClick={function(){
+        handle(0, playerid);
+       }}>Attack with monster at zone 1</button>
+       <button type="button" onClick={function(){
+        handle(1, playerid);
+       }}>Attack with monster at zone 2</button>
+       <button type="button" onClick={function(){
+        handle(2, playerid);
+       }}>Attack with monster at zone 3</button>
+       <button type="button" onClick={function(){
+        handle(3, playerid);
+       }}>Attack with monster at zone 4</button>
+    </div>
+  )
+}
 /**
  * has a block of scrollable text showing player actions and shows turn and phase
  * @returns markup that displays the gamelog in the browser
@@ -524,13 +557,23 @@ function GameLog({
   phase: number;
   currentPlayer: Player;
 }) {
+  let phaseName;
+  if(phase==0){
+    phaseName="Main phase";
+  }
+  else if(phase==1){
+    phaseName="Battle phase";
+  }
+  else if(phase==2){
+    phaseName="End phase";
+  }
   return (
     <>
       <div className="game_log">{log}</div>
       <div className="text-3xl">
         Turn: {turn}
         <br></br>
-        Phase: {phase}
+        Phase: {phaseName}
         <br></br>
         Turn Player: {currentPlayer.username}
       </div>
