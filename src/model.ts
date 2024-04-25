@@ -357,6 +357,8 @@ export class SidedBoard {
       return null;
     }
   }
+
+  
 }
 
 //============================================================== Game ==============================================================
@@ -473,8 +475,8 @@ export class Game extends AbstractGame {
     if(pos?.creature.name === "Null"){
       pos.creature=card;
     } 
-    else{
-      player.discardPile.push(pos?.creature);
+    else{//replacing monster with new card
+      card.death();
       pos.creature=card;
     }
     
@@ -492,6 +494,39 @@ export class Game extends AbstractGame {
       player.actions -= card.getCost();
       player.hand.splice(handPosition, 1);
       this.summonCard(playerId, boardPosition, card, player);
+    }
+  }
+  /**
+   * function that lets me (front-end) do combat. pretty much, the turn players monster attacks and then we do different things based on if they control a monster or
+   * not. if they do not control a monster then we just attack the enemy players life directly. otherwise, turn players monster attacks the other players monster and
+   * the other players monster reciprocates. we then check to see if either creature was destroyed in the battle and, if they did, we move them to their respective
+   * players discard pile.
+   */
+  simulateCombat(column: number, currentPlayerId: number){
+    //since board is separate from player we have to assign both player and pos
+    let pos1 = this.board.getBoardPosByOwnerId(currentPlayerId, column);
+    let pos2 = this.board.getBoardPosByOwnerId(this.getOtherPlayer(currentPlayerId).id, column);
+
+    let player1 = this.getPlayerById(currentPlayerId);
+    let player2 = this.getPlayerById(this.getOtherPlayer(currentPlayerId).id);
+    // i know this is a lot of variable declarations but it makes the code 10000x more readable so
+    let c1 = pos1?.creature;
+    let c2 = pos1?.creature;
+    //check if monster is ready
+    if(c1?.getIsReady()){
+      if(c2?.name==="Null"){//here we attack directly
+        this.getOtherPlayer(currentPlayerId).hp -= c1.attack;
+      }
+      else{
+        c2.defense -= c1.attack;
+        c1.defense -= c2.attack;
+        if(c2?.defense <= 0){
+          c2?.death();
+        }
+        if(c1.defense <= 0){
+          c1.death();
+        }
+      }
     }
   }
 
