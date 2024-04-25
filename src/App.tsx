@@ -36,18 +36,23 @@ function CardComponent({
   position,
   currentPlayer,
   ownerPlayer,
+  phase
 }: {
   card: Card | Creature;
   children?: ReactNode;
   state: React.Dispatch<React.SetStateAction<number>>,
   position: number
   currentPlayer: Player,
-  ownerPlayer: Player
+  ownerPlayer: Player,
+  phase: number
 }) {
   function handleClick(){
     if(card instanceof Creature){
       if(currentPlayer.id==ownerPlayer.id){
-        state(position);
+        if(phase==0){
+          state(position);
+        }
+        
       }
       
       // mark pos of hand
@@ -106,13 +111,15 @@ function CreatureComponent({
     state,
     position,
     currentPlayer,
-    ownerPlayer
+    ownerPlayer,
+    phase
 }: {
   card: Creature,
   state: React.Dispatch<React.SetStateAction<number>>,
   position: number,
   currentPlayer: Player,
-  ownerPlayer: Player
+  ownerPlayer: Player,
+  phase: number
 }) {
   let child = (
     <>
@@ -127,6 +134,7 @@ function CreatureComponent({
       position={position}
       ownerPlayer={ownerPlayer}
       currentPlayer={currentPlayer}
+      phase={phase}
     >
       {child}
     </CardComponent>
@@ -182,8 +190,8 @@ function DiscardPile({ size }: { size: number }) {
  * @author Tanner Brown
  * @returns Array of CardComponents/CreatureComponents
  */
-function HandOfCards({ playerHand, stateChange, currentPlayer, ownerPlayer}: 
-  { playerHand: Card[], stateChange: React.Dispatch<React.SetStateAction<number>>, currentPlayer: Player, ownerPlayer: Player}) {
+function HandOfCards({ playerHand, stateChange, currentPlayer, ownerPlayer, phase}: 
+  { playerHand: Card[], stateChange: React.Dispatch<React.SetStateAction<number>>, currentPlayer: Player, ownerPlayer: Player, phase: number}) {
   let shownHand = [];
   
   for (let i = 0; i < playerHand.length; i++) {
@@ -195,7 +203,8 @@ function HandOfCards({ playerHand, stateChange, currentPlayer, ownerPlayer}:
           state: stateChange,
           position: i,
           ownerPlayer: ownerPlayer,
-          currentPlayer: currentPlayer
+          currentPlayer: currentPlayer,
+          phase: phase
           
         }),
       );
@@ -206,7 +215,8 @@ function HandOfCards({ playerHand, stateChange, currentPlayer, ownerPlayer}:
           state: stateChange,
           position: i,
           ownerPlayer: ownerPlayer,
-          currentPlayer: currentPlayer
+          currentPlayer: currentPlayer,
+          phase: phase
         }),
       );
     }
@@ -359,7 +369,7 @@ function GameBoard({ game }: { game: Game }) {
           <br></br>
           <br></br>
           <div className="flex flex-row justify-center items-center">
-            <HandOfCards playerHand={hand2} stateChange={setSummoningCard} currentPlayer={currentPlayer} ownerPlayer={player2}></HandOfCards>
+            <HandOfCards playerHand={hand2} stateChange={setSummoningCard} currentPlayer={currentPlayer} ownerPlayer={player2} phase={phase}></HandOfCards>
           </div>
           {buttons2}
         </div>
@@ -399,7 +409,7 @@ function GameBoard({ game }: { game: Game }) {
           </div>
         </div>
         <div className="flex flex-row justify-center items-center">
-          <HandOfCards playerHand={hand1} stateChange={setSummoningCard} currentPlayer={currentPlayer} ownerPlayer={player1}></HandOfCards>
+          <HandOfCards playerHand={hand1} stateChange={setSummoningCard} currentPlayer={currentPlayer} ownerPlayer={player1} phase={phase}></HandOfCards>
         </div>
         <div className="flex flex-row justify-center items-center gap-10">
         {buttons1}

@@ -455,6 +455,7 @@ export class Game extends AbstractGame {
   switchTurns() {
     this.currentTurn++;
     this.currentPlayer = this.players[this.currentTurn%this.players.length]
+    this.currentPlayer.actions=2;
     this.resetCards(this.currentPlayer.id);
     this.dispatchEvent(new SwitchTurnsEvent(this.currentTurn));
   }
