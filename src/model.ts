@@ -468,17 +468,31 @@ export class Game extends AbstractGame {
   /**
    * summons a creature to the side of player id at position number 
    */
-  summonCard(playerId: number, position: number, card: Creature){
-
+  summonCard(playerId: number, position: number, card: Creature, player: Player){
     let pos = this.board.getBoardPosByOwnerId(playerId, position);
-    pos.creature=card;
+    if(pos?.creature.name === "Null"){
+      pos.creature=card;
+    } 
+    else{
+      player.discardPile.push(pos?.creature);
+      pos.creature=card;
+    }
+    
   }
-
+  /**
+   * basic helper function i made that removes card from players hand and places it on board
+   * @param playerId 
+   * @param boardPosition 
+   * @param handPosition 
+   */
   summonCardFromHand(playerId: number, boardPosition: number, handPosition: number){
     let player = this.getPlayerById(playerId);
     let card = player.hand[handPosition];
-    player.hand.splice(handPosition, 1);
-    this.summonCard(playerId, boardPosition, card);
+    if(player.actions >= card.getCost()){
+      player.actions -= card.getCost();
+      player.hand.splice(handPosition, 1);
+      this.summonCard(playerId, boardPosition, card, player);
+    }
   }
 
   playCard(card: Card, playerId: number): boolean {
