@@ -124,7 +124,7 @@ function CreatureComponent({
  * Displays card shape with a number on it indicating how many cards are in the pile. This one has onclick to allow player to draw
  * @returns returns markup displaying what i wrote just above
  */
-function Deck({ player, handState}: { player: Player, handState: React.Dispatch<React.SetStateAction<Card[]>>}) {
+function Deck({ player, handState, hand}: { player: Player, hand: Card[], handState: React.Dispatch<React.SetStateAction<Card[]>>}) {
   let handleDraw = function () {
     let boolean = player.drawCardUsingAction();
     handState(player.hand);
@@ -317,25 +317,39 @@ function GameBoard({ game }: { game: Game }) {
 
   let player1 = game.getPlayerById(0);
   let player2 = game.getPlayerById(1);
-  let buttons = (<></>)
+  let buttons1 = (<></>)
+  let buttons2 = (<></>)
   if(summoningCard+1){
-    buttons = <SummoningButtons cardPos ={summoningCard} setSummonState={setSummoningCard} game={game} hand={hand1} setHandState={setCurrentHand1} 
+    if(currentPlayer.id==0){
+      buttons1 = <SummoningButtons playerid={0} cardPos ={summoningCard} setSummonState={setSummoningCard} game={game} hand={hand1} setHandState={setCurrentHand1} 
     setBoardState={setBoard} board={board}></SummoningButtons>
+    }
+    else{
+      buttons2 = <SummoningButtons playerid={1} cardPos ={summoningCard} setSummonState={setSummoningCard} game={game} hand={hand2} setHandState={setCurrentHand2} 
+    setBoardState={setBoard} board={board}></SummoningButtons>
+    }
+    
   }
   return (
     <div className="flex justify-center items-center h-screen p-4">
       <div>
+        {buttons2}
         {/*Gonna need to comment much of this just so we're aware of what is happening in some of these.*/}
         {/*This div is a row that shows a players stats and then their hand of cards*/}
-        <div className="flex flex-row justify-center items-center">
-          <HandOfCards playerHand={hand2}> stateChange={setSummoningCard}</HandOfCards>
+        <div className="flex flex-col justify-center items-center gap-4">
+          <br></br>
+          <br></br>
+          <div className="flex flex-row justify-center items-center">
+            <HandOfCards playerHand={hand2} stateChange={setSummoningCard}></HandOfCards>
+          </div>
+          {buttons2}
         </div>
         {/*This div pretty large. It's where discard piles, decks, and the actual board goes*/}
         <div className="flex justify-center items-center gap-4">
           {/*This column shows a deck and discard pile*/}
           <div className="flex flex-col gap-10">
             <PlayerDisplay game={game} player={player2}></PlayerDisplay>
-            <Deck player={player2} handState={setCurrentHand2}></Deck>
+            <Deck player={player2} hand={hand2} handState={setCurrentHand2}></Deck>
             <DiscardPile size={5}></DiscardPile>
           </div>
           {/*The board between two columns*/}
@@ -345,7 +359,7 @@ function GameBoard({ game }: { game: Game }) {
             {/*The first column shows the deck and discard pile (like the one you saw earlier*/}
             <div className="flex flex-col gap-10">
               <DiscardPile size={5}></DiscardPile>
-              <Deck player={player1} handState={setCurrentHand1}></Deck>
+              <Deck player={player1} hand={hand1} handState={setCurrentHand1}></Deck>
               <PlayerDisplay game={game} player={player1}></PlayerDisplay>
             </div>
             {/*This column shows the game log text bot and the button for moving phases below it*/}
@@ -369,30 +383,36 @@ function GameBoard({ game }: { game: Game }) {
           <HandOfCards playerHand={hand1} stateChange={setSummoningCard}></HandOfCards>
         </div>
         <div className="flex flex-row justify-center items-center gap-10">
-        {buttons}
+        {buttons1}
         </div>
       </div>
     </div>
   );
 }
 
-function SummoningButtons({cardPos, game, setSummonState, hand, setHandState, setBoardState, board}: {cardPos: number, game: Game, setSummonState: any, 
-  hand: Card[], setHandState: any, setBoardState: any, board: SidedBoard}){
-  function handle(){
-    let card = hand[cardPos];
-    hand.splice(cardPos, 1);
+function SummoningButtons({cardPos, game, setSummonState, hand, setHandState, setBoardState, playerid}: {cardPos: number, game: Game, setSummonState: any, 
+  hand: Card[], setHandState: any, setBoardState: any, board: any, playerid: number}){
+  function handle(boardPos: number, playerid: number){
+    game.summonCardFromHand(playerid,boardPos, cardPos)
     setHandState(hand);
     console.log(hand.length)
-    game.summonCard(0, 0, card);
-    setBoardState(game.board);
+    setBoardState(game.getBoard());
     setSummonState(-1);
   }
   return(
     <div className="flex flex-row justify-center items-center gap-20">
-       <button type="button" onClick={handle}>Zone 1</button>
-       <button type="button">Zone 2</button>
-       <button type="button">Zone 3</button>
-       <button type="button">Zone 4</button>
+       <button type="button" onClick={function(){
+        handle(0, playerid);
+       }}>Zone 1</button>
+       <button type="button" onClick={function(){
+        handle(1, playerid);
+       }}>Zone 2</button>
+       <button type="button" onClick={function(){
+        handle(2, playerid);
+       }}>Zone 3</button>
+       <button type="button" onClick={function(){
+        handle(3, playerid);
+       }}>Zone 4</button>
     </div>
    
   )
