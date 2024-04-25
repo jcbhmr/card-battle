@@ -317,11 +317,11 @@ function Board({ game, board}: { game: Game, board: SidedBoard}) {
       <br></br>
       <div className="flex flex-row justify-between justify-around"> 
         {/**not sure if just printing the array will work*/}
-        {p1Board}
+        {p2Board}
       </div>
       <br></br>
       <div className="flex flex-row justify-between justify-around">
-        {p2Board}
+        {p1Board}
       </div>
       <div>
 
