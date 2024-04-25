@@ -97,6 +97,46 @@ function CardComponent({
   );
 }
 
+function CardComponentOnBoard({
+  card,
+  children
+}: {
+  card: Card | Creature;
+  children?: ReactNode;
+}) {
+  return (
+    <button>
+    <div className="card_shape overflow-auto">
+      <div className="flex aspect-16/9">
+        <img
+          alt={card.name}
+          className="object-cover"
+          height={135}
+          src={card.imageURL}
+          style={{
+            aspectRatio: "240/135",
+            objectFit: "cover",
+          }}
+          width={350}
+        />
+      </div>
+      <div className="flex-1 p-4 grid gap-2">
+        <h2 className="text-lg font-bold tracking-tight">{card.name}</h2>
+        <p className="text-sm line-clamp-3">{card.flavorText}</p>
+        <div className="text-xs">
+          <div>
+            AC: {card.getCost()} Type: {card.landscapeType}{" "}
+          </div>
+          <div></div>
+
+          {children}
+        </div>
+      </div>
+    </div>
+    </button>
+  );
+}
+
 /**
  * so basically this is just Card Component, but for creatures. It's kinda like a fucked up version
  * of inheritance for objects. I'm using the children props that Jacob showed me to essentially just
@@ -139,6 +179,26 @@ function CreatureComponent({
       {child}
     </CardComponent>
   );
+}
+
+function CreatureComponentOnBoard({
+  card
+}: {
+card: Creature
+}) {
+let child = (
+  <>
+    <div>Attack: {card.attack}</div>
+    <div>Defense: {card.defense}</div>
+  </>
+);
+return (
+  <CardComponentOnBoard
+    card={card}
+  >
+    {child}
+  </CardComponentOnBoard>
+);
 }
 
 /**
@@ -282,11 +342,15 @@ function LandscapeCard({
   creature: Creature | undefined;
 }) {
   //c is creature, b is building. default values are empty tags (is that what they're called?)
-  let c = <></>;
+  let c;
   let b = <></>;
   // check if creature is undefined
-  if (creature?.name == null) {
-    c = CreatureComponent({card: creature});
+  console.log(creature?.name);
+  if (creature?.name === "Null") {
+    c = (<></>) 
+  }
+  else{
+    c = CreatureComponentOnBoard({card: creature});
   }
   // check if building is undefined
   // if (building?.name == null) {
