@@ -33,16 +33,23 @@ function CardComponent({
   card,
   children,
   state,
-  position
+  position,
+  currentPlayer,
+  ownerPlayer,
 }: {
   card: Card | Creature;
   children?: ReactNode;
   state: React.Dispatch<React.SetStateAction<number>>,
   position: number
+  currentPlayer: Player,
+  ownerPlayer: Player
 }) {
   function handleClick(){
     if(card instanceof Creature){
-      state(position);
+      if(currentPlayer.id==ownerPlayer.id){
+        state(position);
+      }
+      
       // mark pos of hand
     }
     // else if (card instanceof Building){
@@ -97,11 +104,15 @@ function CardComponent({
 function CreatureComponent({
     card,
     state,
-    position
+    position,
+    currentPlayer,
+    ownerPlayer
 }: {
   card: Creature,
   state: React.Dispatch<React.SetStateAction<number>>,
-  position: number
+  position: number,
+  currentPlayer: Player,
+  ownerPlayer: Player
 }) {
   let child = (
     <>
@@ -114,6 +125,8 @@ function CreatureComponent({
       card={card}
       state={state}
       position={position}
+      ownerPlayer={ownerPlayer}
+      currentPlayer={currentPlayer}
     >
       {child}
     </CardComponent>
@@ -169,7 +182,8 @@ function DiscardPile({ size }: { size: number }) {
  * @author Tanner Brown
  * @returns Array of CardComponents/CreatureComponents
  */
-function HandOfCards({ playerHand, stateChange}: { playerHand: Card[], stateChange: React.Dispatch<React.SetStateAction<number>>}) {
+function HandOfCards({ playerHand, stateChange, currentPlayer, ownerPlayer}: 
+  { playerHand: Card[], stateChange: React.Dispatch<React.SetStateAction<number>>, currentPlayer: Player, ownerPlayer: Player}) {
   let shownHand = [];
   
   for (let i = 0; i < playerHand.length; i++) {
@@ -179,7 +193,10 @@ function HandOfCards({ playerHand, stateChange}: { playerHand: Card[], stateChan
         CreatureComponent({
           card: currentCard,
           state: stateChange,
-          position: i
+          position: i,
+          ownerPlayer: ownerPlayer,
+          currentPlayer: currentPlayer
+          
         }),
       );
     } else {
@@ -187,7 +204,9 @@ function HandOfCards({ playerHand, stateChange}: { playerHand: Card[], stateChan
         CardComponent({
           card: currentCard,
           state: stateChange,
-          position: i
+          position: i,
+          ownerPlayer: ownerPlayer,
+          currentPlayer: currentPlayer
         }),
       );
     }
@@ -340,7 +359,7 @@ function GameBoard({ game }: { game: Game }) {
           <br></br>
           <br></br>
           <div className="flex flex-row justify-center items-center">
-            <HandOfCards playerHand={hand2} stateChange={setSummoningCard}></HandOfCards>
+            <HandOfCards playerHand={hand2} stateChange={setSummoningCard} currentPlayer={currentPlayer} ownerPlayer={player2}></HandOfCards>
           </div>
           {buttons2}
         </div>
@@ -380,7 +399,7 @@ function GameBoard({ game }: { game: Game }) {
           </div>
         </div>
         <div className="flex flex-row justify-center items-center">
-          <HandOfCards playerHand={hand1} stateChange={setSummoningCard}></HandOfCards>
+          <HandOfCards playerHand={hand1} stateChange={setSummoningCard} currentPlayer={currentPlayer} ownerPlayer={player1}></HandOfCards>
         </div>
         <div className="flex flex-row justify-center items-center gap-10">
         {buttons1}
