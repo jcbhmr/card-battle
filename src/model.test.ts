@@ -36,28 +36,23 @@ test("Game is Playable", () => {
   Game.startNewGame();
 
   //Game Test
-  Game.getInstance().addEventListener(GetCardTargetEvent, (evt: Event) => {
+  Game.getInstance().addGameEventListener(GetCardTargetEvent, (evt: Event) => {
+    console.log("Recieved event with name " + evt.type);
     if(evt instanceof GetBoardPosTargetEvent) {
+      console.log("Recieved event of Type GetBoardPosTargetEvent!");
       var player: Player = Game.getInstance().getPlayerById(evt.executorId);
       var didExecute = false;
       if(evt.targeter != null) {
-        // var validPos: BoardPos[] | null = evt.targeter.getValidTargets(Card.getNull(), player.id);
-        // if(validPos != null) {
-        //   for(var j = 0; j < validPos.length; j++) {
-        //     if(didExecute) {
-        //       return;
-        //     }else {
-        //       didExecute = evt.execute(validPos[j]);
-        //     }
-        //   }
-        // }
-
         var playerBoard: BoardPos[] | undefined = Game.getInstance().board.getSideByOwnerId(player.id)
         if(typeof(playerBoard) == "undefined") {
           console.log("====PlayerId is incorrect, cannot play card!====");
         }else {
           for(var j = 0; j < playerBoard.length; j++) {
-            
+            if(didExecute) {
+              return;
+            }else {
+              didExecute = evt.execute(playerBoard[j]);
+            }
           }
         }
       }
@@ -93,12 +88,15 @@ test("Game is Playable", () => {
   
     assert(typeof(mySide) != "undefined" && typeof(theirSide) != "undefined");
     assert(mySide.length == theirSide.length);
+    console.log("My Side");
     for(var j = 0; j < mySide.length; j++) {
-      console.log("My Side: " + mySide[j].creature.name + ", ");
-      console.log("Their Side: " + theirSide[j].creature.name + ", ");
+      console.log(mySide[j].creature.name + ", ");
     }
-    //Not going to worry about testing with abilities right now, we can test that in another Test() call
-    // Game.getInstance().enterNextPhase();
+
+    console.log("Their Side:");
+    for(var j = 0; j < theirSide.length; j++) {
+      console.log(theirSide[j].creature.name + ", ");
+    }
 
     //Do attacks
     if(typeof(mySide) != "undefined" && typeof(theirSide) != "undefined") {
