@@ -124,7 +124,7 @@ function CreatureComponent({
  * Displays card shape with a number on it indicating how many cards are in the pile. This one has onclick to allow player to draw
  * @returns returns markup displaying what i wrote just above
  */
-function Deck({ player, handState }: { player: Player, handState: React.Dispatch<React.SetStateAction<Card[]>>}) {
+function Deck({ player, handState}: { player: Player, handState: React.Dispatch<React.SetStateAction<Card[]>>}) {
   let handleDraw = function () {
     let boolean = player.drawCardUsingAction();
     handState(player.hand);
@@ -205,18 +205,19 @@ function HandOfCards({ playerHand, stateChange}: { playerHand: Card[], stateChan
 function Board({ game, board}: { game: Game, board: SidedBoard}) {
   let p1Board = [];
   let p2Board = [];
+  let t = board.getSideByOwnerId(0);
   //Looping through board to display it
   for (let i = 0; i < 4; i++) {
     p1Board.push(
       LandscapeCard({
-        creature: game.board.getBoardPosByOwnerId(0, i)?.creature,
+        creature: board.getBoardPosByOwnerId(0, i)?.creature,
         //building: game.board.getBoardPosByOwnerId(0, i)?.building
       }),
     );
 
     p2Board.push(
       LandscapeCard({
-        creature: game.board.getBoardPosByOwnerId(1, i)?.creature,
+        creature: board.getBoardPosByOwnerId(1, i)?.creature,
         //building: game.board.getBoardPosByOwnerId(1, i)?.building,
       }),
     );
@@ -318,7 +319,8 @@ function GameBoard({ game }: { game: Game }) {
   let player2 = game.getPlayerById(1);
   let buttons = (<></>)
   if(summoningCard+1){
-    buttons = <SummoningButtons cardPos ={summoningCard} setSummonState={setSummoningCard} game={game} hand={hand1}></SummoningButtons>
+    buttons = <SummoningButtons cardPos ={summoningCard} setSummonState={setSummoningCard} game={game} hand={hand1} setHandState={setCurrentHand1} 
+    setBoardState={setBoard} board={board}></SummoningButtons>
   }
   return (
     <div className="flex justify-center items-center h-screen p-4">
@@ -343,7 +345,7 @@ function GameBoard({ game }: { game: Game }) {
             {/*The first column shows the deck and discard pile (like the one you saw earlier*/}
             <div className="flex flex-col gap-10">
               <DiscardPile size={5}></DiscardPile>
-              <Deck player={player1}  handState={setCurrentHand1}></Deck>
+              <Deck player={player1} handState={setCurrentHand1}></Deck>
               <PlayerDisplay game={game} player={player1}></PlayerDisplay>
             </div>
             {/*This column shows the game log text bot and the button for moving phases below it*/}
@@ -374,18 +376,23 @@ function GameBoard({ game }: { game: Game }) {
   );
 }
 
-function SummoningButtons({cardPos, game, setSummonState, hand}: {cardPos: number, game: Game, setSummonState: any, hand: Card[]}){
+function SummoningButtons({cardPos, game, setSummonState, hand, setHandState, setBoardState, board}: {cardPos: number, game: Game, setSummonState: any, 
+  hand: Card[], setHandState: any, setBoardState: any, board: SidedBoard}){
   function handle(){
-    let card = hand.splice(cardPos,1);
+    let card = hand[cardPos];
+    hand.splice(cardPos, 1);
+    setHandState(hand);
+    console.log(hand.length)
     game.summonCard(0, 0, card);
+    setBoardState(game.board);
     setSummonState(-1);
   }
   return(
     <div className="flex flex-row justify-center items-center gap-20">
        <button type="button" onClick={handle}>Zone 1</button>
-       <button type="button">Zone 1</button>
-       <button type="button">Zone 1</button>
-       <button type="button">Zone 1</button>
+       <button type="button">Zone 2</button>
+       <button type="button">Zone 3</button>
+       <button type="button">Zone 4</button>
     </div>
    
   )
