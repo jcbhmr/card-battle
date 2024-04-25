@@ -87,6 +87,7 @@ export class Card {
   }
 
   play(_target: BoardPos, _playerId: number) {
+    console.log("Calling play in class Card");
     this.displayCard();
     return false;
   }
@@ -237,7 +238,8 @@ export class Creature extends Card {
   }
 
   override play(pos: BoardPos, playerId: number) {
-    if (pos.creature == Creature.getNull()) {
+    console.log("Playing Creature " + this.name + " at pos " + pos.posId + " on player " + playerId + "'s side of the board");
+    if (pos.creature.name == Creature.getNull().name) {
       if(pos.setCreature(this)) {
         Game.getInstance().getPlayerById(playerId).actions -= this.getCost();
         return true;
@@ -284,6 +286,7 @@ export class Landscape extends Card {
   }
 
   override play(pos: BoardPos) {
+    console.log("Playing Landscape " + this.name + " at pos " + pos.posId + " on player " + pos.ownerId + "'s side of the board");
     if (pos.landscape == LandscapeType.NULL) {
       return pos.setLandscape(this);
     }

@@ -303,7 +303,7 @@ export class BoardPos {
   }
 
   setCreature(card: Creature) {
-    if (this.creature == Creature.getNull()) {
+    if (this.creature.name == Creature.getNull().name) {
       this.creature = card;
       return true;
     }
@@ -372,7 +372,7 @@ export class AbstractGame extends EventTarget {
     super();
   }
 
-  addEventListener(
+  addGameEventListener(
     _event: string,
     _eventCallback: EventListenerOrEventListenerObject,
   ) {}
@@ -391,7 +391,9 @@ export class AbstractGame extends EventTarget {
 
   resetCards(_playerId: number) {}
 
-  playCard(_card: Card, _playerId: number) {}
+  playCard(_card: Card, _playerId: number): boolean {
+    return false;
+  }
 }
 
 export class Game extends AbstractGame {
@@ -428,10 +430,11 @@ export class Game extends AbstractGame {
     return this.board;
   }
 
-  addEventListener(
+  addGameEventListener(
     event: string,
     eventCallback: EventListenerOrEventListenerObject,
   ) {
+    console.log("Adding Event Listener for " + event);
     this.addEventListener(event, eventCallback);
   }
 
@@ -522,25 +525,29 @@ export class Game extends AbstractGame {
 
   }
   playCard(card: Card, playerId: number): boolean {
+    console.log("playCard called on " + card.name + ", " + playerId);
     if (this.turnPhase != TurnPhases.Play || 
-      (Game.getInstance().getPlayerById(playerId) != null && Game.getInstance().getPlayerById(playerId).actions >= card.getCost())) {
+      (Game.getInstance().getPlayerById(playerId) == null && Game.getInstance().getPlayerById(playerId).actions >= card.getCost())) {
+      console.log("Unable to play card " + card.name + "! Potential causes: this.turnPhase == TurnPhases.Play: " + (this.turnPhase == TurnPhases.Play) + 
+      ", Player from playerId == null: " + (Game.getInstance().getPlayerById(playerId) == null) + 
+      ", Player has enough actions: " + (Game.getInstance().getPlayerById(playerId).actions >= card.getCost()))
       return false;
     }
-
+    
     switch (card.cardType) {
       case CardType.Creature:
         return this.dispatchEvent(
           new GetBoardPosTargetEvent(
             GetCardTargetEvent,
             (pos: BoardPos) => {
-              if (pos.creature != Creature.getNull()) {
+              if (pos.creature.name != Creature.getNull().name) {
                 return false;
               } else {
-                if (card.play(pos, playerId)) {
+                if (card.play(pos, pos.ownerId)) {
                   return Game.getInstance().dispatchEvent(
                     new PlayCardEvent(
                       card,
-                      playerId,
+                      pos.ownerId,
                     ),
                   );
                 }

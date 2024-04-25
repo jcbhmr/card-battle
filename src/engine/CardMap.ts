@@ -1,13 +1,7 @@
 import {
-  LandscapeType,
-  Targeter,
-  PlayerTargeter,
-  LaneTargeter,
-  TargetType,
-  BoardPos,
-  Game,
+  LandscapeType
 } from "../model.ts";
-import { Card, Creature, Landscape } from "./card.ts";
+import { Card, Creature } from "./card.ts";
 
 var cardMap: Map<string, Card> = new Map<string, Card>();
 
