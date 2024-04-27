@@ -50,7 +50,7 @@ function CardComponent({
     if(card instanceof Creature){
       if(currentPlayer.id==ownerPlayer.id){
         if(phase==0){
-          state(position);
+          state(0);
         }
         
       }
@@ -205,21 +205,14 @@ return (
  * Displays card shape with a number on it indicating how many cards are in the pile. This one has onclick to allow player to draw
  * @returns returns markup displaying what i wrote just above
  */
-function Deck({ player, handState, hand}: { player: Player, hand: Card[], handState: React.Dispatch<React.SetStateAction<Card[]>>}) {
-  let handleDraw = function () {
-    let boolean = player.drawCardUsingAction();
-    handState(player.hand);
-    if (!boolean) {
-      console.log("it was false!!!")
-      log.push(
-        <div>
-          {player.username} attempted to draw, but does not have enough actions.
-        </div>,
-      );
-    } 
-    
+function Deck({ player, resetState, reset}: { player: Player,  resetState: any, reset: number}) {
+  function handleDraw() {
+    player.drawCardUsingAction();
+    resetState(dumbStupidFunction(reset));
+    //handState([...hand, ]);
   };
   return (
+    <button>
     <div
       className="card_shape flex h-screen hover:border-red-800"
       onClick={handleDraw}
@@ -228,6 +221,7 @@ function Deck({ player, handState, hand}: { player: Player, hand: Card[], handSt
         <div className="">{player.deck.length}</div>
       </div>
     </div>
+    </button>
   );
 }
 
@@ -345,7 +339,6 @@ function LandscapeCard({
   let c;
   let b = <></>;
   // check if creature is undefined
-  console.log(creature?.name);
   if (creature?.name === "Null") {
     c = (<></>) 
   }
@@ -399,42 +392,52 @@ function getDemoPlayer(player: Player) {
  * @returns Markup to display the game
  */
 function GameBoard({ game }: { game: Game }) {
-  //States:
-  const [turn, setTurn] = useState(game.currentTurn);
-  const [phase, setPhase] = useState(game.turnPhase);
-  const [currentPlayer, setCurrentPlayer] = useState(game.currentPlayer);
-  const [hand1, setCurrentHand1] = useState(game.players[0].hand);
-  const [hand2, setCurrentHand2] = useState(game.players[1].hand);
-  const [summoningCard, setSummoningCard] = useState(-1);
-  const[board, setBoard] = useState(game.board);
-
   let player1 = game.getPlayerById(0);
   let player2 = game.getPlayerById(1);
+
+  let hand1 = player1.hand;
+  let hand2 = player2.hand;
+
+  let board = game.board
+  //States:
+  const [turn, setTurn] = useState(game.currentTurn); //good
+  const [phase, setPhase] = useState(game.turnPhase); //good
+  const [currentPlayer, setCurrentPlayer] = useState(game.currentPlayer);// good(?)
+  const [reset, setReset] = useState(-1);
+  const [summoningCard, setSummoningCard] = useState(-1); //good
+
   let buttons1 = (<></>)
   let buttons2 = (<></>)
   if(phase==0){
-    if(summoningCard+1){
+    if(summoningCard==0){
       if(currentPlayer.id==0){
-        buttons1 = <SummoningButtons playerid={0} cardPos ={summoningCard} setSummonState={setSummoningCard} game={game} hand={hand1} setHandState={setCurrentHand1} 
-      setBoardState={setBoard} board={board}></SummoningButtons>
+        buttons1 = <SummoningButtons playerid={0} cardPos ={summoningCard} setSummonState={setSummoningCard} game={game} hand={hand1} board={board}></SummoningButtons>
       }
       else{
-        buttons2 = <SummoningButtons playerid={1} cardPos ={summoningCard} setSummonState={setSummoningCard} game={game} hand={hand2} setHandState={setCurrentHand2} 
-      setBoardState={setBoard} board={board}></SummoningButtons>
+        buttons2 = <SummoningButtons playerid={1} cardPos ={summoningCard} setSummonState={setSummoningCard} game={game} hand={hand2} board={board}></SummoningButtons>
       }
     }
   }
   else if(phase==1){
     if(currentPlayer.id==0){
-      buttons1 = <AttackingButtons player={player1} game={game} setBoardState={setBoard} ></AttackingButtons>
+      buttons1 = <AttackingButtons player={player1} game={game} reset={reset} resetState={setReset} ></AttackingButtons>
     }
     else{
-      buttons2 = <AttackingButtons player={player2} game={game} setBoardState={setBoard}></AttackingButtons>
+      buttons2 = <AttackingButtons player={player2} game={game} reset={reset} resetState={setReset}></AttackingButtons>
     }
+  }
+
+  let dumbStupidVariable = <></>
+  if(reset==0){
+    dumbStupidVariable=<><></></>
+  }
+  else if(reset==1){
+    dumbStupidVariable=<><><></></></>
   }
   
   return (
     <div className="flex justify-center items-center h-screen p-4">
+      {dumbStupidVariable}
       <div>
         {buttons2}
         {/*Gonna need to comment much of this just so we're aware of what is happening in some of these.*/}
@@ -452,7 +455,7 @@ function GameBoard({ game }: { game: Game }) {
           {/*This column shows a deck and discard pile*/}
           <div className="flex flex-col gap-10">
             <PlayerDisplay game={game} player={player2}></PlayerDisplay>
-            <Deck player={player2} hand={hand2} handState={setCurrentHand2}></Deck>
+            <Deck player={player2} reset={reset} resetState={setReset}></Deck>
             <DiscardPile size={5}></DiscardPile>
           </div>
           {/*The board between two columns*/}
@@ -462,7 +465,7 @@ function GameBoard({ game }: { game: Game }) {
             {/*The first column shows the deck and discard pile (like the one you saw earlier*/}
             <div className="flex flex-col gap-10">
               <DiscardPile size={5}></DiscardPile>
-              <Deck player={player1} hand={hand1} handState={setCurrentHand1}></Deck>
+              <Deck player={player1} reset={reset} resetState={setReset}></Deck>
               <PlayerDisplay game={game} player={player1}></PlayerDisplay>
             </div>
             {/*This column shows the game log text bot and the button for moving phases below it*/}
@@ -494,13 +497,13 @@ function GameBoard({ game }: { game: Game }) {
   );
 }
 
-function SummoningButtons({cardPos, game, setSummonState, hand, setHandState, setBoardState, playerid}: {cardPos: number, game: Game, setSummonState: any, 
-  hand: Card[], setHandState: any, setBoardState: any, board: any, playerid: number}){
+function SummoningButtons({cardPos, game, setSummonState, hand, playerid}: {cardPos: number, game: Game, setSummonState: any, 
+  hand: Card[], board: any, playerid: number}){
   function handle(boardPos: number, playerid: number){
     game.summonCardFromHand(playerid,boardPos, cardPos)
-    setHandState(hand);
+    //setHandState(hand);
     console.log(hand.length)
-    setBoardState(game.getBoard());
+    //setBoardState(game.getBoard());
     setSummonState(-1);
   }
   return(
@@ -521,12 +524,12 @@ function SummoningButtons({cardPos, game, setSummonState, hand, setHandState, se
    
   )
 }
-function AttackingButtons({player, game, setBoardState}: {player: Player, game: Game, setBoardState: any}){
+function AttackingButtons({player, game, reset, resetState}: {player: Player, game: Game, reset: number, resetState: any}){
   let playerid = player.id;
   
   function handle(boardPos: number, playerid: number){
     game.simulateCombat(boardPos, playerid);
-    setBoardState(game.getBoard());
+    resetState(dumbStupidFunction(reset));
   }
   return (
   <div className="flex flex-row justify-center items-center gap-20">
@@ -655,4 +658,13 @@ function DeckSelectScreen({ handle }: { handle: Function }) {
       </div>
     </div>
   );
+}
+
+function dumbStupidFunction(r: number){
+  if(r==0){
+    return 1;
+  }
+  else{
+    return 0;
+  }
 }
