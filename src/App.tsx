@@ -391,7 +391,7 @@ function getDemoPlayer(player: Player) {
  * This is like the big daddy of the components. This makes up pretty much the entire game. Shows players board, hp, hands, etc etc.
  * @returns Markup to display the game
  */
-function GameBoard({ game }: { game: Game }) {
+function GameBoard({ game, setBegin }: { game: Game, setBegin: any}) {
   let player1 = game.getPlayerById(0);
   let player2 = game.getPlayerById(1);
 
@@ -433,6 +433,13 @@ function GameBoard({ game }: { game: Game }) {
   }
   else if(reset==1){
     dumbStupidVariable=<><><></></></>
+  }
+  let vicButtons = <></>
+  if(player1.hp <= 0){
+    vicButtons = 
+  }
+  else if(player2.hp <= 0){
+
   }
   
   return (
@@ -492,6 +499,7 @@ function GameBoard({ game }: { game: Game }) {
         <div className="flex flex-row justify-center items-center">
           <HandOfCards playerHand={hand1} stateChange={setSummoningCard} currentPlayer={currentPlayer} ownerPlayer={player1} phase={phase}></HandOfCards>
         </div>
+        {vicButtons}
       </div>
     </div>
   );
@@ -548,6 +556,19 @@ function AttackingButtons({player, game, reset, resetState}: {player: Player, ga
     </div>
   )
 }
+
+function victoryButtons({winnerPlayer, stateChange}: {winnerPlayer: Player, stateChange: any}){
+  function handleClick(){
+    stateChange(false);
+  }
+  return(
+    <div className="flex flex-col justify-center items-center">
+      {winnerPlayer.username} has won! Press the button to return to the deck select screen.
+      <button onClick={handleClick}>Return</button>
+    </div>
+  )
+}
+
 /**
  * has a block of scrollable text showing player actions and shows turn and phase
  * @returns markup that displays the gamelog in the browser
@@ -626,7 +647,7 @@ function App() {
     let game = new Game();
     getDemoPlayer(game.getPlayerById(0))
     getDemoPlayer(game.getPlayerById(1))
-    page = <GameBoard game={game}></GameBoard>;
+    page = <GameBoard game={game} setBegin={setBegin}></GameBoard>;
   } else {
     page = <DeckSelectScreen handle={h}></DeckSelectScreen>;
   }

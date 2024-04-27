@@ -39,7 +39,7 @@ put(
     "",
     1,
     LandscapeType.Swamp,
-    1,
+    10,
     5,
   ),
 );
