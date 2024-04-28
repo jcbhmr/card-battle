@@ -10,13 +10,9 @@ import {
 import { Creature, Card } from "./engine/card";
 import { Ability } from "./engine/ability";
 import { get } from "./engine/CardMap";
-import { G } from "vitest/dist/reporters-MmQN-57K.js";
+import { G, an } from "vitest/dist/reporters-MmQN-57K.js";
 
-var log = [];
-log.push(<div>Player 1 activated "Spell name!"</div>);
-log.push(<div>Player 2 activated "Spell name!"</div>);
-log.push(<div>Player 1 summoned "Monster name!"</div>);
-log.push(<div>Player 2 summoned "Monster name!"</div>);
+
 
 /**
  * v0 by Vercel.
@@ -205,11 +201,19 @@ return (
  * Displays card shape with a number on it indicating how many cards are in the pile. This one has onclick to allow player to draw
  * @returns returns markup displaying what i wrote just above
  */
-function Deck({ player, resetState, reset}: { player: Player,  resetState: any, reset: number}) {
+function Deck({ player, resetState, reset, log, setLog, game}: { player: Player,  resetState: any, reset: number, log: any, setLog: any, game: Game}) {
   function handleDraw() {
-    player.drawCardUsingAction();
-    resetState(dumbStupidFunction(reset));
-    //handState([...hand, ]);
+    if(player===game.currentPlayer){
+      if(game.turnPhase==0){
+        if(!player.drawCardUsingAction()){
+          setLog([...log, <div>{player.username} attempted to draw, but lacks the actions to</div>])
+        }
+        resetState(dumbStupidFunction(reset));
+      }
+      
+    }
+    
+    
   };
   return (
     <button>
@@ -399,10 +403,13 @@ function GameBoard({ game, setBegin }: { game: Game, setBegin: any}) {
   let hand2 = player2.hand;
 
   let board = game.board
+
+ 
   //States:
   const [turn, setTurn] = useState(game.currentTurn); //good
   const [phase, setPhase] = useState(game.turnPhase); //good
   const [currentPlayer, setCurrentPlayer] = useState(game.currentPlayer);// good(?)
+  const [log, setLog] = useState([<></>]);
   const [reset, setReset] = useState(-1);
   const [summoningCard, setSummoningCard] = useState(-1); //good
 
@@ -411,10 +418,12 @@ function GameBoard({ game, setBegin }: { game: Game, setBegin: any}) {
   if(phase==0){
     if(summoningCard==0){
       if(currentPlayer.id==0){
-        buttons1 = <SummoningButtons playerid={0} cardPos ={summoningCard} setSummonState={setSummoningCard} game={game} hand={hand1} board={board}></SummoningButtons>
+        buttons1 = <SummoningButtons playerid={0} cardPos ={summoningCard} setSummonState={setSummoningCard} 
+        game={game} board={board} log={log} setLog={setLog}></SummoningButtons>
       }
       else{
-        buttons2 = <SummoningButtons playerid={1} cardPos ={summoningCard} setSummonState={setSummoningCard} game={game} hand={hand2} board={board}></SummoningButtons>
+        buttons2 = <SummoningButtons playerid={1} cardPos ={summoningCard} setSummonState={setSummoningCard}
+        game={game} board={board} log={log} setLog={setLog}></SummoningButtons>
       }
     }
   }
@@ -434,6 +443,7 @@ function GameBoard({ game, setBegin }: { game: Game, setBegin: any}) {
   else if(reset==1){
     dumbStupidVariable=<><><></></></>
   }
+
   let vicButtons = <></>
   if(player1.hp <= 0){
     vicButtons = <VictoryButtons winnerPlayer={player1} stateChange={setBegin}></VictoryButtons>
@@ -462,7 +472,7 @@ function GameBoard({ game, setBegin }: { game: Game, setBegin: any}) {
           {/*This column shows a deck and discard pile*/}
           <div className="flex flex-col gap-10">
             <PlayerDisplay game={game} player={player2}></PlayerDisplay>
-            <Deck player={player2} reset={reset} resetState={setReset}></Deck>
+            <Deck player={player2} reset={reset} resetState={setReset} log={log} game={game} setLog={setLog}></Deck>
             <DiscardPile size={5}></DiscardPile>
           </div>
           {/*The board between two columns*/}
@@ -472,7 +482,7 @@ function GameBoard({ game, setBegin }: { game: Game, setBegin: any}) {
             {/*The first column shows the deck and discard pile (like the one you saw earlier*/}
             <div className="flex flex-col gap-10">
               <DiscardPile size={5}></DiscardPile>
-              <Deck player={player1} reset={reset} resetState={setReset}></Deck>
+              <Deck player={player1} reset={reset} resetState={setReset} game={game} setLog={setLog} log={log}></Deck>
               <PlayerDisplay game={game} player={player1}></PlayerDisplay>
             </div>
             {/*This column shows the game log text bot and the button for moving phases below it*/}
@@ -481,6 +491,7 @@ function GameBoard({ game, setBegin }: { game: Game, setBegin: any}) {
                 turn={turn}
                 phase={phase}
                 currentPlayer={currentPlayer}
+                log={log}
               ></GameLog>
               <PhaseButton
                 game={game}
@@ -505,13 +516,13 @@ function GameBoard({ game, setBegin }: { game: Game, setBegin: any}) {
   );
 }
 
-function SummoningButtons({cardPos, game, setSummonState, hand, playerid}: {cardPos: number, game: Game, setSummonState: any, 
-  hand: Card[], board: any, playerid: number}){
+function SummoningButtons({cardPos, game, setSummonState,  playerid, log, setLog}: {cardPos: number, game: Game, setSummonState: any, 
+  board: any, playerid: number, log: any, setLog: any}){
   function handle(boardPos: number, playerid: number){
-    game.summonCardFromHand(playerid,boardPos, cardPos)
+    let name = game.summonCardFromHand(playerid,boardPos, cardPos)
     //setHandState(hand);
-    console.log(hand.length)
     //setBoardState(game.getBoard());
+    setLog([...log, <div>{game.getPlayerById(playerid).username} summoned the "{name}" at zone {boardPos+1}</div>])
     setSummonState(-1);
   }
   return(
@@ -577,10 +588,12 @@ function GameLog({
   turn,
   phase,
   currentPlayer,
+  log
 }: {
   turn: number;
   phase: number;
   currentPlayer: Player;
+  log: any
 }) {
   let phaseName;
   if(phase==0){
@@ -669,7 +682,7 @@ function ListOfDecks() {
   );
 }
 
-function DeckSelectScreen({ handle }: { handle: Function }) {
+function DeckSelectScreen({ handle }: { handle: any }) {
   return (
     <div className="flex flex-col">
       <h1 className="text-2xl flex flex-row justify-center">CARD BATTLES</h1>
