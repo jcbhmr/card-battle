@@ -359,7 +359,8 @@ function LandscapeCard({
   // }
   let cname="";
   if(player.id==0){
-    cname="landscape_shape flex justify-center items-center border-red-800";
+    // bg-[#50d71e]
+    cname=`landscape_shape flex justify-center items-center border-red-800`;
   }
   else{
     cname="landscape_shape flex justify-center items-center border-indigo-800";
