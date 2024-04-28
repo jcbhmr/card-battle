@@ -436,10 +436,10 @@ function GameBoard({ game, setBegin }: { game: Game, setBegin: any}) {
   }
   let vicButtons = <></>
   if(player1.hp <= 0){
-    vicButtons = 
+    vicButtons = <VictoryButtons winnerPlayer={player1} stateChange={setBegin}></VictoryButtons>
   }
   else if(player2.hp <= 0){
-
+    vicButtons= <VictoryButtons winnerPlayer={player2} stateChange={setBegin}></VictoryButtons>
   }
   
   return (
@@ -557,7 +557,7 @@ function AttackingButtons({player, game, reset, resetState}: {player: Player, ga
   )
 }
 
-function victoryButtons({winnerPlayer, stateChange}: {winnerPlayer: Player, stateChange: any}){
+function VictoryButtons({winnerPlayer, stateChange}: {winnerPlayer: Player, stateChange: any}){
   function handleClick(){
     stateChange(false);
   }
@@ -642,6 +642,7 @@ function App() {
   let h = function () {
     setBegin(true);
   };
+  
   let page = <></>;
   if (begin) {
     let game = new Game();
