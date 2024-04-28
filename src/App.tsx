@@ -298,6 +298,7 @@ function Board({ game, board}: { game: Game, board: SidedBoard}) {
     p1Board.push(
       LandscapeCard({
         creature: board.getBoardPosByOwnerId(0, i)?.creature,
+        player: game.getPlayerById(0)
         //building: game.board.getBoardPosByOwnerId(0, i)?.building
       }),
     );
@@ -305,6 +306,7 @@ function Board({ game, board}: { game: Game, board: SidedBoard}) {
     p2Board.push(
       LandscapeCard({
         creature: board.getBoardPosByOwnerId(1, i)?.creature,
+        player: game.getPlayerById(1)
         //building: game.board.getBoardPosByOwnerId(1, i)?.building,
       }),
     );
@@ -335,9 +337,11 @@ function Board({ game, board}: { game: Game, board: SidedBoard}) {
 function LandscapeCard({
   //building,
   creature,
+  player
 }: {
   //building: Building | undefined;
   creature: Creature | undefined;
+  player: Player
 }) {
   //c is creature, b is building. default values are empty tags (is that what they're called?)
   let c;
@@ -353,8 +357,15 @@ function LandscapeCard({
   // if (building?.name == null) {
   //   b = CardComponent({card: building});
   // }
+  let cname="";
+  if(player.id==0){
+    cname="landscape_shape flex justify-center items-center border-red-800";
+  }
+  else{
+    cname="landscape_shape flex justify-center items-center border-indigo-800";
+  }
   return (
-    <div className={"landscape_shape flex justify-center items-center border-indigo-800"}>
+    <div className={cname}>
       {c}
       {/* {b} */}
     </div>
