@@ -441,10 +441,10 @@ function GameBoard({ game, setBegin }: { game: Game, setBegin: any}) {
   }
   else if(phase==1){
     if(currentPlayer.id==0){
-      buttons1 = <AttackingButtons player={player1} game={game} reset={reset} resetState={setReset} ></AttackingButtons>
+      buttons1 = <AttackingButtons player={player1} game={game} setBegin={setBegin} reset={reset} resetState={setReset} ></AttackingButtons>
     }
     else{
-      buttons2 = <AttackingButtons player={player2} game={game} reset={reset} resetState={setReset}></AttackingButtons>
+      buttons2 = <AttackingButtons player={player2} game={game} setBegin={setBegin} reset={reset} resetState={setReset}></AttackingButtons>
     }
   }
 
@@ -456,14 +456,6 @@ function GameBoard({ game, setBegin }: { game: Game, setBegin: any}) {
     dumbStupidVariable=<><><></></></>
   }
 
-  let vicButtons = <></>
-  if(player1.hp <= 0){
-    vicButtons = <VictoryButtons winnerPlayer={player1} stateChange={setBegin}></VictoryButtons>
-  }
-  else if(player2.hp <= 0){
-    vicButtons= <VictoryButtons winnerPlayer={player2} stateChange={setBegin}></VictoryButtons>
-  }
-  
   return (
     <div className="flex justify-center items-center h-screen p-4">
       {dumbStupidVariable}
@@ -522,7 +514,6 @@ function GameBoard({ game, setBegin }: { game: Game, setBegin: any}) {
         <div className="flex flex-row justify-center items-center">
           <HandOfCards playerHand={hand1} stateChange={setSummoningCard} currentPlayer={currentPlayer} ownerPlayer={player1} phase={phase}></HandOfCards>
         </div>
-        {vicButtons}
       </div>
     </div>
   );
@@ -555,11 +546,15 @@ function SummoningButtons({cardPos, game, setSummonState,  playerid, log, setLog
    
   )
 }
-function AttackingButtons({player, game, reset, resetState}: {player: Player, game: Game, reset: number, resetState: any}){
+function AttackingButtons({player, game, reset, resetState, setBegin}: {player: Player, game: Game, reset: number, resetState: any, setBegin: any}){
   let playerid = player.id;
   
   function handle(boardPos: number, playerid: number){
     game.simulateCombat(boardPos, playerid);
+    if(game.getOtherPlayer(player.id).hp <= 0){
+      alert(`${player.username} has won. Press OK to return to deck select screen.`);
+      setBegin(false);
+    }
     resetState(dumbStupidFunction(reset));
   }
   return (
@@ -580,17 +575,7 @@ function AttackingButtons({player, game, reset, resetState}: {player: Player, ga
   )
 }
 
-function VictoryButtons({winnerPlayer, stateChange}: {winnerPlayer: Player, stateChange: any}){
-  function handleClick(){
-    stateChange(false);
-  }
-  return(
-    <div className="flex flex-col justify-center items-center">
-      {winnerPlayer.username} has won! Press the button to return to the deck select screen.
-      <button onClick={handleClick}>Return</button>
-    </div>
-  )
-}
+
 
 /**
  * has a block of scrollable text showing player actions and shows turn and phase
