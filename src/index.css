@@ -84,7 +84,7 @@
   overflow: auto;
   flex-direction: column;
   border-radius: 0.5rem;
-  border-width: 2px;
+  border-width: 3px;
   border-color: black;
   width: 100px;
   height: 150px;
@@ -133,4 +133,21 @@
   top: 50%;
   -ms-transform: translateY(-50%);
   transform: translateY(-50%);
+}
+
+.player_0 {
+  border-color: darkred;
+}
+
+.player_1 {
+  border-color: darkblue;
+}
+
+
+.text_player_0 {
+  color: darkred;
+}
+
+.text_player_1 {
+  color: darkblue;
 }

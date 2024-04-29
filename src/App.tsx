@@ -62,7 +62,7 @@ function CardComponent({
   }
   return (
     <button>
-    <div className="card_shape overflow-auto" onClick={handleClick}>
+    <div className={"card_shape overflow-auto player_"+ownerPlayer.id} onClick={handleClick}>
       <div className="flex aspect-16/9">
         <img
           alt={card.name}
@@ -218,7 +218,7 @@ function Deck({ player, resetState, reset, log, setLog, game}: { player: Player,
   return (
     <button>
     <div
-      className="card_shape flex h-screen hover:border-red-800"
+      className={"card_shape flex h-screen hover:border-yellow-800 player_"+player.id}
       onClick={handleDraw}
     >
       <div className="text-center text-7xl m-auto">
@@ -292,21 +292,26 @@ function HandOfCards({ playerHand, stateChange, currentPlayer, ownerPlayer, phas
 function Board({ game, board}: { game: Game, board: SidedBoard}) {
   let p1Board = [];
   let p2Board = [];
+
+  let p1 = game.getPlayerById(0);
+  let p2 = game.getPlayerById(1);
   let t = board.getSideByOwnerId(0);
   //Looping through board to display it
   for (let i = 0; i < 4; i++) {
     p1Board.push(
       LandscapeCard({
         creature: board.getBoardPosByOwnerId(0, i)?.creature,
-        player: game.getPlayerById(0)
+        player: p1,
+        landscapeColor: board.getBoardPosByOwnerId(p1.id, i)?.landscape
         //building: game.board.getBoardPosByOwnerId(0, i)?.building
       }),
     );
-
+      
     p2Board.push(
       LandscapeCard({
         creature: board.getBoardPosByOwnerId(1, i)?.creature,
-        player: game.getPlayerById(1)
+        player: p2,
+        landscapeColor: board.getBoardPosByOwnerId(p1.id, i)?.landscape
         //building: game.board.getBoardPosByOwnerId(1, i)?.building,
       }),
     );
@@ -337,11 +342,13 @@ function Board({ game, board}: { game: Game, board: SidedBoard}) {
 function LandscapeCard({
   //building,
   creature,
-  player
+  player,
+  landscapeColor
 }: {
   //building: Building | undefined;
   creature: Creature | undefined;
-  player: Player
+  player: Player;
+  landscapeColor: string
 }) {
   //c is creature, b is building. default values are empty tags (is that what they're called?)
   let c;
@@ -357,16 +364,9 @@ function LandscapeCard({
   // if (building?.name == null) {
   //   b = CardComponent({card: building});
   // }
-  let cname="";
-  if(player.id==0){
-    // bg-[#50d71e]
-    cname=`landscape_shape flex justify-center items-center border-red-800`;
-  }
-  else{
-    cname="landscape_shape flex justify-center items-center border-indigo-800";
-  }
+ 
   return (
-    <div className={cname}>
+    <div className={"landscape_shape flex justify-center items-center player_"+player.id+` bg-[${landscapeColor}]`}>
       {c}
       {/* {b} */}
     </div>
@@ -380,7 +380,7 @@ function LandscapeCard({
  */
 function PlayerDisplay({ game, player }: { game: Game; player: Player }) {
   return (
-    <div className="player_display">
+    <div className={"player_display player_"+player.id}>
       <div className="flex flex-col">
         <h1>{player.username}username</h1>
         HP: {player.hp}
@@ -625,7 +625,7 @@ function GameLog({
         <br></br>
         Phase: {phaseName}
         <br></br>
-        Turn Player: {currentPlayer.username}
+        Turn Player: <span className={"text_player_"+currentPlayer.id}>{currentPlayer.username}test</span>
       </div>
     </>
   );
