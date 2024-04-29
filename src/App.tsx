@@ -62,7 +62,7 @@ function CardComponent({
   }
   return (
     <button>
-    <div className={"card_shape overflow-auto player_"+ownerPlayer.id} onClick={handleClick}>
+    <div className={"card_shape overflow-auto hover:border-yellow-800 player_"+ownerPlayer.id} onClick={handleClick}>
       <div className="flex aspect-16/9">
         <img
           alt={card.name}
@@ -236,7 +236,7 @@ function Deck({ player, resetState, reset, log, setLog, game}: { player: Player,
  */
 function DiscardPile({ size }: { size: number }) {
   return (
-    <div className="card_shape flex h-screen hover:border-red-800">
+    <div className="card_shape flex h-screen hover:border-yellow-800">
       <div className="text-center text-7xl m-auto">
         <div className="">{size}</div>
       </div>
