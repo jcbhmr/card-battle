@@ -62,7 +62,7 @@ function CardComponent({
   }
   return (
     <button>
-    <div className={"card_shape overflow-auto hover:border-yellow-800 player_"+ownerPlayer.id} onClick={handleClick}>
+    <div className={"card_shape overflow-auto hover:border-black player_"+ownerPlayer.id} onClick={handleClick}>
       <div className="flex aspect-16/9">
         <img
           alt={card.name}
