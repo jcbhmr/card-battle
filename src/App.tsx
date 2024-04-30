@@ -18,16 +18,15 @@ import { G, an } from "vitest/dist/reporters-MmQN-57K.js";
  * v0 by Vercel.
  * @see https://v0.dev/t/WuNN16G0fnd
  * Documentation: https://v0.dev/docs#integrating-generated-code-into-your-nextjs-app
- *
- *
+ * @author Tanner Brown
+ * This has changed a lot since I've made it so let me redo the documentation. Renders a card with onclick/onhover functionality. "state" is poorly named.
  * @returns Returns a card component
- * @param cardName: the actual name of the card, cardText: the description of the text on the card,
- * actionCost: the cost of the card, landscapeType: the type of landscape that the card needs,
- * imagePath: the location of the image for the card. this is made for spell/building cards
+ * @param card: the card to render. state: sets the summoning buttons state to a number that makes it true or something. setHover: changes state on the hover useState. 
+ * essentially, it just makes the magnified card the hovered card. currentplayer: the current player (needed for making events turn exclusive). ownerPlayer: the
+ * player the cards are assigned to. phase: current turn phase. needed for making events phase exclusive
  */
 function CardComponent({
   card,
-  children,
   state,
   setHover,
   currentPlayer,
@@ -43,14 +42,16 @@ function CardComponent({
   phase: number
 }) {
   function handleClick(){
+    //in future, if we add spells/buildings again there should be an if statement for activating those
     if(card instanceof Creature){
+      // if the card being clicked belongs to the current turn player
       if(currentPlayer.id==ownerPlayer.id){
+        // if the current phase is the main phase
         if(phase==0){
+          //why did i make this a number instead of a boolean? am i stupid or something?
           state(0);
         }
-        
       }
-      
       // mark pos of hand
     }
     // else if (card instanceof Building){
@@ -85,10 +86,14 @@ function CardComponent({
     </button>
   );
 }
-
+/**
+ * @author Tanner Brown
+ * I spoke about this in my documentation on the CreatureComponentOnBoard component. Check there for why this is a thing
+ * @param param0 
+ * @returns 
+ */
 function CardComponentOnBoard({
   card,
-  children,
   setHover
 }: {
   card: Card | Creature;
@@ -115,14 +120,6 @@ function CardComponentOnBoard({
       </div>
       <div className="flex-1 p-4 grid gap-2">
         <h2 className="text-lg font-bold tracking-tight">{card.name}</h2>
-        <p className="text-sm line-clamp-3">{card.flavorText}</p>
-        <div className="text-xs">
-          <div>
-            AC: {card.getCost()} Type: {card.landscapeType}{" "}
-          </div>
-          <div></div>
-          {children}
-        </div>
       </div>
     </div>
     </button>
@@ -172,7 +169,12 @@ function CreatureComponent({
     </CardComponent>
   );
 }
-
+/**
+ * Kinda dumb, but since cards on board have different function than ones in hand I felt this was necessary. Currently, this just is the other creature/card
+ * component but without triggering summoning buttons
+ * @param param0 
+ * @returns 
+ */
 function CreatureComponentOnBoard({
   card, setHover
 }: {
@@ -190,12 +192,18 @@ return (
     card={card}
     setHover={setHover}
   >
-    {child}
   </CardComponentOnBoard>
 );
 }
 
-
+/**
+ * @author Tanner Brown
+ * So basically this is the markup that sits on the left of the screen. If its null (ie. no one has hovered a card yet) then its blank. However, if a card
+ * (whether it be field or hand) is hovered we show it here. It's essentially a magnified version of the card so you don't have to break out the reading glasses
+ * to read a card.
+ * @param param0 
+ * @returns 
+ */
 function HoverCard({card}: {card: Creature}){
   if(card===null){
     return(
@@ -236,8 +244,11 @@ function HoverCard({card}: {card: Creature}){
   )
 }
 /**
+ * @author Tanner Brown
  * Displays card shape with a number on it indicating how many cards are in the pile. This one has onclick to allow player to draw
  * @returns returns markup displaying what i wrote just above
+ * @param player: the player whom the deck belongs to. resetState: state to cause re-render. reset: variable necessary for determining re-render. 
+ * log: the log. needed for if player cannot draw anymore and game must tell player as such. setLog: useState for re-rendering log. game: the game object
  */
 function Deck({ player, resetState, reset, log, setLog, game}: { player: Player,  resetState: any, reset: number, log: any, setLog: any, game: Game}) {
   function handleDraw() {
@@ -248,10 +259,7 @@ function Deck({ player, resetState, reset, log, setLog, game}: { player: Player,
         }
         resetState(dumbStupidFunction(reset));
       }
-      
-    }
-    
-    
+    } 
   };
   return (
     <button>
@@ -284,12 +292,15 @@ function DiscardPile({ size }: { size: number }) {
 /**
  * Creates markup that displays players hand
  * @author Tanner Brown
- * @returns Array of CardComponents/CreatureComponents
+ * @returns a rendered hand of cards\
+ * @param playerHand: the actual hand we'll render. stateChange: another poorly named variable? what was i thinking? anyways this is the statechange for letting
+ * the summoning buttons appear. currentPlayer: the current player. needed for turn exclusivity reasons. ownerPlayer: the player who owns the cards in hand. 
+ * phase: the current turn phase. needed for exclusivity reasons. setHover: statechange for magnifying cards.
  */
 function HandOfCards({ playerHand, stateChange, currentPlayer, ownerPlayer, phase, setHover}: 
   { playerHand: Card[], stateChange: React.Dispatch<React.SetStateAction<number>>, currentPlayer: Player, ownerPlayer: Player, phase: number, setHover: any}) {
   let shownHand = [];
-  
+  //create players hand
   for (let i = 0; i < playerHand.length; i++) {
     let currentCard = playerHand[i];
     if (currentCard instanceof Creature) {
@@ -304,6 +315,8 @@ function HandOfCards({ playerHand, stateChange, currentPlayer, ownerPlayer, phas
           
         }),
       );
+      //not really relevant anymore since back-end axed spells/buildings, but in case we have time and they re-implement them i see no reason to remove this
+      // else statement. currently does not execute
     } else {
       shownHand.push(
         CardComponent({
@@ -322,10 +335,11 @@ function HandOfCards({ playerHand, stateChange, currentPlayer, ownerPlayer, phas
 }
 
 /**
- *
+ *@author Tanner Brown
  * Board loops through the board (the actual array that keeps track of the board) to display each
  * creature, building in the array inside of each landscape inside of a larger board.
  * @returns markup that displays the board.
+ * @param game: the actual game object. board: the board from the game. why do i pass this as a parameter even? setHover: magnify the cards when hovered. 
  */
 function Board({ game, board, setHover}: { game: Game, board: SidedBoard, setHover: any}) {
   let p1Board = [];
@@ -375,9 +389,12 @@ function Board({ game, board, setHover}: { game: Game, board: SidedBoard, setHov
   );
 }
 /**
+ * @author Tanner Brown
  * This method will take in a Creature and building from a given "landscape card" from the backend. This will
  * then dynamically render them inside of the landscape.
  * @returns markup that displays a landscape box with building and creature optionally inside
+ * @param creature: the creature in the landscape. player: the player. needed for dynamic css reasons. landscape color: the landscape type. setHover: magnify cards
+ * when hovered oooooh so cool
  */
 function LandscapeCard({
   //building,
@@ -416,11 +433,14 @@ function LandscapeCard({
 }
 
 /**
+ * @author Tanner Brown
+ * Man I really should've updated my documentation as I went instead of putting it off. My fingers are getting TIRED. Anyways, 
+ * 
  * Block that shows players hp, username, and actions
- * @param game object (probably temporarily) and a player id (0 or 1)
+ * @param player: gotta know which player we rendering
  * @returns markup that shows what I just wrote above
  */
-function PlayerDisplay({ game, player }: { game: Game; player: Player }) {
+function PlayerDisplay({player }: {player: Player }) {
   return (
     <div className={"player_display player_"+player.id}>
       <div className="flex flex-col">
@@ -446,19 +466,21 @@ function getDemoPlayer(player: Player) {
   player.hand.push(get("Dark Angel")!);
 }
 /**
+ * @author Tanner Brown
  * This is like the big daddy of the components. This makes up pretty much the entire game. Shows players board, hp, hands, etc etc.
+ * 
+ * How very descript me from a few weeks ago. Anyways yeah this is where everything goes on. We manage state here and stuff. I don't
+ * think a paragraph of documentation is fit for the massive wall of text that this component is so I'll just document as we go, okay?
+ * 
  * @returns Markup to display the game
+ * @param game: the game object we're rendering. setBegin: when we set this as true the game ends and we go backto deck select screen
  */
 function GameBoard({ game, setBegin }: { game: Game, setBegin: any}) {
+  // grab our players. a lot of components need this guys as parameters
   let player1 = game.getPlayerById(0);
   let player2 = game.getPlayerById(1);
-
-  let hand1 = player1.hand;
-  let hand2 = player2.hand;
-
-  let board = game.board
-
- 
+  // same for him
+  let board = game.board;
   //States:
   const [turn, setTurn] = useState(game.currentTurn); //good
   const [phase, setPhase] = useState(game.turnPhase); //good
@@ -470,7 +492,9 @@ function GameBoard({ game, setBegin }: { game: Game, setBegin: any}) {
 
   let buttons1 = (<></>)
   let buttons2 = (<></>)
+  //only in main phase can we summon
   if(phase==0){
+    //Anyways, if we're summoning a card then these buttons need to render (for player 1 or two depending). otherwise they'll stay empty
     if(summoningCard==0){
       if(currentPlayer.id==0){
         buttons1 = <SummoningButtons playerid={0} cardPos ={summoningCard} setSummonState={setSummoningCard} 
@@ -482,6 +506,7 @@ function GameBoard({ game, setBegin }: { game: Game, setBegin: any}) {
       }
     }
   }
+  //if we're in battle phase then we need to render the attacking buttons
   else if(phase==1){
     if(currentPlayer.id==0){
       buttons1 = <AttackingButtons player={player1} game={game} setBegin={setBegin} reset={reset} resetState={setReset} ></AttackingButtons>
@@ -491,6 +516,7 @@ function GameBoard({ game, setBegin }: { game: Game, setBegin: any}) {
     }
   }
 
+  // you should probably just ignore this. its probaly not important. forget you ever saw it
   let dumbStupidVariable = <></>
   if(reset==0){
     dumbStupidVariable=<><></></>
@@ -503,23 +529,27 @@ function GameBoard({ game, setBegin }: { game: Game, setBegin: any}) {
     <div className="flex justify-center items-center h-screen p-4">
       {dumbStupidVariable}
       <div>
+        {/*buttons2 are summoning buttons */}
         {buttons2}
         {/*Gonna need to comment much of this just so we're aware of what is happening in some of these.*/}
         {/*This div is a row that shows a players stats and then their hand of cards*/}
         <div className="flex flex-col justify-center items-center gap-4">
           <br></br>
           <br></br>
+          {/*rendered in a seperate div so they'll be in a row*/}
           <div className="flex flex-row justify-center items-center">
-            <HandOfCards playerHand={hand2} stateChange={setSummoningCard} currentPlayer={currentPlayer} setHover={setHoverCard} ownerPlayer={player2} phase={phase}></HandOfCards>
+            <HandOfCards playerHand={player2.hand} stateChange={setSummoningCard} currentPlayer={currentPlayer} setHover={setHoverCard} ownerPlayer={player2} phase={phase}></HandOfCards>
           </div>
           {buttons2}
         </div>
         {/*This div pretty large. It's where discard piles, decks, and the actual board goes*/}
         <div className="flex flex-row justify-center items-center gap-4">
-          {/*This column shows a deck and discard pile*/}
+          
+          {/*the magnified card*/}
           <HoverCard card={hoverCard}></HoverCard>
+          {/*This column shows a deck and discard pile*/}
           <div className="flex flex-col gap-10">
-            <PlayerDisplay game={game} player={player2}></PlayerDisplay>
+            <PlayerDisplay player={player2}></PlayerDisplay>
             <Deck player={player2} reset={reset} resetState={setReset} log={log} game={game} setLog={setLog}></Deck>
             <DiscardPile size={5}></DiscardPile>
           </div>
@@ -531,7 +561,7 @@ function GameBoard({ game, setBegin }: { game: Game, setBegin: any}) {
             <div className="flex flex-col gap-10">
               <DiscardPile size={5}></DiscardPile>
               <Deck player={player1} reset={reset} resetState={setReset} game={game} setLog={setLog} log={log}></Deck>
-              <PlayerDisplay game={game} player={player1}></PlayerDisplay>
+              <PlayerDisplay player={player1}></PlayerDisplay>
             </div>
             {/*This column shows the game log text bot and the button for moving phases below it*/}
             <div className="flex flex-col justify-center items-center gap-20">
@@ -556,19 +586,27 @@ function GameBoard({ game, setBegin }: { game: Game, setBegin: any}) {
         {buttons1}
         </div>
         <div className="flex flex-row justify-center items-center">
-          <HandOfCards playerHand={hand1} stateChange={setSummoningCard} setHover={setHoverCard} currentPlayer={currentPlayer} ownerPlayer={player1} phase={phase}></HandOfCards>
+          <HandOfCards playerHand={player1.hand} stateChange={setSummoningCard} setHover={setHoverCard} currentPlayer={currentPlayer} ownerPlayer={player1} phase={phase}></HandOfCards>
         </div>
       </div>
     </div>
   );
 }
-
+/**
+ * @author Tanner Brown
+ * I always thought it was weird that common practice was to put an author on these. Like, I get its so down the line someone can call you up and be like 
+ * "why does your code suck?", but I can't shake the feeling like I'm a child writing my name on my toys so no one else can play with them.
+ * 
+ * Anyways, summoning buttons are the buttons that render when we're summoning a card. 4 buttons show up; one for each zone. 
+ * @param cardPos: the position in hand the card we're summoning is. game: the game object. setSummonState: the state that controls when the buttons are rendering. 
+ * marked -1 to make buttons disappear after we summon. playerid: the id of the player who will be summoning the card. log/setLog: the log the game keeps
+ * and the function to update it
+ * @returns markup for summoning buttons
+ */
 function SummoningButtons({cardPos, game, setSummonState,  playerid, log, setLog}: {cardPos: number, game: Game, setSummonState: any, 
   board: any, playerid: number, log: any, setLog: any}){
   function handle(boardPos: number, playerid: number){
     let name = game.summonCardFromHand(playerid,boardPos, cardPos)
-    //setHandState(hand);
-    //setBoardState(game.getBoard());
     setLog([...log, <div>{game.getPlayerById(playerid).username} summoned the "{name}" at zone {boardPos+1}</div>])
     setSummonState(-1);
   }
@@ -590,6 +628,14 @@ function SummoningButtons({cardPos, game, setSummonState,  playerid, log, setLog
    
   )
 }
+/**
+ * @author Tanner Brown
+ * 
+ * These are the buttons that show up during battle phase and let you attack. if an attack kills the opponent then we alert and reset the game
+ * @param player: the player who will be attacking. game: the game object. reset/setReset: variable and function for controlling re-render. setbegin: need this
+ * to return to deck select screen
+ * @returns mark up for attacking buttons
+ */
 function AttackingButtons({player, game, reset, resetState, setBegin}: {player: Player, game: Game, reset: number, resetState: any, setBegin: any}){
   let playerid = player.id;
   
