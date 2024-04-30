@@ -29,7 +29,7 @@ function CardComponent({
   card,
   children,
   state,
-  position,
+  setHover,
   currentPlayer,
   ownerPlayer,
   phase
@@ -37,7 +37,7 @@ function CardComponent({
   card: Card | Creature;
   children?: ReactNode;
   state: React.Dispatch<React.SetStateAction<number>>,
-  position: number
+  setHover: any,
   currentPlayer: Player,
   ownerPlayer: Player,
   phase: number
@@ -62,7 +62,9 @@ function CardComponent({
   }
   return (
     <button>
-    <div className={"card_shape overflow-auto hover:border-black player_"+ownerPlayer.id} onClick={handleClick}>
+    <div className={"card_shape overflow-auto hover:border-black player_"+ownerPlayer.id} onClick={handleClick} onMouseOver={()=> {
+      setHover(card);
+    }}>
       <div className="flex aspect-16/9">
         <img
           alt={card.name}
@@ -78,15 +80,6 @@ function CardComponent({
       </div>
       <div className="flex-1 p-4 grid gap-2">
         <h2 className="text-lg font-bold tracking-tight">{card.name}</h2>
-        <p className="text-sm line-clamp-3">{card.flavorText}</p>
-        <div className="text-xs">
-          <div>
-            AC: {card.getCost()} Type: {card.landscapeType}{" "}
-          </div>
-          <div></div>
-
-          {children}
-        </div>
       </div>
     </div>
     </button>
@@ -95,14 +88,18 @@ function CardComponent({
 
 function CardComponentOnBoard({
   card,
-  children
+  children,
+  setHover
 }: {
   card: Card | Creature;
   children?: ReactNode;
+  setHover: any
 }) {
   return (
     <button>
-    <div className="card_shape overflow-auto">
+    <div className="card_shape overflow-auto" onMouseOver={()=> {
+      setHover(card);
+    }}>
       <div className="flex aspect-16/9">
         <img
           alt={card.name}
@@ -124,7 +121,6 @@ function CardComponentOnBoard({
             AC: {card.getCost()} Type: {card.landscapeType}{" "}
           </div>
           <div></div>
-
           {children}
         </div>
       </div>
@@ -145,14 +141,14 @@ function CardComponentOnBoard({
 function CreatureComponent({
     card,
     state,
-    position,
+    setHover,
     currentPlayer,
     ownerPlayer,
     phase
 }: {
   card: Creature,
   state: React.Dispatch<React.SetStateAction<number>>,
-  position: number,
+  setHover: any,
   currentPlayer: Player,
   ownerPlayer: Player,
   phase: number
@@ -167,10 +163,10 @@ function CreatureComponent({
     <CardComponent
       card={card}
       state={state}
-      position={position}
       ownerPlayer={ownerPlayer}
       currentPlayer={currentPlayer}
       phase={phase}
+      setHover={setHover}
     >
       {child}
     </CardComponent>
@@ -178,9 +174,10 @@ function CreatureComponent({
 }
 
 function CreatureComponentOnBoard({
-  card
+  card, setHover
 }: {
 card: Creature
+setHover: any
 }) {
 let child = (
   <>
@@ -191,12 +188,53 @@ let child = (
 return (
   <CardComponentOnBoard
     card={card}
+    setHover={setHover}
   >
     {child}
   </CardComponentOnBoard>
 );
 }
 
+
+function HoverCard({card}: {card: Creature}){
+  if(card===null){
+    return(
+      <div className="hover_card_shape">
+        
+      </div>
+    )
+  }
+  return (
+    <div className="hover_card_shape overflow-auto">
+      <div className="flex aspect-16/9">
+        <img
+          alt={card.name}
+          className="object-cover"
+          height={135}
+          src={card.imageURL}
+          style={{
+            aspectRatio: "240/135",
+            objectFit: "cover",
+          }}
+          width={350}
+        />
+      </div>
+      <div className="flex-1 p-4 grid gap-2">
+        <h2 className="text-lg font-bold tracking-tight">{card.name}</h2>
+        <p className="text-sm line-clamp-3">{card.flavorText}</p>
+        <div className="text-xs">
+          <div>
+            AC: {card.getCost()} Type: {card.landscapeType}{" "}
+          </div>
+          <div></div>
+
+          <div>Attack: {card.attack}</div>
+          <div>Defense: {card.defense}</div>
+        </div>
+      </div>
+    </div>
+  )
+}
 /**
  * Displays card shape with a number on it indicating how many cards are in the pile. This one has onclick to allow player to draw
  * @returns returns markup displaying what i wrote just above
@@ -248,8 +286,8 @@ function DiscardPile({ size }: { size: number }) {
  * @author Tanner Brown
  * @returns Array of CardComponents/CreatureComponents
  */
-function HandOfCards({ playerHand, stateChange, currentPlayer, ownerPlayer, phase}: 
-  { playerHand: Card[], stateChange: React.Dispatch<React.SetStateAction<number>>, currentPlayer: Player, ownerPlayer: Player, phase: number}) {
+function HandOfCards({ playerHand, stateChange, currentPlayer, ownerPlayer, phase, setHover}: 
+  { playerHand: Card[], stateChange: React.Dispatch<React.SetStateAction<number>>, currentPlayer: Player, ownerPlayer: Player, phase: number, setHover: any}) {
   let shownHand = [];
   
   for (let i = 0; i < playerHand.length; i++) {
@@ -259,7 +297,7 @@ function HandOfCards({ playerHand, stateChange, currentPlayer, ownerPlayer, phas
         CreatureComponent({
           card: currentCard,
           state: stateChange,
-          position: i,
+          setHover: setHover,
           ownerPlayer: ownerPlayer,
           currentPlayer: currentPlayer,
           phase: phase
@@ -271,7 +309,7 @@ function HandOfCards({ playerHand, stateChange, currentPlayer, ownerPlayer, phas
         CardComponent({
           card: currentCard,
           state: stateChange,
-          position: i,
+          setHover: setHover,
           ownerPlayer: ownerPlayer,
           currentPlayer: currentPlayer,
           phase: phase
@@ -289,7 +327,7 @@ function HandOfCards({ playerHand, stateChange, currentPlayer, ownerPlayer, phas
  * creature, building in the array inside of each landscape inside of a larger board.
  * @returns markup that displays the board.
  */
-function Board({ game, board}: { game: Game, board: SidedBoard}) {
+function Board({ game, board, setHover}: { game: Game, board: SidedBoard, setHover: any}) {
   let p1Board = [];
   let p2Board = [];
 
@@ -302,7 +340,8 @@ function Board({ game, board}: { game: Game, board: SidedBoard}) {
       LandscapeCard({
         creature: board.getBoardPosByOwnerId(0, i)?.creature,
         player: p1,
-        landscapeColor: board.getBoardPosByOwnerId(p1.id, i)?.landscape
+        landscapeColor: board.getBoardPosByOwnerId(p1.id, i)?.landscape,
+        setHover: setHover
         //building: game.board.getBoardPosByOwnerId(0, i)?.building
       }),
     );
@@ -311,7 +350,8 @@ function Board({ game, board}: { game: Game, board: SidedBoard}) {
       LandscapeCard({
         creature: board.getBoardPosByOwnerId(1, i)?.creature,
         player: p2,
-        landscapeColor: board.getBoardPosByOwnerId(p1.id, i)?.landscape
+        landscapeColor: board.getBoardPosByOwnerId(p1.id, i)?.landscape,
+        setHover: setHover
         //building: game.board.getBoardPosByOwnerId(1, i)?.building,
       }),
     );
@@ -343,12 +383,14 @@ function LandscapeCard({
   //building,
   creature,
   player,
-  landscapeColor
+  landscapeColor,
+  setHover
 }: {
   //building: Building | undefined;
   creature: Creature | undefined;
   player: Player;
-  landscapeColor: string
+  landscapeColor: string;
+  setHover: any;
 }) {
   //c is creature, b is building. default values are empty tags (is that what they're called?)
   let c;
@@ -358,7 +400,7 @@ function LandscapeCard({
     c = (<></>) 
   }
   else{
-    c = CreatureComponentOnBoard({card: creature});
+    c = CreatureComponentOnBoard({card: creature, setHover: setHover});
   }
   // check if building is undefined
   // if (building?.name == null) {
@@ -392,15 +434,15 @@ function PlayerDisplay({ game, player }: { game: Game; player: Player }) {
 }
 function getDemoPlayer(player: Player) {
   player.deck.push(get("Dark Angel")!);
+  player.deck.push(get("Swamp Dragon")!);
   player.deck.push(get("Dark Angel")!);
-  player.deck.push(get("Dark Angel")!);
-  player.deck.push(get("Dark Angel")!);
+  player.deck.push(get("Swamp Dragon")!);
   player.deck.push(get("Dark Angel")!);
 
   player.hand.push(get("Dark Angel")!);
+  player.hand.push(get("Swamp Dragon")!);
   player.hand.push(get("Dark Angel")!);
-  player.hand.push(get("Dark Angel")!);
-  player.hand.push(get("Dark Angel")!);
+  player.hand.push(get("Swamp Dragon")!);
   player.hand.push(get("Dark Angel")!);
 }
 /**
@@ -424,6 +466,7 @@ function GameBoard({ game, setBegin }: { game: Game, setBegin: any}) {
   const [log, setLog] = useState([<></>]);
   const [reset, setReset] = useState(-1);
   const [summoningCard, setSummoningCard] = useState(-1); //good
+  const [hoverCard, setHoverCard] = useState(null);
 
   let buttons1 = (<></>)
   let buttons2 = (<></>)
@@ -467,20 +510,21 @@ function GameBoard({ game, setBegin }: { game: Game, setBegin: any}) {
           <br></br>
           <br></br>
           <div className="flex flex-row justify-center items-center">
-            <HandOfCards playerHand={hand2} stateChange={setSummoningCard} currentPlayer={currentPlayer} ownerPlayer={player2} phase={phase}></HandOfCards>
+            <HandOfCards playerHand={hand2} stateChange={setSummoningCard} currentPlayer={currentPlayer} setHover={setHoverCard} ownerPlayer={player2} phase={phase}></HandOfCards>
           </div>
           {buttons2}
         </div>
         {/*This div pretty large. It's where discard piles, decks, and the actual board goes*/}
-        <div className="flex justify-center items-center gap-4">
+        <div className="flex flex-row justify-center items-center gap-4">
           {/*This column shows a deck and discard pile*/}
+          <HoverCard card={hoverCard}></HoverCard>
           <div className="flex flex-col gap-10">
             <PlayerDisplay game={game} player={player2}></PlayerDisplay>
             <Deck player={player2} reset={reset} resetState={setReset} log={log} game={game} setLog={setLog}></Deck>
             <DiscardPile size={5}></DiscardPile>
           </div>
           {/*The board between two columns*/}
-          <Board game={game} board={board}/>
+          <Board setHover={setHoverCard} game={game} board={board}/>
           {/*This is a row of two columns*/}
           <div className="flex flex-row gap-4">
             {/*The first column shows the deck and discard pile (like the one you saw earlier*/}
@@ -512,7 +556,7 @@ function GameBoard({ game, setBegin }: { game: Game, setBegin: any}) {
         {buttons1}
         </div>
         <div className="flex flex-row justify-center items-center">
-          <HandOfCards playerHand={hand1} stateChange={setSummoningCard} currentPlayer={currentPlayer} ownerPlayer={player1} phase={phase}></HandOfCards>
+          <HandOfCards playerHand={hand1} stateChange={setSummoningCard} setHover={setHoverCard} currentPlayer={currentPlayer} ownerPlayer={player1} phase={phase}></HandOfCards>
         </div>
       </div>
     </div>

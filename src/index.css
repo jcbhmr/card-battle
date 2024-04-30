@@ -90,6 +90,16 @@
   height: 150px;
 }
 
+.hover_card_shape {
+  overflow: auto;
+  flex-direction: column;
+  border-radius: 0.5rem;
+  border-width: 3px;
+  border-color: black;
+  width: 200px;
+  height: 300px;
+}
+
 .player_display {
   overflow: auto;
   flex-direction: row;
