@@ -920,18 +920,22 @@ function PhaseButton({
   );
 }
 
-import { useMachine } from "@xstate/react"
+import { useMachine } from "@xstate/react";
 import { machine } from "./machine.ts";
 import MainMenuScreen from "./MainMenuScreen.tsx";
-import PlayGameScreen from "./PlayGameScreen.tsx"
+import PlayGameScreen from "./PlayGameScreen.tsx";
 
 function App() {
-  const [state, send] = useMachine(machine)
+  const [state, send] = useMachine(machine);
 
-  return (<>
-    {state.matches("SelectDecks") && <MainMenuScreen state={state} send={send} />}
-    {state.matches("Play") && <PlayGameScreen state={state} send={send} />}
-  </>)
+  return (
+    <>
+      {state.matches("SelectDecks") && (
+        <MainMenuScreen state={state} send={send} />
+      )}
+      {state.matches("Play") && <PlayGameScreen state={state} send={send} />}
+    </>
+  );
 }
 
 export default App;

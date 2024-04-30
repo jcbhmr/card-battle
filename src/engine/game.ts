@@ -1,10 +1,5 @@
 //import { randomInt } from "crypto";
-import {
-  Card,
-  Creature,
-  Landscape,
-  GetCardTargetEvent,
-} from "./card.ts";
+import { Card, Creature, Landscape, GetCardTargetEvent } from "./card.ts";
 import {
   GetBoardPosTargetEvent,
   PlayCardEvent,

@@ -7,12 +7,7 @@ import {
   CardType,
   Player,
 } from "./game.ts";
-import {
-  Card,
-  Creature,
-  Landscape,
-  GetCardTargetEvent,
-} from "./card.ts";
+import { Card, Creature, Landscape, GetCardTargetEvent } from "./card.ts";
 import { get as getCardFromCardMap } from "./CardMap.ts";
 import {
   GetBoardPosTargetEvent,
