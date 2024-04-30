@@ -1,8 +1,24 @@
 import { expect, test, assert } from "vitest";
-import { Game, AbstractGame, LandscapeType, BoardPos, CardType, Player } from "./model.ts";
-import { Card, Creature, Landscape, GetCardTargetEvent } from "./engine/card.ts";
+import {
+  Game,
+  AbstractGame,
+  LandscapeType,
+  BoardPos,
+  CardType,
+  Player,
+} from "./model.ts";
+import {
+  Card,
+  Creature,
+  Landscape,
+  GetCardTargetEvent,
+} from "./engine/card.ts";
 import { get as getCardFromCardMap } from "./engine/CardMap.ts";
-import { GetBoardPosTargetEvent, PlayCardEventName, PlayCardEvent } from "./engine/event.ts";
+import {
+  GetBoardPosTargetEvent,
+  PlayCardEventName,
+  PlayCardEvent,
+} from "./engine/event.ts";
 
 test("new game works", () => {
   assert(Game.getInstance() instanceof AbstractGame);
@@ -19,39 +35,81 @@ test("new game works", () => {
 
 test("Game is Playable", () => {
   //Setup
-  var deck1: Card[] = [getCardFromCardMap("Dark Angel"), getCardFromCardMap("Bog Bum"), getCardFromCardMap("Fly Swatter"), getCardFromCardMap("Dark Angel"), 
-  getCardFromCardMap("Bog Bum"), getCardFromCardMap("Fly Swatter"), getCardFromCardMap("Dark Angel"), getCardFromCardMap("Bog Bum"), 
-  getCardFromCardMap("Fly Swatter"), getCardFromCardMap("Dark Angel"), getCardFromCardMap("Bog Bum"), getCardFromCardMap("Fly Swatter")];
+  var deck1: Card[] = [
+    getCardFromCardMap("Dark Angel"),
+    getCardFromCardMap("Bog Bum"),
+    getCardFromCardMap("Fly Swatter"),
+    getCardFromCardMap("Dark Angel"),
+    getCardFromCardMap("Bog Bum"),
+    getCardFromCardMap("Fly Swatter"),
+    getCardFromCardMap("Dark Angel"),
+    getCardFromCardMap("Bog Bum"),
+    getCardFromCardMap("Fly Swatter"),
+    getCardFromCardMap("Dark Angel"),
+    getCardFromCardMap("Bog Bum"),
+    getCardFromCardMap("Fly Swatter"),
+  ];
 
-  assert(deck1.map((card: Card) => {return card.name != Card.getNull().name}));
+  assert(
+    deck1.map((card: Card) => {
+      return card.name != Card.getNull().name;
+    }),
+  );
 
-  var deck2: Card[] = [getCardFromCardMap("Dark Angel"), getCardFromCardMap("Bog Bum"), getCardFromCardMap("Fly Swatter"), getCardFromCardMap("Dark Angel"), 
-  getCardFromCardMap("Bog Bum"), getCardFromCardMap("Fly Swatter"), getCardFromCardMap("Dark Angel"), getCardFromCardMap("Bog Bum"), 
-  getCardFromCardMap("Fly Swatter"), getCardFromCardMap("Dark Angel"), getCardFromCardMap("Bog Bum"), getCardFromCardMap("Fly Swatter")];
+  var deck2: Card[] = [
+    getCardFromCardMap("Dark Angel"),
+    getCardFromCardMap("Bog Bum"),
+    getCardFromCardMap("Fly Swatter"),
+    getCardFromCardMap("Dark Angel"),
+    getCardFromCardMap("Bog Bum"),
+    getCardFromCardMap("Fly Swatter"),
+    getCardFromCardMap("Dark Angel"),
+    getCardFromCardMap("Bog Bum"),
+    getCardFromCardMap("Fly Swatter"),
+    getCardFromCardMap("Dark Angel"),
+    getCardFromCardMap("Bog Bum"),
+    getCardFromCardMap("Fly Swatter"),
+  ];
 
-  var tempDeck: Card[] = [getCardFromCardMap("Dark Angel"), getCardFromCardMap("Bog Bum"), getCardFromCardMap("Fly Swatter"), getCardFromCardMap("Dark Angel"), 
-  getCardFromCardMap("Bog Bum"), getCardFromCardMap("Fly Swatter"), getCardFromCardMap("Dark Angel"), getCardFromCardMap("Bog Bum"), 
-  getCardFromCardMap("Fly Swatter"), getCardFromCardMap("Dark Angel"), getCardFromCardMap("Bog Bum"), getCardFromCardMap("Fly Swatter")];
+  var tempDeck: Card[] = [
+    getCardFromCardMap("Dark Angel"),
+    getCardFromCardMap("Bog Bum"),
+    getCardFromCardMap("Fly Swatter"),
+    getCardFromCardMap("Dark Angel"),
+    getCardFromCardMap("Bog Bum"),
+    getCardFromCardMap("Fly Swatter"),
+    getCardFromCardMap("Dark Angel"),
+    getCardFromCardMap("Bog Bum"),
+    getCardFromCardMap("Fly Swatter"),
+    getCardFromCardMap("Dark Angel"),
+    getCardFromCardMap("Bog Bum"),
+    getCardFromCardMap("Fly Swatter"),
+  ];
 
-  var swampLand: Landscape = new Landscape("Swamp", "Goopy!", LandscapeType.Swamp);
+  var swampLand: Landscape = new Landscape(
+    "Swamp",
+    "Goopy!",
+    LandscapeType.Swamp,
+  );
 
   Game.startNewGame();
 
   //Game Test
   Game.getInstance().addGameEventListener(GetCardTargetEvent, (evt: Event) => {
     //console.log("Recieved event with name " + evt.type);
-    if(evt instanceof GetBoardPosTargetEvent) {
+    if (evt instanceof GetBoardPosTargetEvent) {
       //console.log("Recieved event of Type GetBoardPosTargetEvent!");
       var player: Player = Game.getInstance().getPlayerById(evt.executorId);
       var didExecute = false;
-      var playerBoard: BoardPos[] | undefined = Game.getInstance().board.getSideByOwnerId(player.id)
-      if(typeof(playerBoard) == "undefined") {
+      var playerBoard: BoardPos[] | undefined =
+        Game.getInstance().board.getSideByOwnerId(player.id);
+      if (typeof playerBoard == "undefined") {
         console.log("====PlayerId is incorrect, cannot play card!====");
-      }else {
-        for(var j = 0; j < playerBoard.length; j++) {
-          if(didExecute) {
+      } else {
+        for (var j = 0; j < playerBoard.length; j++) {
+          if (didExecute) {
             return;
-          }else {
+          } else {
             didExecute = evt.execute(playerBoard[j]);
           }
         }
@@ -73,13 +131,27 @@ test("Game is Playable", () => {
     // }
   });
 
-  Game.getInstance().board.getSideByOwnerId(0)?.map((pos: BoardPos) => {pos.setLandscape(swampLand)});
-  Game.getInstance().board.getSideByOwnerId(1)?.map((pos: BoardPos) => {pos.setLandscape(swampLand)});
+  Game.getInstance()
+    .board.getSideByOwnerId(0)
+    ?.map((pos: BoardPos) => {
+      pos.setLandscape(swampLand);
+    });
+  Game.getInstance()
+    .board.getSideByOwnerId(1)
+    ?.map((pos: BoardPos) => {
+      pos.setLandscape(swampLand);
+    });
 
-  var player0Side: BoardPos[] | undefined = Game.getInstance().board.getSideByOwnerId(0);
-  expect(typeof player0Side != "undefined" && player0Side[0].landscape == LandscapeType.Swamp);
+  var player0Side: BoardPos[] | undefined =
+    Game.getInstance().board.getSideByOwnerId(0);
+  expect(
+    typeof player0Side != "undefined" &&
+      player0Side[0].landscape == LandscapeType.Swamp,
+  );
 
-  assert(Game.getInstance().currentPlayer == Game.getInstance().getPlayerById(0));
+  assert(
+    Game.getInstance().currentPlayer == Game.getInstance().getPlayerById(0),
+  );
 
   Game.getInstance().getPlayerById(0).setDeck(deck1);
   Game.getInstance().getPlayerById(1).setDeck(deck2);
@@ -100,65 +172,142 @@ test("Game is Playable", () => {
 
   assert(Game.getInstance().currentPlayer.hand.length == 6);
 
-  for(var i = 0; i < 50; i++) {
-    console.log("====================================== TURN " + (i+1) + " ======================================");
-    console.log("Game Phase: " + Game.getInstance().turnPhase + ", Actual Game turn: " + (Game.getInstance().currentTurn+1));
-    console.log("My HP: " + Game.getInstance().currentPlayer.hp + ", Their HP: " + Game.getInstance().getOtherPlayer(Game.getInstance().currentPlayer.id).hp);
+  for (var i = 0; i < 50; i++) {
+    console.log(
+      "====================================== TURN " +
+        (i + 1) +
+        " ======================================",
+    );
+    console.log(
+      "Game Phase: " +
+        Game.getInstance().turnPhase +
+        ", Actual Game turn: " +
+        (Game.getInstance().currentTurn + 1),
+    );
+    console.log(
+      "My HP: " +
+        Game.getInstance().currentPlayer.hp +
+        ", Their HP: " +
+        Game.getInstance().getOtherPlayer(Game.getInstance().currentPlayer.id)
+          .hp,
+    );
     var cardHand = "";
-    Game.getInstance().currentPlayer.hand.map((card: Card) => {cardHand += (card.name + ", ")});
-    console.log("Current player's hand: [" + cardHand.slice(0, cardHand.length - 2) + "]");
+    Game.getInstance().currentPlayer.hand.map((card: Card) => {
+      cardHand += card.name + ", ";
+    });
+    console.log(
+      "Current player's hand: [" + cardHand.slice(0, cardHand.length - 2) + "]",
+    );
 
     var playerHand: Card[] = Game.getInstance().currentPlayer.hand;
-    for(var j = 0; j < playerHand.length; j++) {
+    for (var j = 0; j < playerHand.length; j++) {
       var card: Card = playerHand[j];
-      if(Game.getInstance().currentPlayer.actions >= card.getCost() && card.cardType == CardType.Creature) {
+      if (
+        Game.getInstance().currentPlayer.actions >= card.getCost() &&
+        card.cardType == CardType.Creature
+      ) {
         //console.log("Trying to play card " + card.name);
-        if(Game.getInstance().playCard(card, Game.getInstance().currentPlayer.id)) {
+        if (
+          Game.getInstance().playCard(card, Game.getInstance().currentPlayer.id)
+        ) {
           //console.log("Trying to play card " + card.name);
         }
       }
     }
 
-    assert(Game.getInstance().currentPlayer.actions >= 0, "Player Actions left: " + Game.getInstance().currentPlayer.actions);
+    assert(
+      Game.getInstance().currentPlayer.actions >= 0,
+      "Player Actions left: " + Game.getInstance().currentPlayer.actions,
+    );
     Game.getInstance().enterNextPhase();
 
-    var mySide: BoardPos[] | undefined = Game.getInstance().board.getSideByOwnerId(Game.getInstance().currentPlayer.id);
-    var theirSide: BoardPos[] | undefined = Game.getInstance().board.getSideByOwnerId(Game.getInstance().getOtherPlayer(Game.getInstance().currentPlayer.id).id)
-  
-    assert(typeof(mySide) != "undefined" && typeof(theirSide) != "undefined");
+    var mySide: BoardPos[] | undefined =
+      Game.getInstance().board.getSideByOwnerId(
+        Game.getInstance().currentPlayer.id,
+      );
+    var theirSide: BoardPos[] | undefined =
+      Game.getInstance().board.getSideByOwnerId(
+        Game.getInstance().getOtherPlayer(Game.getInstance().currentPlayer.id)
+          .id,
+      );
+
+    assert(typeof mySide != "undefined" && typeof theirSide != "undefined");
     assert(mySide.length == theirSide.length);
-    
+
     var mySideString = "";
-    for(var j = 0; j < mySide.length; j++) {
-      mySideString += (mySide[j].creature.name + "{A:" + mySide[j].creature.attack + "--D:" + mySide[j].creature.defense + "}" + ", ");
+    for (var j = 0; j < mySide.length; j++) {
+      mySideString +=
+        mySide[j].creature.name +
+        "{A:" +
+        mySide[j].creature.attack +
+        "--D:" +
+        mySide[j].creature.defense +
+        "}" +
+        ", ";
     }
-    console.log("My Side: [" + mySideString.slice(0, mySideString.length - 2) + "]");
+    console.log(
+      "My Side: [" + mySideString.slice(0, mySideString.length - 2) + "]",
+    );
 
     var theirSideString = "";
-    for(var j = 0; j < theirSide.length; j++) {
-      theirSideString += (theirSide[j].creature.name + "{A:" + theirSide[j].creature.attack + "--D:" + theirSide[j].creature.defense + "}" + ", ");
+    for (var j = 0; j < theirSide.length; j++) {
+      theirSideString +=
+        theirSide[j].creature.name +
+        "{A:" +
+        theirSide[j].creature.attack +
+        "--D:" +
+        theirSide[j].creature.defense +
+        "}" +
+        ", ";
     }
-    console.log("Their Side: [" + theirSideString.slice(0, theirSideString.length - 2) + "]");
+    console.log(
+      "Their Side: [" +
+        theirSideString.slice(0, theirSideString.length - 2) +
+        "]",
+    );
 
     //Do attacks
-    if(typeof(mySide) != "undefined" && typeof(theirSide) != "undefined") {
-      for(var j = 0; j < mySide.length; j++) {
+    if (typeof mySide != "undefined" && typeof theirSide != "undefined") {
+      for (var j = 0; j < mySide.length; j++) {
         var myPos: BoardPos = mySide[j];
         var theirPos: BoardPos = theirSide[j];
-        if(!myPos.creature.equals(Creature.getNull())) {
-          if(!theirPos.creature.equals(Creature.getNull())) {
-            console.log("My " + myPos.creature.name + " is attacking their " + theirPos.creature.name + " in lane " + (myPos.posId+1) + "!");
+        if (!myPos.creature.equals(Creature.getNull())) {
+          if (!theirPos.creature.equals(Creature.getNull())) {
+            console.log(
+              "My " +
+                myPos.creature.name +
+                " is attacking their " +
+                theirPos.creature.name +
+                " in lane " +
+                (myPos.posId + 1) +
+                "!",
+            );
             myPos.creature.Attack(theirPos.creature);
-          }else {
-            console.log("My " + myPos.creature.name + " is attacking their hero from lane " + myPos.posId + "!");
-            myPos.creature.Attack(Game.getInstance().getOtherPlayer(Game.getInstance().currentPlayer.id));
+          } else {
+            console.log(
+              "My " +
+                myPos.creature.name +
+                " is attacking their hero from lane " +
+                myPos.posId +
+                "!",
+            );
+            myPos.creature.Attack(
+              Game.getInstance().getOtherPlayer(
+                Game.getInstance().currentPlayer.id,
+              ),
+            );
           }
         }
       }
     }
 
-    if(Game.getInstance().getOtherPlayer(Game.getInstance().currentPlayer.id).hp <= 0) {
-      console.log("Player " + Game.getInstance().currentPlayer.id + " has won the game!");
+    if (
+      Game.getInstance().getOtherPlayer(Game.getInstance().currentPlayer.id)
+        .hp <= 0
+    ) {
+      console.log(
+        "Player " + Game.getInstance().currentPlayer.id + " has won the game!",
+      );
       break;
     }
 
