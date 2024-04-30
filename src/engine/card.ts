@@ -21,7 +21,7 @@ export class Card {
   imageURL: string = "";
   private cost: number;
   private isReady: boolean;
-  private location: BoardPos | string = CardLocations.Deck;
+  location: BoardPos | string = CardLocations.Deck;
 
   constructor(
     name: string,
@@ -36,7 +36,7 @@ export class Card {
     this.cost = cost;
     this.landscapeType = landscapeType;
     this.turnPlayed = Game.getInstance().currentTurn;
-    this.isReady = true;
+    this.isReady = false;
   }
 
   setImageUrl(URL: string): Card {
@@ -87,14 +87,20 @@ export class Card {
   }
 
   play(_target: BoardPos, _playerId: number) {
+    console.log("Calling play(target: BoardPos, playerId: number) in class Card, don't do that!");
     this.displayCard();
     return false;
   }
 
   death() {
+    console.log("Calling death() on " + this.name);
     if (this.ownerId != null) {
       Game.getInstance().getPlayerById(this.ownerId).discardPile.push(this);
-      this.moveCard(CardLocations.Discard);
+      //this.moveCard(CardLocations.Discard); //Doesn't actually move the cards from the board...
+      if(this.location instanceof BoardPos) {
+        console.log(this.name + " has died from lane " + (this.location.posId+1));
+        this.location.removeCreature();
+      }
     }
   }
 
@@ -196,6 +202,11 @@ export class Card {
     );
   }
 
+  equals(other: Card): boolean {
+    return this.name == other.name && this.flavorText == other.flavorText && this.cardType == other.cardType && this.cost == other.cost 
+    && this.landscapeType == other.landscapeType;
+  }
+
   //Null Card Constant
   static getNull(): Card {
     return new Card("Null", "You shouldn't be seeing this!", 99, 0, LandscapeType.NULL);
@@ -222,6 +233,11 @@ export class Creature extends Card {
   }
 
   Attack(Target: Creature | Player) {
+    if(!this.getIsReady()) {
+      console.log("Creature not ready!");
+      return false;
+    }
+
     if (Target instanceof Creature) {
       Target.defense -= this.attack;
       if (Target.defense <= 0) {
@@ -231,17 +247,23 @@ export class Creature extends Card {
       if (this.defense <= 0) {
         this.death();
       }
+      this.setIsReady(false);
+      return true;
     } else {
       Target.hp -= this.attack;
+      this.setIsReady(false);
+      return true;
     }
   }
 
   override play(pos: BoardPos, playerId: number) {
-    if (pos.creature == Creature.getNull()) {
-      if(pos.setCreature(this)) {
-        Game.getInstance().getPlayerById(playerId).actions -= this.getCost();
-        return true;
-      }
+    console.log("Playing Creature " + this.name + " at pos " + pos.posId + " on player " + playerId + "'s side of the board");
+    if (pos.creature.name == Creature.getNull().name) {
+        if(pos.setCreature(this)) {
+          this.location = pos;
+          this.ownerId = playerId;
+          return true;
+        }
     }
     return false;
   }
@@ -255,6 +277,11 @@ export class Creature extends Card {
       this.attack,
       this.defense,
     );
+  }
+
+  override equals(other: Creature): boolean {
+    return this.name == other.name && this.flavorText == other.flavorText && this.cardType == other.cardType && this.getCost() == other.getCost() 
+    && this.landscapeType == other.landscapeType && this.maxDefense == other.maxDefense;
   }
 
   //Creature Constants
@@ -284,6 +311,7 @@ export class Landscape extends Card {
   }
 
   override play(pos: BoardPos) {
+    console.log("Playing Landscape " + this.name + " at pos " + pos.posId + " on player " + pos.ownerId + "'s side of the board");
     if (pos.landscape == LandscapeType.NULL) {
       return pos.setLandscape(this);
     }

@@ -1,3 +1,4 @@
+//import { randomInt } from "crypto";
 import {
   Card,
   Creature,
@@ -6,20 +7,18 @@ import {
 } from "./engine/card.ts";
 import {
   GetBoardPosTargetEvent,
-  GetPlayerTargetEvent,
   PlayCardEvent,
   SwitchTurnsEvent,
   SwitchTurnPhaseEvent,
   DrawCardEvent,
-  DiscardCardEvent,
-  CardDeathEvent
+  DiscardCardEvent
 } from "./engine/event.ts";
 
 //============================================================== Enums ==============================================================
 export const TurnPhases = {
   Play: 0,
-  Action: 1,
-  Battle: 2,
+  //Action: 1,
+  Battle: 1,
 };
 
 export const LandscapeType = {
@@ -245,6 +244,20 @@ export class Player {
     this.cardDiscount = 0;
   }
 
+  setDeck(deck: Card[]) {
+    this.deck = deck;
+    this.shuffleCards();
+  }
+
+  shuffleCards() {
+    for(var i = 0; i < this.deck.length; i++) {
+      var rand1 = randomInt(0, this.deck.length);
+      var temp = this.deck[rand1];
+      this.deck.push(temp);
+      this.deck.splice(rand1, 1);
+    }
+  }
+
   discard(index: number = -1) {
     if (index == -1) {
       index = Math.floor(Math.random() * this.hand.length);
@@ -254,6 +267,15 @@ export class Player {
     this.hand.splice(index, 1);
 
     Game.getInstance().dispatchEvent(new DiscardCardEvent(this.discardPile[discardIndex], this.id));
+  }
+
+  discardCard(card: Card) {
+    for(var i = 0; i < this.hand.length; i++) {
+      if(card.equals(this.hand[i])) {
+        this.discard(i);
+        return;
+      }
+    }
   }
 
   drawCard(amount: number, useAction: boolean) {
@@ -285,8 +307,6 @@ export class Player {
   }
 }
 
-
-
 //============================================================== Board ==============================================================
 export class BoardPos {
   static boardIdCounter = 0;
@@ -303,7 +323,7 @@ export class BoardPos {
   }
 
   setCreature(card: Creature) {
-    if (this.creature == Creature.getNull()) {
+    if (this.creature.name == Creature.getNull().name) {
       this.creature = card;
       return true;
     }
@@ -372,7 +392,7 @@ export class AbstractGame extends EventTarget {
     super();
   }
 
-  addEventListener(
+  addGameEventListener(
     _event: string,
     _eventCallback: EventListenerOrEventListenerObject,
   ) {}
@@ -385,13 +405,19 @@ export class AbstractGame extends EventTarget {
     return new Player(0);
   }
 
+  getBoard(): SidedBoard {
+    return this.board;
+  }
+
   enterNextPhase() {}
 
   switchTurns(_currentPlayerId: number) {}
 
   resetCards(_playerId: number) {}
 
-  playCard(_card: Card, _playerId: number) {}
+  playCard(_card: Card, _playerId: number): boolean {
+    return false;
+  }
 }
 
 export class Game extends AbstractGame {
@@ -424,26 +450,27 @@ export class Game extends AbstractGame {
     Game.GameInstance = new Game();
   }
 
-  getBoard() {
+  override getBoard(): SidedBoard {
     return this.board;
   }
 
-  addEventListener(
+  override addGameEventListener(
     event: string,
     eventCallback: EventListenerOrEventListenerObject,
   ) {
+    console.log("Adding Event Listener for " + event);
     this.addEventListener(event, eventCallback);
   }
 
-  getPlayerById(playerId: number) {
+  override getPlayerById(playerId: number) {
     return this.players[playerId];
   }
 
-  getOtherPlayer(playerId: number) {
+  override getOtherPlayer(playerId: number) {
     return this.players[(playerId + 1)%this.players.length];
   }
 
-  enterNextPhase() {
+  override enterNextPhase() {
     this.turnPhase++;
     if (this.turnPhase > TurnPhases.Battle) {
       this.turnPhase = TurnPhases.Play;
@@ -452,13 +479,22 @@ export class Game extends AbstractGame {
     this.dispatchEvent(new SwitchTurnPhaseEvent(this.turnPhase));
   }
 
-  switchTurns() {
+  override switchTurns() {
     this.currentTurn++;
     this.currentPlayer = this.players[this.currentTurn%this.players.length]
     this.currentPlayer.actions=2;
+    this.currentPlayer.drawCard(1, false);
     this.resetCards(this.currentPlayer.id);
     this.dispatchEvent(new SwitchTurnsEvent(this.currentTurn));
   }
+
+  override resetCards(playerId: number) {
+    var board: BoardPos[] | undefined = this.board.getSideByOwnerId(playerId);
+    if(typeof(board) != "undefined") {
+      board.map((pos: BoardPos) => {pos.creature.setIsReady(true);});
+    }
+  }
+
   /**
    * summons a creature to the side of player id at position number 
    */
@@ -479,7 +515,6 @@ export class Game extends AbstractGame {
    * @param boardPosition 
    * @param handPosition 
    */
-
   summonCardFromHand(playerId: number, boardPosition: number, handPosition: number){
     let player = this.getPlayerById(playerId);
     let card = player.hand[handPosition];
@@ -487,7 +522,9 @@ export class Game extends AbstractGame {
       player.actions -= card.getCost();
       player.hand.splice(handPosition, 1);
       this.summonCard(playerId, boardPosition, card, player);
+      return card.name
     }
+    return "";
   }
   /**
    * function that lets me (front-end) do combat. pretty much, the turn players monster attacks and then we do different things based on if they control a monster or
@@ -519,11 +556,14 @@ export class Game extends AbstractGame {
       }
       c1.setIsReady(false);
     }
-
   }
-  playCard(card: Card, playerId: number): boolean {
+
+  override playCard(card: Card, playerId: number): boolean {
     if (this.turnPhase != TurnPhases.Play || 
-      (Game.getInstance().getPlayerById(playerId) != null && Game.getInstance().getPlayerById(playerId).actions >= card.getCost())) {
+      (Game.getInstance().getPlayerById(playerId) == null && Game.getInstance().getPlayerById(playerId).actions >= card.getCost())) {
+        // console.log("Unable to play card " + card.name + "! Potential causes: this.turnPhase == TurnPhases.Play: " + (this.turnPhase == TurnPhases.Play) + 
+        // ", Player from playerId == null: " + (Game.getInstance().getPlayerById(playerId) == null) + 
+        // ", Player has enough actions: " + (Game.getInstance().getPlayerById(playerId).actions >= card.getCost()));
       return false;
     }
 
@@ -533,14 +573,16 @@ export class Game extends AbstractGame {
           new GetBoardPosTargetEvent(
             GetCardTargetEvent,
             (pos: BoardPos) => {
-              if (pos.creature != Creature.getNull()) {
+              if (!pos.creature.equals(Creature.getNull())) {
                 return false;
               } else {
-                if (card.play(pos, playerId)) {
+                if (card.play(pos, pos.ownerId)) {
+                  Game.getInstance().getPlayerById(playerId).actions -= card.getCost();
+                  Game.getInstance().getPlayerById(playerId).discardCard(card);
                   return Game.getInstance().dispatchEvent(
                     new PlayCardEvent(
                       card,
-                      playerId,
+                      pos.ownerId,
                     ),
                   );
                 }
