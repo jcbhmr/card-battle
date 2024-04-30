@@ -616,13 +616,9 @@ function GameBoard({ game, setBegin }: { game: Game, setBegin: any}) {
 function SummoningButtons({cardPos, game, setSummonState,  playerid, log, setLog}: {cardPos: number, game: Game, setSummonState: any, 
   board: any, playerid: number, log: any, setLog: any}){
   function handle(boardPos: number, playerid: number){
-
     globalTempVariable = boardPos;
-    game.playCard(game.getPlayerById(playerid).hand[cardPos], playerid);
-    let name = game.board.getBoardPosByOwnerId(playerid, boardPos)?.creature.name;
-    //let name = game.summonCardFromHand(playerid,boardPos, cardPos);
-    if(name){
-      setLog([...log, <div>{game.getPlayerById(playerid).username} summoned the "{name}" at zone {boardPos+1}</div>])
+    if(game.playCard(game.getPlayerById(playerid).hand[cardPos], playerid)){
+      setLog([...log, <div>{game.getPlayerById(playerid).username} summoned the "{game.board.getBoardPosByOwnerId(playerid, boardPos)?.creature.name}" at zone {boardPos+1}</div>])
     }
     else{
       setLog([...log, <div>{game.getPlayerById(playerid).username} attempted to summon a creature, but lacks the actions</div>])

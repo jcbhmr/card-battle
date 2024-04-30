@@ -560,8 +560,11 @@ export class Game extends AbstractGame {
   }
 
   override playCard(card: Card, playerId: number): boolean {
-    if (this.turnPhase != TurnPhases.Play && 
-      (Game.getInstance().getPlayerById(playerId) == null && Game.getInstance().getPlayerById(playerId).actions >= card.getCost())) {
+    console.log(Game.getInstance().getPlayerById(playerId).actions < card.getCost())
+    //removed check for turnphase since frontend sorta already does this
+    // Game.getInstance().getPlayerById(playerId) == null <- this statement always resolved to false, even when player was not null
+    // remmoved for now
+    if (((Game.getInstance().getPlayerById(playerId).actions < card.getCost()))) {
         // console.log("Unable to play card " + card.name + "! Potential causes: this.turnPhase == TurnPhases.Play: " + (this.turnPhase == TurnPhases.Play) + 
         // ", Player from playerId == null: " + (Game.getInstance().getPlayerById(playerId) == null) + 
         // ", Player has enough actions: " + (Game.getInstance().getPlayerById(playerId).actions >= card.getCost()));
@@ -574,6 +577,8 @@ export class Game extends AbstractGame {
           new GetBoardPosTargetEvent(
             GetCardTargetEvent,
             (pos: BoardPos) => {
+              //found error with summoning card here. if we are trying to summon to a zone that a creature is in then we return false
+              // wont change until i know that this was unintentional
               if (!pos.creature.equals(Creature.getNull())) {
                 return false;
               } else {
