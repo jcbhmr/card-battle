@@ -5,14 +5,18 @@ import {
   Player,
   SidedBoard,
   Targeter,
+  LandscapeType,
+  BoardPos
 } from "./model";
 //import { Creature, Building, Card } from "./engine/card";
-import { Creature, Card } from "./engine/card";
+import { Creature, Card, Landscape } from "./engine/card";
 import { Ability } from "./engine/ability";
 import { get } from "./engine/CardMap";
 import { G, an } from "vitest/dist/reporters-MmQN-57K.js";
+import { GetCardTargetEvent } from "./engine/card";
+import { GetBoardPosTargetEvent } from "./engine/event";
 
-
+let globalTempVariable = -1;
 
 /**
  * v0 by Vercel.
@@ -612,7 +616,11 @@ function GameBoard({ game, setBegin }: { game: Game, setBegin: any}) {
 function SummoningButtons({cardPos, game, setSummonState,  playerid, log, setLog}: {cardPos: number, game: Game, setSummonState: any, 
   board: any, playerid: number, log: any, setLog: any}){
   function handle(boardPos: number, playerid: number){
-    let name = game.summonCardFromHand(playerid,boardPos, cardPos)
+
+    globalTempVariable = boardPos;
+    game.playCard(game.getPlayerById(playerid).hand[cardPos], playerid);
+    let name = game.board.getBoardPosByOwnerId(playerid, boardPos)?.creature.name;
+    //let name = game.summonCardFromHand(playerid,boardPos, cardPos);
     if(name){
       setLog([...log, <div>{game.getPlayerById(playerid).username} summoned the "{name}" at zone {boardPos+1}</div>])
     }
@@ -755,10 +763,40 @@ function App() {
   
   let page = <></>;
   if (begin) {
-    let game = new Game();
-    getDemoPlayer(game.getPlayerById(0))
-    getDemoPlayer(game.getPlayerById(1))
-    page = <GameBoard game={game} setBegin={setBegin}></GameBoard>;
+    var swampLand: Landscape = new Landscape("Swamp", "Goopy!", LandscapeType.Swamp);
+
+  Game.startNewGame();
+  Game.getInstance().addEventListener(GetCardTargetEvent, (evt: Event)=>{
+    if(evt instanceof GetBoardPosTargetEvent){
+      var player: Player = Game.getInstance().getPlayerById(evt.executorId);
+      let tmp = Game.getInstance().board.getBoardPosByOwnerId(player.id, globalTempVariable);
+      if(tmp){
+        evt.execute(tmp);
+      } 
+    }
+    globalTempVariable = -1;
+  });
+
+  Game.getInstance().board.getSideByOwnerId(0)?.map((pos: BoardPos) => {pos.setLandscape(swampLand)});
+  Game.getInstance().board.getSideByOwnerId(1)?.map((pos: BoardPos) => {pos.setLandscape(swampLand)});
+
+  var deck1: Card[] = [get("Dark Angel"), get("Bog Bum"), get("Fly Swatter"), get("Dark Angel"), 
+  get("Bog Bum"), get("Fly Swatter"), get("Dark Angel"), get("Bog Bum"), 
+  get("Fly Swatter"), get("Dark Angel"), get("Bog Bum"), get("Fly Swatter")];
+
+  var deck2: Card[] = [get("Dark Angel"), get("Bog Bum"), get("Fly Swatter"), get("Dark Angel"), 
+  get("Bog Bum"), get("Fly Swatter"), get("Dark Angel"), get("Bog Bum"), 
+  get("Fly Swatter"), get("Dark Angel"), get("Bog Bum"), get("Fly Swatter")];
+
+  var player0Side: BoardPos[] | undefined = Game.getInstance().board.getSideByOwnerId(0);
+
+  Game.getInstance().getPlayerById(0).setDeck(deck1);
+  Game.getInstance().getPlayerById(1).setDeck(deck2);
+
+  Game.getInstance().getPlayerById(0).drawCard(6, false);
+  Game.getInstance().getPlayerById(1).drawCard(5, false);
+
+    page = <GameBoard game={Game.getInstance()} setBegin={setBegin}></GameBoard>;
   } else {
     page = <DeckSelectScreen handle={h}></DeckSelectScreen>;
   }
@@ -799,4 +837,8 @@ function dumbStupidFunction(r: number){
   else{
     return 0;
   }
+}
+
+function tism(){
+  
 }

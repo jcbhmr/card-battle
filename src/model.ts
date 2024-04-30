@@ -1,4 +1,3 @@
-//import { randomInt } from "crypto";
 import {
   Card,
   Creature,
@@ -501,9 +500,11 @@ export class Game extends AbstractGame {
   summonCard(playerId: number, position: number, card: Creature, player: Player){
     let pos = this.board.getBoardPosByOwnerId(playerId, position);
     if(pos?.creature.name === "Null"){
+      card.ownerId = playerId;
       pos.creature=card;
     } 
     else{//replacing monster with new card
+      card.ownerId = playerId;
       card.death();
       pos.creature=card;
     }
@@ -519,8 +520,8 @@ export class Game extends AbstractGame {
     let player = this.getPlayerById(playerId);
     let card = player.hand[handPosition];
     if(player.actions >= card.getCost()){
-      player.actions -= card.getCost();
-      player.hand.splice(handPosition, 1);
+      //player.actions -= card.getCost();
+      //player.hand.splice(handPosition, 1);
       this.summonCard(playerId, boardPosition, card, player);
       return card.name
     }
@@ -559,7 +560,7 @@ export class Game extends AbstractGame {
   }
 
   override playCard(card: Card, playerId: number): boolean {
-    if (this.turnPhase != TurnPhases.Play || 
+    if (this.turnPhase != TurnPhases.Play && 
       (Game.getInstance().getPlayerById(playerId) == null && Game.getInstance().getPlayerById(playerId).actions >= card.getCost())) {
         // console.log("Unable to play card " + card.name + "! Potential causes: this.turnPhase == TurnPhases.Play: " + (this.turnPhase == TurnPhases.Play) + 
         // ", Player from playerId == null: " + (Game.getInstance().getPlayerById(playerId) == null) + 
@@ -619,4 +620,7 @@ export class Game extends AbstractGame {
     }
     return false;
   }
+}
+function randomInt(min: number, max: number){
+  return Math.floor((max-min) * Math.random()) + min;
 }
