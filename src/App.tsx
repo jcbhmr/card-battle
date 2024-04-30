@@ -28,6 +28,7 @@ import { G, an } from "vitest/dist/reporters-MmQN-57K.js";
 function CardComponent({
   card,
   state,
+  position,
   setHover,
   currentPlayer,
   ownerPlayer,
@@ -37,6 +38,7 @@ function CardComponent({
   children?: ReactNode;
   state: React.Dispatch<React.SetStateAction<number>>,
   setHover: any,
+  position: number,
   currentPlayer: Player,
   ownerPlayer: Player,
   phase: number
@@ -49,7 +51,7 @@ function CardComponent({
         // if the current phase is the main phase
         if(phase==0){
           //why did i make this a number instead of a boolean? am i stupid or something?
-          state(0);
+          state(position);
         }
       }
       // mark pos of hand
@@ -138,6 +140,7 @@ function CardComponentOnBoard({
 function CreatureComponent({
     card,
     state,
+    position,
     setHover,
     currentPlayer,
     ownerPlayer,
@@ -148,6 +151,7 @@ function CreatureComponent({
   setHover: any,
   currentPlayer: Player,
   ownerPlayer: Player,
+  position: number,
   phase: number
 }) {
   let child = (
@@ -164,6 +168,7 @@ function CreatureComponent({
       currentPlayer={currentPlayer}
       phase={phase}
       setHover={setHover}
+      position={position}
     >
       {child}
     </CardComponent>
@@ -311,6 +316,7 @@ function HandOfCards({ playerHand, stateChange, currentPlayer, ownerPlayer, phas
           setHover: setHover,
           ownerPlayer: ownerPlayer,
           currentPlayer: currentPlayer,
+          position: i,
           phase: phase
           
         }),
@@ -323,6 +329,7 @@ function HandOfCards({ playerHand, stateChange, currentPlayer, ownerPlayer, phas
           card: currentCard,
           state: stateChange,
           setHover: setHover,
+          position: i,
           ownerPlayer: ownerPlayer,
           currentPlayer: currentPlayer,
           phase: phase
@@ -495,7 +502,7 @@ function GameBoard({ game, setBegin }: { game: Game, setBegin: any}) {
   //only in main phase can we summon
   if(phase==0){
     //Anyways, if we're summoning a card then these buttons need to render (for player 1 or two depending). otherwise they'll stay empty
-    if(summoningCard==0){
+    if(summoningCard>-1){
       if(currentPlayer.id==0){
         buttons1 = <SummoningButtons playerid={0} cardPos ={summoningCard} setSummonState={setSummoningCard} 
         game={game} board={board} log={log} setLog={setLog}></SummoningButtons>
@@ -530,7 +537,6 @@ function GameBoard({ game, setBegin }: { game: Game, setBegin: any}) {
       {dumbStupidVariable}
       <div>
         {/*buttons2 are summoning buttons */}
-        {buttons2}
         {/*Gonna need to comment much of this just so we're aware of what is happening in some of these.*/}
         {/*This div is a row that shows a players stats and then their hand of cards*/}
         <div className="flex flex-col justify-center items-center gap-4">
@@ -607,7 +613,12 @@ function SummoningButtons({cardPos, game, setSummonState,  playerid, log, setLog
   board: any, playerid: number, log: any, setLog: any}){
   function handle(boardPos: number, playerid: number){
     let name = game.summonCardFromHand(playerid,boardPos, cardPos)
-    setLog([...log, <div>{game.getPlayerById(playerid).username} summoned the "{name}" at zone {boardPos+1}</div>])
+    if(name){
+      setLog([...log, <div>{game.getPlayerById(playerid).username} summoned the "{name}" at zone {boardPos+1}</div>])
+    }
+    else{
+      setLog([...log, <div>{game.getPlayerById(playerid).username} attempted to summon a creature, but lacks the actions</div>])
+    }
     setSummonState(-1);
   }
   return(

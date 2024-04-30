@@ -522,8 +522,9 @@ export class Game extends AbstractGame {
       player.actions -= card.getCost();
       player.hand.splice(handPosition, 1);
       this.summonCard(playerId, boardPosition, card, player);
+      return card.name
     }
-    return card.name
+    return "";
   }
   /**
    * function that lets me (front-end) do combat. pretty much, the turn players monster attacks and then we do different things based on if they control a monster or
