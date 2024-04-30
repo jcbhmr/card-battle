@@ -557,7 +557,7 @@ function GameBoard({ game, setBegin }: { game: Game, setBegin: any}) {
           <div className="flex flex-col gap-10">
             <PlayerDisplay player={player2}></PlayerDisplay>
             <Deck player={player2} reset={reset} resetState={setReset} log={log} game={game} setLog={setLog}></Deck>
-            <DiscardPile size={5}></DiscardPile>
+            <DiscardPile size={player2.discardPile.length}></DiscardPile>
           </div>
           {/*The board between two columns*/}
           <Board setHover={setHoverCard} game={game} board={board}/>
@@ -565,7 +565,7 @@ function GameBoard({ game, setBegin }: { game: Game, setBegin: any}) {
           <div className="flex flex-row gap-4">
             {/*The first column shows the deck and discard pile (like the one you saw earlier*/}
             <div className="flex flex-col gap-10">
-              <DiscardPile size={5}></DiscardPile>
+              <DiscardPile size={player1.discardPile.length}></DiscardPile>
               <Deck player={player1} reset={reset} resetState={setReset} game={game} setLog={setLog} log={log}></Deck>
               <PlayerDisplay player={player1}></PlayerDisplay>
             </div>
@@ -636,7 +636,6 @@ function SummoningButtons({cardPos, game, setSummonState,  playerid, log, setLog
         handle(3, playerid);
        }}>Zone 4</button>
     </div>
-   
   )
 }
 /**
