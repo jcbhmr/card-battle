@@ -29,7 +29,7 @@ export default function MainMenuScreen({ onChoose }: { onChoose: (p1: string, p2
     }
 
     function handleChangeP1(event: FormEvent<HTMLDivElement>) {
-        setP1(event.)
+        setP1(event)
     }
 
     function handleChangeP2() {
