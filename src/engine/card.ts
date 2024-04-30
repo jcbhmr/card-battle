@@ -18,7 +18,7 @@ export class Card {
   turnPlayed: number;
   ownerId: number | null = null;
   currentOwnerId: number | null = null;
-  imageURL: string = "";
+  imagePath: string;
   private cost: number;
   private isReady: boolean;
   location: BoardPos | string = CardLocations.Deck;
@@ -29,6 +29,7 @@ export class Card {
     cardType: number,
     cost: number,
     landscapeType: string,
+    imageURL: string
   ) {
     this.name = name;
     this.flavorText = flavorText;
@@ -37,6 +38,7 @@ export class Card {
     this.landscapeType = landscapeType;
     this.turnPlayed = Game.getInstance().currentTurn;
     this.isReady = false;
+    this.imagePath = imageURL;
   }
 
   setImageUrl(URL: string): Card {
@@ -199,6 +201,7 @@ export class Card {
       this.cardType,
       this.cost,
       this.landscapeType,
+      this.imagePath
     );
   }
 
@@ -209,7 +212,7 @@ export class Card {
 
   //Null Card Constant
   static getNull(): Card {
-    return new Card("Null", "You shouldn't be seeing this!", 99, 0, LandscapeType.NULL);
+    return new Card("Null", "You shouldn't be seeing this!", 99, 0, LandscapeType.NULL, "");
   }
 }
 
@@ -225,8 +228,9 @@ export class Creature extends Card {
     landscapeType: string,
     attack: number,
     defense: number,
+    imagePath: string
   ) {
-    super(name, flavorText, CardType.Creature, cost, landscapeType);
+    super(name, flavorText, CardType.Creature, cost, landscapeType, imagePath);
     this.attack = attack;
     this.defense = defense;
     this.maxDefense = defense; // Used when healing a creature so it doesn't overheal, and cards that say things like "if a creature has exactly x damage."
@@ -276,6 +280,7 @@ export class Creature extends Card {
       this.landscapeType,
       this.attack,
       this.defense,
+      this.imagePath
     );
   }
 
@@ -293,6 +298,7 @@ export class Creature extends Card {
       LandscapeType.NULL,
       0,
       0,
+      ""
     );
   }
 }
@@ -300,7 +306,7 @@ export class Creature extends Card {
 // By having this class, the front end can render these like they're in your hand when the game starts so you can choose where your landscapes belong
 export class Landscape extends Card {
   constructor(name: string, flavorText: string, landscapeType: string) {
-    super(name, flavorText, CardType.Landscape, 0, landscapeType);
+    super(name, flavorText, CardType.Landscape, 0, landscapeType, "");
   }
 
   static addGetTargetEventListener(

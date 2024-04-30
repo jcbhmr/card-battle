@@ -455,7 +455,7 @@ function PlayerDisplay({player }: {player: Player }) {
   return (
     <div className={"player_display player_"+player.id}>
       <div className="flex flex-col">
-        <h1>{player.username}username</h1>
+        <h1>{player.username}</h1>
         HP: {player.hp}
         <br></br>
         Actions: {player.actions}
@@ -714,7 +714,7 @@ function GameLog({
         <br></br>
         Phase: {phaseName}
         <br></br>
-        Turn Player: <span className={"text_player_"+currentPlayer.id}>{currentPlayer.username}test</span>
+        Turn Player: <span className={"text_player_"+currentPlayer.id}>{currentPlayer.username}</span>
       </div>
     </>
   );
@@ -759,40 +759,8 @@ function App() {
   
   let page = <></>;
   if (begin) {
-    var swampLand: Landscape = new Landscape("Swamp", "Goopy!", LandscapeType.Swamp);
 
-  Game.startNewGame();
-  Game.getInstance().addEventListener(GetCardTargetEvent, (evt: Event)=>{
-    if(evt instanceof GetBoardPosTargetEvent){
-      var player: Player = Game.getInstance().getPlayerById(evt.executorId);
-      let tmp = Game.getInstance().board.getBoardPosByOwnerId(player.id, globalTempVariable);
-      if(tmp){
-        evt.execute(tmp);
-      } 
-    }
-    globalTempVariable = -1;
-  });
-
-  Game.getInstance().board.getSideByOwnerId(0)?.map((pos: BoardPos) => {pos.setLandscape(swampLand)});
-  Game.getInstance().board.getSideByOwnerId(1)?.map((pos: BoardPos) => {pos.setLandscape(swampLand)});
-
-  var deck1: Card[] = [get("Dark Angel"), get("Bog Bum"), get("Fly Swatter"), get("Dark Angel"), 
-  get("Bog Bum"), get("Fly Swatter"), get("Dark Angel"), get("Bog Bum"), 
-  get("Fly Swatter"), get("Dark Angel"), get("Bog Bum"), get("Fly Swatter")];
-
-  var deck2: Card[] = [get("Dark Angel"), get("Bog Bum"), get("Fly Swatter"), get("Dark Angel"), 
-  get("Bog Bum"), get("Fly Swatter"), get("Dark Angel"), get("Bog Bum"), 
-  get("Fly Swatter"), get("Dark Angel"), get("Bog Bum"), get("Fly Swatter")];
-
-  var player0Side: BoardPos[] | undefined = Game.getInstance().board.getSideByOwnerId(0);
-
-  Game.getInstance().getPlayerById(0).setDeck(deck1);
-  Game.getInstance().getPlayerById(1).setDeck(deck2);
-
-  Game.getInstance().getPlayerById(0).drawCard(6, false);
-  Game.getInstance().getPlayerById(1).drawCard(5, false);
-
-    page = <GameBoard game={Game.getInstance()} setBegin={setBegin}></GameBoard>;
+    page = <GameBoard game={gameInit()} setBegin={setBegin}></GameBoard>;
   } else {
     page = <DeckSelectScreen handle={h}></DeckSelectScreen>;
   }
@@ -835,6 +803,42 @@ function dumbStupidFunction(r: number){
   }
 }
 
-function tism(){
+function gameInit(){
+  var swampLand: Landscape = new Landscape("Swamp", "Goopy!", LandscapeType.Swamp);
+  Game.startNewGame();
+  let g = Game.getInstance();
+  g.addEventListener(GetCardTargetEvent, (evt: Event)=>{
+    if(evt instanceof GetBoardPosTargetEvent){
+      var player: Player = Game.getInstance().getPlayerById(evt.executorId);
+      let tmp = Game.getInstance().board.getBoardPosByOwnerId(player.id, globalTempVariable);
+      if(tmp){
+        evt.execute(tmp);
+      } 
+    }
+    globalTempVariable = -1;
+  });
+
+ g.board.getSideByOwnerId(0)?.map((pos: BoardPos) => {pos.setLandscape(swampLand)});
+  g.board.getSideByOwnerId(1)?.map((pos: BoardPos) => {pos.setLandscape(swampLand)});
+
+  var deck1: Card[] = [get("Dark Angel"), get("Bog Bum"), get("Fly Swatter"), get("Dark Angel"), 
+  get("Bog Bum"), get("Fly Swatter"), get("Dark Angel"), get("Bog Bum"), 
+  get("Fly Swatter"), get("Dark Angel"), get("Bog Bum"), get("Fly Swatter")];
+
+  var deck2: Card[] = [get("Dark Angel"), get("Bog Bum"), get("Fly Swatter"), get("Dark Angel"), 
+  get("Bog Bum"), get("Fly Swatter"), get("Dark Angel"), get("Bog Bum"), 
+  get("Fly Swatter"), get("Dark Angel"), get("Bog Bum"), get("Fly Swatter")];
+
+  var player0Side: BoardPos[] | undefined = Game.getInstance().board.getSideByOwnerId(0);
+
+  g.getPlayerById(0).setDeck(deck1);
+  g.getPlayerById(1).setDeck(deck2);
+
+  g.getPlayerById(0).drawCard(6, false);
+  g.getPlayerById(1).drawCard(5, false);
+
+  g.getPlayerById(0).username = "Player 1";
+  g.getPlayerById(1).username = "Player 2";
   
+  return Game.getInstance();
 }
