@@ -77,7 +77,7 @@ function CardComponent({
           alt={card.name}
           className="object-cover"
           height={135}
-          src={card.imageURL}
+          src={card.imagePath}
           style={{
             aspectRatio: "240/135",
             objectFit: "cover",
@@ -116,7 +116,7 @@ function CardComponentOnBoard({
           alt={card.name}
           className="object-cover"
           height={135}
-          src={card.imageURL}
+          src={card.imagePath}
           style={{
             aspectRatio: "240/135",
             objectFit: "cover",
@@ -228,16 +228,15 @@ function HoverCard({card}: {card: Creature}){
           alt={card.name}
           className="object-cover"
           height={135}
-          src={card.imageURL}
+          src={card.imagePath}
           style={{
-            aspectRatio: "240/135",
             objectFit: "cover",
           }}
           width={350}
         />
       </div>
       <div className="flex-1 p-4 grid gap-2">
-        <h2 className="text-lg font-bold tracking-tight">{card.name}</h2>
+        <h2 className="text-s font-bold tracking-tight">{card.name}</h2>
         <p className="text-sm line-clamp-3">{card.flavorText}</p>
         <div className="text-xs">
           <div>

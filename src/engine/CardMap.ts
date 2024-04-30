@@ -69,7 +69,7 @@ put(
     LandscapeType.Swamp,
     1,
     6,
-    "../assets/flyswatter.png"
+    "src/assets/flyswatter.png"
   ),
 );
 
