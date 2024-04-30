@@ -1,4 +1,4 @@
-import { Game, BoardPos, CardType, Player, LandscapeType } from "../model.ts";
+import { Game, BoardPos, CardType, Player, LandscapeType } from "./game.ts";
 import { DisplayCardEvent } from "./event.ts";
 
 export const GetCardTargetEvent: string = "getCardTarget";

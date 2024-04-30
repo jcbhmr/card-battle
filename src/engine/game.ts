@@ -4,7 +4,7 @@ import {
   Creature,
   Landscape,
   GetCardTargetEvent,
-} from "./engine/card.ts";
+} from "./card.ts";
 import {
   GetBoardPosTargetEvent,
   PlayCardEvent,
@@ -12,7 +12,7 @@ import {
   SwitchTurnPhaseEvent,
   DrawCardEvent,
   DiscardCardEvent,
-} from "./engine/event.ts";
+} from "./event.ts";
 
 //============================================================== Enums ==============================================================
 export const TurnPhases = {

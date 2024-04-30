@@ -1,11 +1,8 @@
 import { ReactNode, createContext, useContext, useState } from "react";
-import placeholderSVGURL from "./assets/placeholder.svg";
-import { Game, Player, SidedBoard, Targeter } from "./model";
+import { Game, Player, SidedBoard, Targeter } from "./engine/game.ts";
 //import { Creature, Building, Card } from "./engine/card";
 import { Creature, Card } from "./engine/card";
-import { Ability } from "./engine/ability";
 import { get } from "./engine/CardMap";
-import { G, an } from "vitest/dist/reporters-MmQN-57K.js";
 
 /**
  * v0 by Vercel.
@@ -500,19 +497,7 @@ function PlayerDisplay({ player }: { player: Player }) {
     </div>
   );
 }
-function getDemoPlayer(player: Player) {
-  player.deck.push(get("Dark Angel")!);
-  player.deck.push(get("Swamp Dragon")!);
-  player.deck.push(get("Dark Angel")!);
-  player.deck.push(get("Swamp Dragon")!);
-  player.deck.push(get("Dark Angel")!);
 
-  player.hand.push(get("Dark Angel")!);
-  player.hand.push(get("Swamp Dragon")!);
-  player.hand.push(get("Dark Angel")!);
-  player.hand.push(get("Swamp Dragon")!);
-  player.hand.push(get("Dark Angel")!);
-}
 /**
  * @author Tanner Brown
  * This is like the big daddy of the components. This makes up pretty much the entire game. Shows players board, hp, hands, etc etc.
@@ -934,22 +919,19 @@ function PhaseButton({
     </button>
   );
 }
-function App() {
-  const [begin, setBegin] = useState(false);
-  let h = function () {
-    setBegin(true);
-  };
 
-  let page = <></>;
-  if (begin) {
-    let game = new Game();
-    getDemoPlayer(game.getPlayerById(0));
-    getDemoPlayer(game.getPlayerById(1));
-    page = <GameBoard game={game} setBegin={setBegin}></GameBoard>;
-  } else {
-    page = <DeckSelectScreen handle={h}></DeckSelectScreen>;
-  }
-  return <>{page}</>;
+import { useMachine } from "@xstate/react"
+import { machine } from "./machine.ts";
+import MainMenuScreen from "./MainMenuScreen.tsx";
+import PlayGameScreen from "./PlayGameScreen.tsx"
+
+function App() {
+  const [state, send] = useMachine(machine)
+
+  return (<>
+    {state.matches("SelectDecks") && <MainMenuScreen state={state} send={send} />}
+    {state.matches("Play") && <PlayGameScreen state={state} send={send} />}
+  </>)
 }
 
 export default App;

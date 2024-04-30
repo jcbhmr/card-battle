@@ -1,1 +1,1 @@
-import { Game } from "./model";
+import { Game } from "./engine/game";

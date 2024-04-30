@@ -1,4 +1,4 @@
-import { LandscapeType } from "../model.ts";
+import { LandscapeType } from "./game.ts";
 import { Card, Creature } from "./card.ts";
 
 var cardMap: Map<string, Card> = new Map<string, Card>();

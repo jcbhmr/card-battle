@@ -6,19 +6,19 @@ import {
   BoardPos,
   CardType,
   Player,
-} from "./model.ts";
+} from "./game.ts";
 import {
   Card,
   Creature,
   Landscape,
   GetCardTargetEvent,
-} from "./engine/card.ts";
-import { get as getCardFromCardMap } from "./engine/CardMap.ts";
+} from "./card.ts";
+import { get as getCardFromCardMap } from "./CardMap.ts";
 import {
   GetBoardPosTargetEvent,
   PlayCardEventName,
   PlayCardEvent,
-} from "./engine/event.ts";
+} from "./event.ts";
 
 test("new game works", () => {
   assert(Game.getInstance() instanceof AbstractGame);

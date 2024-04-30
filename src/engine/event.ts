@@ -1,5 +1,5 @@
 import { Card } from "./card.ts";
-import { Targeter, BoardPos, Player } from "../model.ts";
+import { Targeter, BoardPos, Player } from "./game.ts";
 
 //Event name constants
 export const PlayCardEventName: string = "playCard";
