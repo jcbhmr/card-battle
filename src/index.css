@@ -81,7 +81,7 @@
 }
 
 .card_shape {
-  overflow: auto;
+  overflow: hidden;
   flex-direction: column;
   border-radius: 0.5rem;
   border-width: 3px;
@@ -89,7 +89,15 @@
   width: 100px;
   height: 150px;
 }
-
+.card_shape_not_ready {
+  overflow: hidden;
+  flex-direction: column;
+  border-radius: 0.5rem;
+  border-width: 3px;
+  border-color: black;
+  width: 150px;
+  height: 100px;
+}
 .hover_card_shape {
   overflow: auto;
   flex-direction: column;

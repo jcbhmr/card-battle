@@ -104,9 +104,13 @@ function CardComponentOnBoard({
   children?: ReactNode;
   setHover: any
 }) {
+  let className = "card_shape_not_ready overflow-hidden";
+  if(card.getIsReady()){
+    className = "card_shape overflow-hidden";
+  }
   return (
     <button>
-    <div className="card_shape overflow-auto" onMouseOver={()=> {
+    <div className={className} onMouseOver={()=> {
       setHover(card);
     }}>
       <div className="flex aspect-16/9">
