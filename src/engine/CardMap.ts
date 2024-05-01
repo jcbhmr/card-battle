@@ -1,7 +1,7 @@
 import {
   LandscapeType
 } from "../model.ts";
-import { Card, Creature } from "./card.ts";
+import { Card, Creature, Landscape } from "./card.ts";
 
 var cardMap: Map<string, Card> = new Map<string, Card>();
 
@@ -27,10 +27,22 @@ export function get(name: string): Card {
   }
 }
 
+class Deck {
+  name: string;
+  landscapes: Landscape[];
+  cards: Card[];
+
+  constructor(name: string, lands: Landscape[], cards: Card[]) {
+    this.name = name;
+    this.landscapes = lands;
+    this.cards = cards;
+  }
+}
+
 //WRITE CARDS BELOW
 
 //=====================================================================================================================================================
-//                                                                  CREATURES
+//                                                                  SWAMP
 //=====================================================================================================================================================
 
 //Swamp Creatures
@@ -74,12 +86,12 @@ put(
 );
 
 put(
-  "Unicylops",
-  new Creature("Unicylops", "", 2, LandscapeType.Swamp, 7, 3,""),
+  "Unicyclops",
+  new Creature("Unicyclops", "", 2, LandscapeType.Swamp, 7, 3,""),
 );
 put(
-  "Man Witch",
-  new Creature("Man Witch", "", 2, LandscapeType.Swamp, 4, 4,""),
+  "Man-Witch",
+  new Creature("Man-Witch", "", 2, LandscapeType.Swamp, 4, 4,""),
 );
 
 
@@ -163,9 +175,11 @@ put(
   "Green Merman",new Creature("Green Merman","",1,LandscapeType.Swamp,0,10,"")
 );
 
+put("Bog Frog Bomb", new Creature("Bog Frog Bomb", "", 2, LandscapeType.Swamp, 16, 18, ""));
 
-
-//CandyLand Creatures
+//=====================================================================================================================================================
+//                                                              CANDYLANDS
+//=====================================================================================================================================================
 
 put(
   "Furious Hen",
@@ -200,13 +214,17 @@ put(
   ),
 );
 
+put("Dr. Stuffenstein", new Creature("Dr. Stuffenstein", "", 0, LandscapeType.Candylands, 0, 1, ""));
+
+put("Furious Chick", new Creature("Furious Chick", "", 1, LandscapeType.Candylands, 7, 8, ""));
+
 //=====================================================================================================================================================
-//                                                                SANDYLANDS
+//                                                             SANDYLANDS
 //=====================================================================================================================================================
 
 put(
-  "Beach Mum",
-  new Creature("Beach Mum", "", 2, LandscapeType.Desert, 9, 11,"")
+  "Beach Mummy",
+  new Creature("Beach Mummy", "", 2, LandscapeType.Desert, 9, 11,"")
 );
 
 put(
@@ -240,8 +258,8 @@ put(
 );
 
 put(
-  "Green Cactaball",
-  new Creature("Greem Cactaball", "", 1, LandscapeType.Desert, 4, 3,"")
+  "Green Cactiball",
+  new Creature("Green Cactiball", "", 1, LandscapeType.Desert, 4, 3,"")
 );
 
 put(
@@ -325,13 +343,13 @@ put(
 );
 
 put(
-  "Snadsnake",
+  "Sandsnake",
   new Creature("Sandsnake", "", 2, LandscapeType.Desert, 12, 7,"")
 );
 
 put(
-  "Sandwitch",
-  new Creature("Sandwitch", "", 4, LandscapeType.Desert, 25, 10,"")
+  "SandWitch",
+  new Creature("SandWitch", "", 4, LandscapeType.Desert, 25, 10,"")
 );
 
 put(
@@ -349,14 +367,75 @@ put(
   new Creature("Wall of Sand", "", 3, LandscapeType.Desert, 0, 26,"")
 )
 
+put("The Mariachi", new Creature("The Mariachi", "", 2, LandscapeType.Desert, 5, 20, ""));
+
+put("Sandhorn Devil", new Creature("Sandhorn Devil", "", 1, LandscapeType.Desert, 18, 21, ""));
+
+put("Peach Djinni", new Creature("Peach Djinni", "", 1, LandscapeType.Desert, 2, 8, ""));
+
 //=====================================================================================================================================================
 //                                                                BUILDINGS
 //=====================================================================================================================================================
 
 //=====================================================================================================================================================
-//                                                                  SPELLS
-//=====================================================================================================================================================
-
-//=====================================================================================================================================================
 //                                                                LANDSCAPES
 //=====================================================================================================================================================
+var Cornfield: Landscape = new Landscape("Cornfields", "Corny Joke Here!", LandscapeType.Cornfields);
+var Hills: Landscape = new Landscape("Hills", "", LandscapeType.Hills);
+var Swampland: Landscape = new Landscape("Swamplands", "Goopy!", LandscapeType.Swamp);
+var Candyland: Landscape = new Landscape("Candylands", "Sweet!", LandscapeType.Candylands);
+var Icyland: Landscape = new Landscape("Icylands", "Cold!", LandscapeType.Icelands);
+var Sandyland: Landscape = new Landscape("Sandylands", "", LandscapeType.Desert);
+
+//=====================================================================================================================================================
+//                                                                   DECKS
+//=====================================================================================================================================================
+var CornfieldDeck = new Deck("Cornfield Deck", [Cornfield, Cornfield, Cornfield, Cornfield], [get("Husker Worm"), get("Cornataur"), get("Legion of Earlings"), 
+get("Field Stalker"), get("Patchy the Pumpkin"), get("Corn Ronin"), get("Wall of Ears"), get("Travelin' Farmer"), get("Husker Knight"), get("Archer Dan"), get("Corn Dog"), 
+get("Corn Lord"), get("Field Reaper"), get("Phyllis"), get("Evil Eye"), get("Big Foot"), get("Husker Worm"), get("Corntaur"), get("Legion of Earlings"), 
+get("Field Stalker")]);
+
+var HillsDeck = new Deck("Hills Deck", [Hills, Hills, Hills, Hills], [get("Punk Cat"), get("Cool Dog"), get("Embarrassing Bard"), get("Ancient Scholar"), get("Dragon Claw"), 
+get("Woadic Chief"), get("Struzann Jinn"), get("Psionic Architect"), get("X-Large Spirit Soldier"), get("Heavenly Gazer"), get("Uni-Knight"), 
+get("Woadic Marauder"), get("The Pig"), get("Punk Cat"), get("Cool Dog"), get("Ancient Scholar"), get("Dragon Claw"), get("Struzann Jinn"), 
+get("Psionic Architect"), get("X-Large Spirit Soldier")]);
+
+var SwamplandsDeck = new Deck("Swmaplands Deck", [Swampland, Swampland, Candyland, Candyland], [get("Bog Ban-She Angel"), get("Ban-She Princess"), get("Fly Swatter"), 
+get("Bog Bum"), get("Unicyclops"), get("Man-Witch"), get("Ban-She Queen"), get("Bog Frog Bomb"), get("Furious Rooster"), get("Music Mallard"), get("Cottonpult"), 
+get("Dr. Stuffenstein"), get("Furious Hen"), get("Papercut Tiger"), get("Furious Chick"), get("Ban-She Princess"), get("Fly Swatter"), get("Bog Bum"), 
+get("Unicyclops"), get("Man-Witch")]);
+
+var IcelandsDeck = new Deck("Icylands Deck", [Icyland, Icyland, Icyland, Icyland], [get("Cold Soldier"), get("Abdominal Snowman"), get("Icemeister"), get("Sprucy Lucy"), 
+get("Reign Deer"), get("Frost Dragon"), get("Slay Rider"), get("Frozen Fish"), get("Snow Angel"), get("Emperor Penguin"), get("Snow Bunny"), get("Snow Dog"), 
+get("Boarder Collie"), get("Cold Soldier"), get("Adbominal Snowman"), get("Icemeister"), get("Reign Deer"), get("Frost Dragon"), get("Slay Rider"), 
+get("Frozen Fish")])
+
+var SandylandsDeck = new Deck("Sandyland Deck", [Sandyland, Sandyland, Sandyland, Sandyland], [get("Sandsnake"), get("Beach Mummy"), get("The Mariachi"), get("SandWitch"), 
+get("Sand Eyebat"), get("Green Cactiball"), get("Sandhorn Devil"), get("Wall of Sand"), get("Lost Golem"), get("Sand Knight"), get("Fummy"), get("Sand Angel"), 
+get("Peach Djinni"), get("Ms. Mummy"), get("Sandsnake"), get("Beach Mummy"), get("The Mariachi"), get("SandWitch"), get("Sand Eyebat"), get("Green Cactiball")]);
+
+//[get(""), get(""), get(""), get(""), get(""), get(""), get(""), get(""), get(""), get(""), get(""), 
+//get(""), get(""), get(""), get(""), get(""), get(""), get(""), get(""), get("")]
+
+export function seeNonNullDecks() {
+  var decks = [CornfieldDeck, HillsDeck, SwamplandsDeck, IcelandsDeck, SandylandsDeck];
+  runner: for(var i = 0; i < decks.length; i++) {
+    console.log("=====================================================================================");
+    console.log("                         CHECKING " + decks[i].name);
+    console.log("=====================================================================================")
+    for(var j = 0; j < decks[i].cards.length; j++) {
+      console.log("Checking Card " + decks[i].cards[j].name);
+      if(decks[i].cards[j].equals(Creature.getNull())) {
+        decks.splice(i, 1);
+        i--;
+        continue runner;
+      }
+    }
+  }
+
+  console.log();
+  console.log("=====================================NON-NULL DECKS=====================================");
+  for(var i = 0; i < decks.length; i++) {
+    console.log(decks[i].name + " is Non-Null");
+  }
+}

@@ -27,6 +27,8 @@ export const LandscapeType = {
   Desert: "#b3b179",
   Hills: "#468546",
   Candylands: "#d192cc",
+  Cornfields: "#e8b348",
+  Icelands: "#69a4cf"
 };
 
 export const CardType = {

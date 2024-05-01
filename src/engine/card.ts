@@ -206,7 +206,7 @@ export class Card {
   }
 
   equals(other: Card): boolean {
-    return this.name == other.name && this.flavorText == other.flavorText && this.cardType == other.cardType && this.cost == other.cost 
+    return this.name == other.name && this.flavorText == other.flavorText && this.cost == other.cost 
     && this.landscapeType == other.landscapeType;
   }
 
