@@ -1,5 +1,4 @@
 import { ReactNode, createContext, useContext, useState } from "react";
-import placeholderSVGURL from "./assets/placeholder.svg";
 import {
   Game,
   Player,
@@ -10,9 +9,8 @@ import {
 } from "./model";
 //import { Creature, Building, Card } from "./engine/card";
 import { Creature, Card, Landscape } from "./engine/card";
-import { Ability } from "./engine/ability";
-import { get } from "./engine/CardMap";
-import { G, an } from "vitest/dist/reporters-MmQN-57K.js";
+import { get, exportDecks } from "./engine/CardMap";
+
 import { GetCardTargetEvent } from "./engine/card";
 import { GetBoardPosTargetEvent } from "./engine/event";
 
@@ -462,19 +460,7 @@ function PlayerDisplay({player }: {player: Player }) {
     </div>
   );
 }
-function getDemoPlayer(player: Player) {
-  player.deck.push(get("Dark Angel")!);
-  player.deck.push(get("Swamp Dragon")!);
-  player.deck.push(get("Dark Angel")!);
-  player.deck.push(get("Swamp Dragon")!);
-  player.deck.push(get("Dark Angel")!);
 
-  player.hand.push(get("Dark Angel")!);
-  player.hand.push(get("Swamp Dragon")!);
-  player.hand.push(get("Dark Angel")!);
-  player.hand.push(get("Swamp Dragon")!);
-  player.hand.push(get("Dark Angel")!);
-}
 /**
  * @author Tanner Brown
  * This is like the big daddy of the components. This makes up pretty much the entire game. Shows players board, hp, hands, etc etc.
@@ -752,42 +738,49 @@ function PhaseButton({
 }
 function App() {
   const [begin, setBegin] = useState(false);
+  const [deck1, setDeck1] = useState(exportDecks[0].deck());
+  const [deck2, setDeck2] = useState(exportDecks[0].deck());
   let h = function () {
     setBegin(true);
   };
   
   let page = <></>;
   if (begin) {
-
-    page = <GameBoard game={gameInit()} setBegin={setBegin}></GameBoard>;
+    page = <GameBoard game={gameInit(deck1.cards, deck2.cards)} setBegin={setBegin}></GameBoard>;
   } else {
-    page = <DeckSelectScreen handle={h}></DeckSelectScreen>;
+    page = <DeckSelectScreen setDeck1={setDeck1} setDeck2={setDeck2} handle={h}></DeckSelectScreen>;
   }
   return <>{page}</>;
 }
 
 export default App;
 
-function ListOfDecks() {
+function ListOfDecks({setDeck}: {setDeck: any}) {
+  let options = [];
+  for(let i =0; i<exportDecks.length;i++){
+    options.push(<option value={i}>{exportDecks[i].name}</option>)
+  }
+  function handle(event: any){
+    setDeck(exportDecks[event.target.value].deck())
+  }
   return (
     <div>
       <label>Choose a deck:</label>
-      <select>
-        <option>Deck 1</option>
-        <option>Deck 2</option>
+      <select onChange={handle}>
+        {options}
       </select>
     </div>
   );
 }
 
-function DeckSelectScreen({ handle }: { handle: any }) {
+function DeckSelectScreen({ handle, setDeck1, setDeck2 }: { handle: any, setDeck1: any, setDeck2: any }) {
   return (
     <div className="flex flex-col">
       <h1 className="text-2xl flex flex-row justify-center">CARD BATTLES</h1>
       <div className="flex flex-row justify-center gap-10">
-        <ListOfDecks></ListOfDecks>
+        <ListOfDecks setDeck={setDeck1}></ListOfDecks>
         <button onClick={handle}>Begin</button>
-        <ListOfDecks></ListOfDecks>
+        <ListOfDecks setDeck={setDeck2}></ListOfDecks>
       </div>
     </div>
   );
@@ -802,7 +795,7 @@ function dumbStupidFunction(r: number){
   }
 }
 
-function gameInit(){
+function gameInit(deck1: Card[], deck2: Card[]){
   var swampLand: Landscape = new Landscape("Swamp", "Goopy!", LandscapeType.Swamp);
   Game.startNewGame();
   let g = Game.getInstance();
@@ -820,20 +813,12 @@ function gameInit(){
  g.board.getSideByOwnerId(0)?.map((pos: BoardPos) => {pos.setLandscape(swampLand)});
   g.board.getSideByOwnerId(1)?.map((pos: BoardPos) => {pos.setLandscape(swampLand)});
 
-  var deck1: Card[] = [get("Dark Angel"), get("Bog Bum"), get("Fly Swatter"), get("Dark Angel"), 
-  get("Bog Bum"), get("Fly Swatter"), get("Dark Angel"), get("Bog Bum"), 
-  get("Fly Swatter"), get("Dark Angel"), get("Bog Bum"), get("Fly Swatter")];
-
-  var deck2: Card[] = [get("Dark Angel"), get("Bog Bum"), get("Fly Swatter"), get("Dark Angel"), 
-  get("Bog Bum"), get("Fly Swatter"), get("Dark Angel"), get("Bog Bum"), 
-  get("Fly Swatter"), get("Dark Angel"), get("Bog Bum"), get("Fly Swatter")];
-
   var player0Side: BoardPos[] | undefined = Game.getInstance().board.getSideByOwnerId(0);
 
   g.getPlayerById(0).setDeck(deck1);
   g.getPlayerById(1).setDeck(deck2);
 
-  g.getPlayerById(0).drawCard(6, false);
+  g.getPlayerById(0).drawCard(5, false);
   g.getPlayerById(1).drawCard(5, false);
 
   g.getPlayerById(0).username = "Player 1";

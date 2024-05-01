@@ -439,3 +439,43 @@ export function seeNonNullDecks() {
     console.log(decks[i].name + " is Non-Null");
   }
 }
+
+
+
+
+
+export var exportDecks = [{name: "Cornfield deck", deck: getCornfieldDeck}, {name: "Hills deck", deck: getHillsDeck}, 
+{name: "SwamplandsDeck", deck: getSwamplandsDeck}, {name: "IcelandsDeck", deck: getIcelandsDeck}, {name: "SandylandsDeck", deck: getSandylandsDeck}];
+function getSandylandsDeck(){
+  return new Deck("Sandyland Deck", [Sandyland, Sandyland, Sandyland, Sandyland], [get("Sandsnake"), get("Beach Mummy"), get("The Mariachi"), get("SandWitch"), 
+  get("Sand Eyebat"), get("Green Cactiball"), get("Sandhorn Devil"), get("Wall of Sand"), get("Lost Golem"), get("Sand Knight"), get("Fummy"), get("Sand Angel"), 
+  get("Peach Djinni"), get("Ms. Mummy"), get("Sandsnake"), get("Beach Mummy"), get("The Mariachi"), get("SandWitch"), get("Sand Eyebat"), get("Green Cactiball")]);
+}
+
+function getIcelandsDeck(){
+  return new Deck("Icylands Deck", [Icyland, Icyland, Icyland, Icyland], [get("Cold Soldier"), get("Abdominal Snowman"), get("Icemeister"), get("Sprucy Lucy"), 
+  get("Reign Deer"), get("Frost Dragon"), get("Slay Rider"), get("Frozen Fish"), get("Snow Angel"), get("Emperor Penguin"), get("Snow Bunny"), get("Snow Dog"), 
+  get("Boarder Collie"), get("Cold Soldier"), get("Adbominal Snowman"), get("Icemeister"), get("Reign Deer"), get("Frost Dragon"), get("Slay Rider"), 
+  get("Frozen Fish")])
+}
+
+function getSwamplandsDeck(){
+  return new Deck("Swmaplands Deck", [Swampland, Swampland, Candyland, Candyland], [get("Bog Ban-She Angel"), get("Ban-She Princess"), get("Fly Swatter"), 
+  get("Bog Bum"), get("Unicyclops"), get("Man-Witch"), get("Ban-She Queen"), get("Bog Frog Bomb"), get("Furious Rooster"), get("Music Mallard"), get("Cottonpult"), 
+  get("Dr. Stuffenstein"), get("Furious Hen"), get("Papercut Tiger"), get("Furious Chick"), get("Ban-She Princess"), get("Fly Swatter"), get("Bog Bum"), 
+  get("Unicyclops"), get("Man-Witch")]);
+}
+
+function getHillsDeck(){
+  return new Deck("Hills Deck", [Hills, Hills, Hills, Hills], [get("Punk Cat"), get("Cool Dog"), get("Embarrassing Bard"), get("Ancient Scholar"), get("Dragon Claw"), 
+  get("Woadic Chief"), get("Struzann Jinn"), get("Psionic Architect"), get("X-Large Spirit Soldier"), get("Heavenly Gazer"), get("Uni-Knight"), 
+  get("Woadic Marauder"), get("The Pig"), get("Punk Cat"), get("Cool Dog"), get("Ancient Scholar"), get("Dragon Claw"), get("Struzann Jinn"), 
+  get("Psionic Architect"), get("X-Large Spirit Soldier")]);
+}
+
+function getCornfieldDeck(){
+  return new Deck("Cornfield Deck", [Cornfield, Cornfield, Cornfield, Cornfield], [get("Husker Worm"), get("Cornataur"), get("Legion of Earlings"), 
+  get("Field Stalker"), get("Patchy the Pumpkin"), get("Corn Ronin"), get("Wall of Ears"), get("Travelin' Farmer"), get("Husker Knight"), get("Archer Dan"), get("Corn Dog"), 
+  get("Corn Lord"), get("Field Reaper"), get("Phyllis"), get("Evil Eye"), get("Big Foot"), get("Husker Worm"), get("Corntaur"), get("Legion of Earlings"), 
+  get("Field Stalker")]);
+}
