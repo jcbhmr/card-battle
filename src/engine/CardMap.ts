@@ -1,3 +1,4 @@
+import { createVerify } from "crypto";
 import {
   LandscapeType
 } from "../model.ts";
@@ -372,6 +373,150 @@ put("The Mariachi", new Creature("The Mariachi", "", 2, LandscapeType.Desert, 5,
 put("Sandhorn Devil", new Creature("Sandhorn Devil", "", 1, LandscapeType.Desert, 18, 21, ""));
 
 put("Peach Djinni", new Creature("Peach Djinni", "", 1, LandscapeType.Desert, 2, 8, ""));
+
+//=====================================================================================================================================================
+//                                                                CORNFIELDS
+//=====================================================================================================================================================
+
+put(
+  "Archer Dan",
+  new Creature("Archer Dan", "", 2, LandscapeType.Cornfields, 12, 6, "")
+);
+
+put(
+  "Captain Taco",
+  new Creature("Captain Taco", "", 5, LandscapeType.Cornfields, 15, 30, "")
+);
+
+put(
+  "Weak ChupaMaiz",
+  new Creature("Weak ChupaMaiz", "", 3, LandscapeType.Cornfields, 4, 10, "")
+);
+
+put(
+  "Corn Dog",
+  new Creature("Corn Dog", "", 2, LandscapeType.Cornfields, 9, 11, "")
+);
+
+put(
+  "Corn Lord",
+  new Creature("Corn Lord", "", 5, LandscapeType.Cornfields, 10, 38, "")
+);
+
+put(
+  "Corn Ronin",
+  new Creature("Corn Ronin", "", 3, LandscapeType.Cornfields, 18, 10, "")
+);
+
+put(
+  "Cornataur",
+  new Creature("cornataur", "", 4, LandscapeType.Cornfields, 17, 19, "")
+);
+
+put(
+  "Cornball",
+  new Creature("Cornball", "", 1, LandscapeType.Cornfields, 2, 5, "")
+);
+
+put(
+  "Ethan Allfire",
+  new Creature("Ethan Allfire", "", 1, LandscapeType.Cornfields, 5, 1, "")
+);
+
+put(
+  "Field Reaper",
+  new Creature("Field Reaper", "", 4, LandscapeType.Cornfields, 25, 13, "")
+);
+
+put(
+  "Field Stalker",
+  new Creature("Field Stalker", "", 4, LandscapeType.Cornfields, 5, 34, "")
+);
+
+put(
+  "Ghost Sludger",
+  new Creature("Ghost Sludger", "", 4, LandscapeType.Cornfields, 1, 37, "")
+);
+
+put(
+  "Husker Giant",
+  new Creature("Husker Giant", "", 5, LandscapeType.Cornfields, 15, 30, "")
+);
+
+put(
+  "Husker Knight",
+  new Creature("Husker Knight", "", 1, LandscapeType.Cornfields, 6, 3, "")
+);
+
+put(
+  "Husker Worm",
+  new Creature("Husker Worm", "", 1, LandscapeType.Cornfields, 3, 5, "")
+);
+
+put(
+  "Huskerbat",
+  new Creature("Huskerbat", "", 3, LandscapeType.Cornfields, 4, 22, "")
+);
+
+put(
+  "Legion of Earlings",
+  new Creature("Legion of Earlings", "", 5, LandscapeType.Cornfields, 23, 23, "")
+);
+
+put(
+  "Log Knight",
+  new Creature("Log Knight", "", 0, LandscapeType.Cornfields, 10, 20, "")
+);
+
+put(
+  "Mary-Ann",
+  new Creature("Mary-Ann", "", 4, LandscapeType.Cornfields, 10, 27, "")
+);
+
+put(
+  "Patchy the Pumpkin",
+  new Creature("Patchy the Pumpkin", "", 3, LandscapeType.Cornfields, 22, 5, "")
+);
+
+put(
+  "Purple Cow",
+  new Creature("Purple Cow", "", 3, LandscapeType.Cornfields, 5, 20, "")
+);
+
+put(
+  "Rural Earl",
+  new Creature("Rural Earl", "", 2, LandscapeType.Cornfields, 13, 8, "")
+);
+
+put(
+  "Sun King",
+  new Creature("Sun King", "", 0, LandscapeType.Cornfields, 5, 25, "")
+);
+
+put(
+  "The Sludger",
+  new Creature("The Sludger", "", 3, LandscapeType.Cornfields, 15, 15, "")
+);
+
+put(
+  "Travelin' Farmer",
+  new Creature("Travelin' Farmer", "", 1, LandscapeType.Cornfields, 5, 5, "")
+);
+
+put(
+  "Ugly Tree",
+  new Creature("Ugly Tree", "", 5, LandscapeType.Cornfields, 15, 33, "")
+);
+
+put(
+  "Wall of Ears",
+  new Creature("Wall of Ears", "", 2, LandscapeType.Cornfields, 0, 18, "")
+);
+
+put(
+  "Yellow Gnome",
+  new Creature("Yellow Gnome", "", 0, LandscapeType.Cornfields, 0, 30, "")
+)
 
 //=====================================================================================================================================================
 //                                                                BUILDINGS
