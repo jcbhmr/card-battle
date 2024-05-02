@@ -516,7 +516,170 @@ put(
 put(
   "Yellow Gnome",
   new Creature("Yellow Gnome", "", 0, LandscapeType.Cornfields, 0, 30, "")
-)
+);
+
+put(
+  "Phyllis",
+  new Creature("Phyllis", "", 4, LandscapeType.Cornfields, 5, 15, "")
+);
+
+put(
+  "Evil Eye",
+  new Creature("Evil Eye", "", 2, LandscapeType.Cornfields, 5, 5, "")
+);
+
+put(
+  "Big Foot",
+  new Creature("Big Foot", "", 3, LandscapeType.Cornfields, 7, 8, "")
+);
+
+//=====================================================================================================================================================
+//                                                                Hills
+//=====================================================================================================================================================
+
+put(
+  "Punk Cat",
+  new Creature("Punk Cat", "", 3, LandscapeType.Hills, 8, 22, "")
+);
+
+put(
+  "Cool Dog",
+  new Creature("Cool Dog", "", 1, LandscapeType.Hills, 3, 7, "")
+);
+
+put(
+  "Embarrassing Bard",
+  new Creature("Embarrassing Bard", "", 5, LandscapeType.Hills, 10, 34, "")
+);
+
+put(
+  "Ancient Scholar",
+  new Creature("Ancient Scholar", "", 2, LandscapeType.Hills, 3, 13, "")
+);
+
+put(
+  "Dragon Claw",
+  new Creature("Dragon Claw", "", 2, LandscapeType.Hills, 5, 15, "")
+);
+
+put(
+  "Woadic Chief",
+  new Creature("Woadic Chief", "", 5, LandscapeType.Hills, 18, 30, "")
+);
+
+put(
+  "Struzann Jinn",
+  new Creature("Struzann Jinn", "", 4, LandscapeType.Hills, 15, 25, "")
+);
+
+put(
+  "Psionic Architect",
+  new Creature("Psionic Architect", "", 3, LandscapeType.Hills, 17, 8, "")
+);
+
+put(
+  "X-Large Spirit Soldier",
+  new Creature("X-Large Spirit Soldier", "", 5, LandscapeType.Hills, 5, 40, "")
+);
+
+put(
+  "Heavenly Gazer",
+  new Creature("Heavenly Gazer", "", 1, LandscapeType.Hills, 1, 6, "")
+);
+
+put(
+  "Woadic Marauder",
+  new Creature("Woadic Marauder", "", 4, LandscapeType.Hills, 22, 12, "")
+);
+
+put(
+  "The Pig",
+  new Creature("The Pig", "", 1, LandscapeType.Hills, 1, 4, "")
+);
+
+put(
+  "Uni-Knight",
+  new Creature("Unicycle Knight", "", 5, LandscapeType.Hills, 12, 13, "")
+);
+
+//=====================================================================================================================================================
+//                                                                Icelands
+//=====================================================================================================================================================
+
+put(
+  "Uni",
+  new Creature("Unicycle", "", 5, LandscapeType.Hills, 12, 13, "")
+);
+
+put(
+  "Uni",
+  new Creature("Unicycle", "", 5, LandscapeType.Hills, 12, 13, "")
+);
+
+put(
+  "Uni",
+  new Creature("Unicycle", "", 5, LandscapeType.Hills, 12, 13, "")
+);
+
+put(
+  "Uni",
+  new Creature("Unicycle", "", 5, LandscapeType.Hills, 12, 13, "")
+);
+
+put(
+  "Uni",
+  new Creature("Unicycle", "", 5, LandscapeType.Hills, 12, 13, "")
+);
+
+put(
+  "Uni",
+  new Creature("Unicycle", "", 5, LandscapeType.Hills, 12, 13, "")
+);
+
+put(
+  "Uni",
+  new Creature("Unicycle", "", 5, LandscapeType.Hills, 12, 13, "")
+);
+
+put(
+  "Uni",
+  new Creature("Unicycle", "", 5, LandscapeType.Hills, 12, 13, "")
+);
+
+put(
+  "Uni",
+  new Creature("Unicycle", "", 5, LandscapeType.Hills, 12, 13, "")
+);
+
+put(
+  "Uni",
+  new Creature("Unicycle", "", 5, LandscapeType.Hills, 12, 13, "")
+);
+
+put(
+  "Uni",
+  new Creature("Unicycle", "", 5, LandscapeType.Hills, 12, 13, "")
+);
+
+put(
+  "Uni",
+  new Creature("Unicycle", "", 5, LandscapeType.Hills, 12, 13, "")
+);
+
+put(
+  "Uni",
+  new Creature("Unicycle", "", 5, LandscapeType.Hills, 12, 13, "")
+);
+
+put(
+  "Uni",
+  new Creature("Unicycle", "", 5, LandscapeType.Hills, 12, 13, "")
+);
+
+put(
+  "Uni",
+  new Creature("Unicycle", "", 5, LandscapeType.Hills, 12, 13, "")
+);
 
 //=====================================================================================================================================================
 //                                                                BUILDINGS
@@ -537,7 +700,7 @@ var Sandyland: Landscape = new Landscape("Sandylands", "", LandscapeType.Desert)
 //=====================================================================================================================================================
 var CornfieldDeck = new Deck("Cornfield Deck", [Cornfield, Cornfield, Cornfield, Cornfield], [get("Husker Worm"), get("Cornataur"), get("Legion of Earlings"), 
 get("Field Stalker"), get("Patchy the Pumpkin"), get("Corn Ronin"), get("Wall of Ears"), get("Travelin' Farmer"), get("Husker Knight"), get("Archer Dan"), get("Corn Dog"), 
-get("Corn Lord"), get("Field Reaper"), get("Phyllis"), get("Evil Eye"), get("Big Foot"), get("Husker Worm"), get("Corntaur"), get("Legion of Earlings"), 
+get("Corn Lord"), get("Field Reaper"), get("Phyllis"), get("Evil Eye"), get("Big Foot"), get("Husker Worm"), get("Cornataur"), get("Legion of Earlings"), 
 get("Field Stalker")]);
 
 var HillsDeck = new Deck("Hills Deck", [Hills, Hills, Hills, Hills], [get("Punk Cat"), get("Cool Dog"), get("Embarrassing Bard"), get("Ancient Scholar"), get("Dragon Claw"), 
@@ -550,10 +713,10 @@ get("Bog Bum"), get("Unicyclops"), get("Man-Witch"), get("Ban-She Queen"), get("
 get("Dr. Stuffenstein"), get("Furious Hen"), get("Papercut Tiger"), get("Furious Chick"), get("Ban-She Princess"), get("Fly Swatter"), get("Bog Bum"), 
 get("Unicyclops"), get("Man-Witch")]);
 
-var IcelandsDeck = new Deck("Icylands Deck", [Icyland, Icyland, Icyland, Icyland], [get("Cold Soldier"), get("Abdominal Snowman"), get("Icemeister"), get("Sprucy Lucy"), 
+/*var IcelandsDeck = new Deck("Icylands Deck", [Icyland, Icyland, Icyland, Icyland], [get("Cold Soldier"), get("Abdominal Snowman"), get("Icemeister"), get("Sprucy Lucy"), 
 get("Reign Deer"), get("Frost Dragon"), get("Slay Rider"), get("Frozen Fish"), get("Snow Angel"), get("Emperor Penguin"), get("Snow Bunny"), get("Snow Dog"), 
 get("Boarder Collie"), get("Cold Soldier"), get("Adbominal Snowman"), get("Icemeister"), get("Reign Deer"), get("Frost Dragon"), get("Slay Rider"), 
-get("Frozen Fish")])
+get("Frozen Fish")])*/
 
 var SandylandsDeck = new Deck("Sandyland Deck", [Sandyland, Sandyland, Sandyland, Sandyland], [get("Sandsnake"), get("Beach Mummy"), get("The Mariachi"), get("SandWitch"), 
 get("Sand Eyebat"), get("Green Cactiball"), get("Sandhorn Devil"), get("Wall of Sand"), get("Lost Golem"), get("Sand Knight"), get("Fummy"), get("Sand Angel"), 
@@ -563,7 +726,7 @@ get("Peach Djinni"), get("Ms. Mummy"), get("Sandsnake"), get("Beach Mummy"), get
 //get(""), get(""), get(""), get(""), get(""), get(""), get(""), get(""), get("")]
 
 export function seeNonNullDecks() {
-  var decks = [CornfieldDeck, HillsDeck, SwamplandsDeck, IcelandsDeck, SandylandsDeck];
+  var decks = [CornfieldDeck, HillsDeck, SwamplandsDeck, SandylandsDeck];
   runner: for(var i = 0; i < decks.length; i++) {
     console.log("=====================================================================================");
     console.log("                         CHECKING " + decks[i].name);
