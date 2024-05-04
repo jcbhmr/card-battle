@@ -105,8 +105,11 @@ function CardComponentOnBoard({
   setHover: any
 }) {
   let className = "card_shape_not_ready overflow-hidden";
+  let classNameImg = "object-cover rotate-90";
+  
   if(card.getIsReady()){
     className = "card_shape overflow-hidden";
+    classNameImg = "object-cover";  
   }
   return (
     <button>
@@ -116,7 +119,7 @@ function CardComponentOnBoard({
       <div className="flex aspect-16/9">
         <img
           alt={card.name}
-          className="object-cover"
+          className={classNameImg}
           height={135}
           src={card.imagePath}
           style={{
@@ -803,6 +806,8 @@ function gameInit(deck1: Card[], deck2: Card[]){
   var swampLand: Landscape = new Landscape("Swamp", "Goopy!", LandscapeType.Swamp);
   Game.startNewGame();
   let g = Game.getInstance();
+  let p1 = g.getPlayerById(0);
+  let p2 =  g.getPlayerById(1);
   g.addEventListener(GetCardTargetEvent, (evt: Event)=>{
     if(evt instanceof GetBoardPosTargetEvent){
       var player: Player = Game.getInstance().getPlayerById(evt.executorId);
@@ -814,19 +819,19 @@ function gameInit(deck1: Card[], deck2: Card[]){
     globalTempVariable = -1;
   });
 
- g.board.getSideByOwnerId(0)?.map((pos: BoardPos) => {pos.setLandscape(swampLand)});
+  g.board.getSideByOwnerId(0)?.map((pos: BoardPos) => {pos.setLandscape(swampLand)});
   g.board.getSideByOwnerId(1)?.map((pos: BoardPos) => {pos.setLandscape(swampLand)});
 
-  var player0Side: BoardPos[] | undefined = Game.getInstance().board.getSideByOwnerId(0);
+  p1.setDeck(deck1);
+  p2.setDeck(deck2);
 
-  g.getPlayerById(0).setDeck(deck1);
-  g.getPlayerById(1).setDeck(deck2);
+  p1.drawCard(5, false);
+  p2.drawCard(5, false);
 
-  g.getPlayerById(0).drawCard(5, false);
-  g.getPlayerById(1).drawCard(5, false);
+  p1
 
-  g.getPlayerById(0).username = "Player 1";
-  g.getPlayerById(1).username = "Player 2";
+  p1.username = "Player 1";
+  p2.username = "Player 2";
   
   return Game.getInstance();
 }
