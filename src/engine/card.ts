@@ -29,7 +29,7 @@ export class Card {
     cardType: number,
     cost: number,
     landscapeType: string,
-    imageURL: string
+    imageURL: string,
   ) {
     this.name = name;
     this.flavorText = flavorText;
@@ -89,7 +89,9 @@ export class Card {
   }
 
   play(_target: BoardPos, _playerId: number) {
-    console.log("Calling play(target: BoardPos, playerId: number) in class Card, don't do that!");
+    console.log(
+      "Calling play(target: BoardPos, playerId: number) in class Card, don't do that!",
+    );
     this.displayCard();
     return false;
   }
@@ -99,8 +101,10 @@ export class Card {
     if (this.ownerId != null) {
       Game.getInstance().getPlayerById(this.ownerId).discardPile.push(this);
       //this.moveCard(CardLocations.Discard); //Doesn't actually move the cards from the board...
-      if(this.location instanceof BoardPos) {
-        console.log(this.name + " has died from lane " + (this.location.posId+1));
+      if (this.location instanceof BoardPos) {
+        console.log(
+          this.name + " has died from lane " + (this.location.posId + 1),
+        );
         this.location.removeCreature();
       }
     }
@@ -118,69 +122,73 @@ export class Card {
     if (this.location instanceof BoardPos) {
       //Type safe check for removeCreature()
       var type = this.constructor.name;
-      switch(type){
-        case 'Creature':
+      switch (type) {
+        case "Creature":
           this.location.removeCreature();
           break;
         //case 'Building':
-          //this.location.removeBuilding();
-          //break;
+        //this.location.removeBuilding();
+        //break;
       }
     } else {
-      switch(this.location){
+      switch (this.location) {
         case CardLocations.Deck:
-          if(this.ownerId != null){
+          if (this.ownerId != null) {
             var deck = Game.getInstance().getPlayerById(this.ownerId).deck;
             deck.splice(deck.indexOf(this), 1);
           }
           break;
         case CardLocations.Hand:
-          if(this.ownerId != null){
+          if (this.ownerId != null) {
             var hand = Game.getInstance().getPlayerById(this.ownerId).hand;
             hand.splice(hand.indexOf(this), 1);
           }
           break;
         case CardLocations.Discard:
-          if(this.ownerId != null){
-            var discardPile = Game.getInstance().getPlayerById(this.ownerId).discardPile;
+          if (this.ownerId != null) {
+            var discardPile = Game.getInstance().getPlayerById(
+              this.ownerId,
+            ).discardPile;
             discardPile.splice(discardPile.indexOf(this), 1);
           }
-          break
-      }
-     
-    this.location = newLocation
-    //ADDING CARD
-    if (this.location instanceof BoardPos) {
-      //Type safe check for removeCreature()
-      var type = this.constructor.name;
-      switch(type){
-        case 'Creature':
-          this.location.setCreature(this);
           break;
-        //case 'Building':
+      }
+
+      this.location = newLocation;
+      //ADDING CARD
+      if (this.location instanceof BoardPos) {
+        //Type safe check for removeCreature()
+        var type = this.constructor.name;
+        switch (type) {
+          case "Creature":
+            this.location.setCreature(this);
+            break;
+          //case 'Building':
           //this.location.setBuilding(this);
           //break;
-      }
-    } else {
-      switch(this.location){
-        case CardLocations.Deck:
-          if(this.ownerId != null){
-            var deck = Game.getInstance().getPlayerById(this.ownerId).deck;
-            deck.push(this);
-          }
-          break;
-        case CardLocations.Hand:
-          if(this.ownerId != null){
-            var hand = Game.getInstance().getPlayerById(this.ownerId).hand;
-            hand.push(this);
-          }
-          break;
-        case CardLocations.Discard:
-          if(this.ownerId != null){
-            var discardPile = Game.getInstance().getPlayerById(this.ownerId).discardPile;
-            discardPile.push(this);
-          }
-          break;
+        }
+      } else {
+        switch (this.location) {
+          case CardLocations.Deck:
+            if (this.ownerId != null) {
+              var deck = Game.getInstance().getPlayerById(this.ownerId).deck;
+              deck.push(this);
+            }
+            break;
+          case CardLocations.Hand:
+            if (this.ownerId != null) {
+              var hand = Game.getInstance().getPlayerById(this.ownerId).hand;
+              hand.push(this);
+            }
+            break;
+          case CardLocations.Discard:
+            if (this.ownerId != null) {
+              var discardPile = Game.getInstance().getPlayerById(
+                this.ownerId,
+              ).discardPile;
+              discardPile.push(this);
+            }
+            break;
         }
       }
     }
@@ -189,9 +197,7 @@ export class Card {
 
   displayCard() {
     //Was drawCard, name changed for clarity
-    Game.getInstance().dispatchEvent(
-      new DisplayCardEvent(),
-    );
+    Game.getInstance().dispatchEvent(new DisplayCardEvent());
   }
 
   clone(): Card {
@@ -201,18 +207,29 @@ export class Card {
       this.cardType,
       this.cost,
       this.landscapeType,
-      this.imagePath
+      this.imagePath,
     );
   }
 
   equals(other: Card): boolean {
-    return this.name == other.name && this.flavorText == other.flavorText && this.cost == other.cost 
-    && this.landscapeType == other.landscapeType;
+    return (
+      this.name == other.name &&
+      this.flavorText == other.flavorText &&
+      this.cost == other.cost &&
+      this.landscapeType == other.landscapeType
+    );
   }
 
   //Null Card Constant
   static getNull(): Card {
-    return new Card("Null", "You shouldn't be seeing this!", 99, 0, LandscapeType.NULL, "");
+    return new Card(
+      "Null",
+      "You shouldn't be seeing this!",
+      99,
+      0,
+      LandscapeType.NULL,
+      "",
+    );
   }
 }
 
@@ -228,7 +245,7 @@ export class Creature extends Card {
     landscapeType: string,
     attack: number,
     defense: number,
-    imagePath: string
+    imagePath: string,
   ) {
     super(name, flavorText, CardType.Creature, cost, landscapeType, imagePath);
     this.attack = attack;
@@ -237,7 +254,7 @@ export class Creature extends Card {
   }
 
   Attack(Target: Creature | Player) {
-    if(!this.getIsReady()) {
+    if (!this.getIsReady()) {
       console.log("Creature not ready!");
       return false;
     }
@@ -261,13 +278,21 @@ export class Creature extends Card {
   }
 
   override play(pos: BoardPos, playerId: number) {
-    console.log("Playing Creature " + this.name + " at pos " + pos.posId + " on player " + playerId + "'s side of the board");
+    console.log(
+      "Playing Creature " +
+        this.name +
+        " at pos " +
+        pos.posId +
+        " on player " +
+        playerId +
+        "'s side of the board",
+    );
     if (pos.creature.name == Creature.getNull().name) {
-        if(pos.setCreature(this)) {
-          this.location = pos;
-          this.ownerId = playerId;
-          return true;
-        }
+      if (pos.setCreature(this)) {
+        this.location = pos;
+        this.ownerId = playerId;
+        return true;
+      }
     }
     return false;
   }
@@ -280,13 +305,19 @@ export class Creature extends Card {
       this.landscapeType,
       this.attack,
       this.defense,
-      this.imagePath
+      this.imagePath,
     );
   }
 
   override equals(other: Creature): boolean {
-    return this.name == other.name && this.flavorText == other.flavorText && this.cardType == other.cardType && this.getCost() == other.getCost() 
-    && this.landscapeType == other.landscapeType && this.maxDefense == other.maxDefense;
+    return (
+      this.name == other.name &&
+      this.flavorText == other.flavorText &&
+      this.cardType == other.cardType &&
+      this.getCost() == other.getCost() &&
+      this.landscapeType == other.landscapeType &&
+      this.maxDefense == other.maxDefense
+    );
   }
 
   //Creature Constants
@@ -298,7 +329,7 @@ export class Creature extends Card {
       LandscapeType.NULL,
       0,
       0,
-      ""
+      "",
     );
   }
 }
@@ -317,7 +348,15 @@ export class Landscape extends Card {
   }
 
   override play(pos: BoardPos) {
-    console.log("Playing Landscape " + this.name + " at pos " + pos.posId + " on player " + pos.ownerId + "'s side of the board");
+    console.log(
+      "Playing Landscape " +
+        this.name +
+        " at pos " +
+        pos.posId +
+        " on player " +
+        pos.ownerId +
+        "'s side of the board",
+    );
     if (pos.landscape == LandscapeType.NULL) {
       return pos.setLandscape(this);
     }
