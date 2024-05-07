@@ -10,6 +10,7 @@ function put(name: string, card: Card): void {
 export function addUrl(name: string, Url: string): void {
   var card: Card | undefined = cardMap.get(name);
   if (typeof card == "undefined") {
+    console.assert('Card not found', name, "for addUrl", Url)
     return;
   } else {
     put(name, card.setImageUrl(Url));
@@ -985,7 +986,7 @@ import n0 from "../assets/swamp-dragon.png"; addUrl("Swamp Dragon", n0)
 import n1 from "../assets/dark-angel.png"; addUrl("Dark Angel", n1)
 import n2 from "../assets/bog-bum.png"; addUrl("Bog Bum", n2)
 import n3 from "../assets/fly-swatter.png"; addUrl("Fly Swatter", n3)
-import n4 from "../assets/unicylops.png"; addUrl("Unicylops", n4)
+import n4 from "../assets/unicyclops.png"; addUrl("Unicyclops", n4)
 import n5 from "../assets/man-witch.png"; addUrl("Man Witch", n5)
 import n6 from "../assets/ban-she-princess.png"; addUrl("Ban-She Princess", n6)
 import n7 from "../assets/ban-she-queen.png"; addUrl("Ban-She Queen", n7)
@@ -1023,41 +1024,23 @@ import n38 from "../assets/giant-mummy-hand.png"; addUrl("Giant Mummy Hand", n38
 import n39 from "../assets/green-cactaball.png"; addUrl("Green Cactaball", n39)
 import n40 from "../assets/green-party-ogre.png"; addUrl("Green Party Ogre", n40)
 import n41 from "../assets/lady-mary.png"; addUrl("Lady Mary", n41)
-
 import n42 from "../assets/lime-slimey.png"; addUrl("Lime Slimey", n42)
-
 import n43 from "../assets/lost-golem.png"; addUrl("Lost Golem", n43)
-
 import n44 from "../assets/mayonaise-angel.png"; addUrl("Mayonaise Angel", n44)
 
-import n45 from "../assets/ms-mummy.png"; addUrl("Ms. Mummy", n45)
-
-import n46 from "../assets/mud-angel.png"; addUrl("Mud Angel", n46)
-
-import n47 from "../assets/pieclops.png"; addUrl("Pieclops", n47)
-
-import n48 from "../assets/prickle.png"; addUrl("Prickle", n48)
-
-import n49 from "../assets/sandbacho.png"; addUrl("Sandbacho", n49)
-
-import n50 from "../assets/sand-angel.png"; addUrl("Sand Angel", n50)
-
-import n51 from "../assets/sand-eyebat.png"; addUrl("Sand Eyebat", n51)
-
-import n52 from "../assets/sand-jackal.png"; addUrl("Sand Jackal", n52)
-
-import n53 from "../assets/sand-knight.png"; addUrl("Sand Knight", n53)
-
-import n54 from "../assets/sandasaurus-rex.png"; addUrl("Sandasaurus Rex", n54)
-
-import n55 from "../assets/sandfoot.png"; addUrl("Sandfoot", n55)
-
-import n56 from "../assets/sandsnake.png"; addUrl("Sandsnake", n56)
-
-import n57 from "../assets/sandwitch.png"; addUrl("Sandwitch", n57)
-
-import n58 from "../assets/sandy.png"; addUrl("Sandy", n58)
-
-import n59 from "../assets/wall-of-chocolate.png"; addUrl("Wall of Chocolate", n59)
-
-import n60 from "../assets/wall-of-sand.png"; addUrl("Wall of Sand", n60)
+// import n45 from "../assets/ms-mummy.png"; addUrl("Ms. Mummy", n45)
+// import n46 from "../assets/mud-angel.png"; addUrl("Mud Angel", n46)
+// import n47 from "../assets/pieclops.png"; addUrl("Pieclops", n47)
+// import n48 from "../assets/prickle.png"; addUrl("Prickle", n48)
+// import n49 from "../assets/sandbacho.png"; addUrl("Sandbacho", n49)
+// import n50 from "../assets/sand-angel.png"; addUrl("Sand Angel", n50)
+// import n51 from "../assets/sand-eyebat.png"; addUrl("Sand Eyebat", n51)
+// import n52 from "../assets/sand-jackal.png"; addUrl("Sand Jackal", n52)
+// import n53 from "../assets/sand-knight.png"; addUrl("Sand Knight", n53)
+// import n54 from "../assets/sandasaurus-rex.png"; addUrl("Sandasaurus Rex", n54)
+// import n55 from "../assets/sandfoot.png"; addUrl("Sandfoot", n55)
+// import n56 from "../assets/sandsnake.png"; addUrl("Sandsnake", n56)
+// import n57 from "../assets/sandwitch.png"; addUrl("Sandwitch", n57)
+// import n58 from "../assets/sandy.png"; addUrl("Sandy", n58)
+// import n59 from "../assets/wall-of-chocolate.png"; addUrl("Wall of Chocolate", n59)
+// import n60 from "../assets/wall-of-sand.png"; addUrl("Wall of Sand", n60)

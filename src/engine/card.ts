@@ -42,7 +42,7 @@ export class Card {
   }
 
   setImageUrl(URL: string): Card {
-    this.imageURL = URL;
+    this.imagePath = URL;
     return this;
   }
 
