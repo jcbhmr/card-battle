@@ -12,7 +12,13 @@ import { CardComponent, CardComponentOnBoard } from "./Card";
  * @returns CardComponent, but with attack/defense values
  */
 export function CreatureComponent({
-  card, state, position, setHover, currentPlayer, ownerPlayer, phase,
+  card,
+  state,
+  position,
+  setHover,
+  currentPlayer,
+  ownerPlayer,
+  phase,
 }: {
   card: Creature;
   state: React.Dispatch<React.SetStateAction<number>>;
@@ -41,14 +47,15 @@ export function CreatureComponent({
       {child}
     </CardComponent>
   );
-}/**
+} /**
  * Kinda dumb, but since cards on board have different function than ones in hand I felt this was necessary. Currently, this just is the other creature/card
  * component but without triggering summoning buttons
  * @param param0
  * @returns
  */
 export function CreatureComponentOnBoard({
-  card, setHover,
+  card,
+  setHover,
 }: {
   card: Creature;
   setHover: any;
@@ -66,4 +73,3 @@ export function CreatureComponentOnBoard({
     ></CardComponentOnBoard>
   );
 }
-

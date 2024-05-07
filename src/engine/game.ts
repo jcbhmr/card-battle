@@ -1,9 +1,4 @@
-import {
-  Card,
-  Creature,
-  Landscape,
-  GetCardTargetEvent,
-} from "./card.ts";
+import { Card, Creature, Landscape, GetCardTargetEvent } from "./card.ts";
 import {
   GetBoardPosTargetEvent,
   PlayCardEvent,
@@ -614,7 +609,9 @@ export class Game extends AbstractGame {
                 if (card.play(pos, pos.ownerId)) {
                   Game.getInstance().getPlayerById(playerId).actions -=
                     card.getCost();
-                  Game.getInstance().getPlayerById(playerId).deleteCardFromHand(card);
+                  Game.getInstance()
+                    .getPlayerById(playerId)
+                    .deleteCardFromHand(card);
                   return Game.getInstance().dispatchEvent(
                     new PlayCardEvent(card, pos.ownerId),
                   );

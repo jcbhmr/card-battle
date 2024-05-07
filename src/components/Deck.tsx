@@ -1,7 +1,4 @@
-import {
-  Game,
-  Player
-} from "../engine/game";
+import { Game, Player } from "../engine/game";
 import { dumbStupidFunction } from "../PlayGameScreen";
 
 /**
@@ -12,7 +9,12 @@ import { dumbStupidFunction } from "../PlayGameScreen";
  * log: the log. needed for if player cannot draw anymore and game must tell player as such. setLog: useState for re-rendering log. game: the game object
  */
 export function Deck({
-  player, resetState, reset, log, setLog, game,
+  player,
+  resetState,
+  reset,
+  log,
+  setLog,
+  game,
 }: {
   player: Player;
   resetState: any;
@@ -39,7 +41,9 @@ export function Deck({
   return (
     <button>
       <div
-        className={"card_shape flex h-screen hover:border-yellow-800 player_" + player.id}
+        className={
+          "card_shape flex h-screen hover:border-yellow-800 player_" + player.id
+        }
         onClick={handleDraw}
       >
         <div className="text-center text-7xl m-auto">

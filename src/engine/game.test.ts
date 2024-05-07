@@ -7,16 +7,8 @@ import {
   CardType,
   Player,
 } from "./game.ts";
-import {
-  Card,
-  Creature,
-  Landscape,
-  GetCardTargetEvent,
-} from "./card.ts";
-import {
-  get as getCardFromCardMap,
-  seeNonNullDecks,
-} from "./CardMap.ts";
+import { Card, Creature, Landscape, GetCardTargetEvent } from "./card.ts";
+import { get as getCardFromCardMap, seeNonNullDecks } from "./CardMap.ts";
 import { GetBoardPosTargetEvent, PlayCardEventName } from "./event.ts";
 
 test("new game works", () => {

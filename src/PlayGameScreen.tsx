@@ -14,22 +14,15 @@ export function dumbStupidFunction(r: number) {
   }
 }
 
-
 export default function PlayGameScreen({ game }: { game: Game }) {
-    const [, forceUpdate] = useState(0);
-    function setBegin(b: boolean) {
-      if (b) {
-        location.reload();
-      }
+  const [, forceUpdate] = useState(0);
+  function setBegin(b: boolean) {
+    if (b) {
+      location.reload();
     }
-    return (
-        <GameBoard game={game} setBegin={setBegin} />
-    );
   }
-
-
-
-
+  return <GameBoard game={game} setBegin={setBegin} />;
+}
 
 /**
  * @author Tanner Brown
@@ -39,7 +32,7 @@ export default function PlayGameScreen({ game }: { game: Game }) {
  * @param player: gotta know which player we rendering
  * @returns markup that shows what I just wrote above
  */
-export function PlayerDisplay({ player }: { player: Player; }) {
+export function PlayerDisplay({ player }: { player: Player }) {
   return (
     <div className={"player_display player_" + player.id}>
       <div className="flex flex-col">
@@ -60,10 +53,10 @@ export function PlayerDisplay({ player }: { player: Player; }) {
  * @param game: the actual game object. board: the board from the game. why do i pass this as a parameter even? setHover: magnify the cards when hovered.
  */
 
-
-
 export function Board({
-  game, board, setHover,
+  game,
+  board,
+  setHover,
 }: {
   game: Game;
   board: SidedBoard;
@@ -84,7 +77,7 @@ export function Board({
         landscapeColor: board.getBoardPosByOwnerId(p1.id, i)?.landscape,
         setHover: setHover,
         //building: game.board.getBoardPosByOwnerId(0, i)?.building
-      })
+      }),
     );
 
     p2Board.push(
@@ -94,7 +87,7 @@ export function Board({
         landscapeColor: board.getBoardPosByOwnerId(p1.id, i)?.landscape,
         setHover: setHover,
         //building: game.board.getBoardPosByOwnerId(1, i)?.building,
-      })
+      }),
     );
   }
 
@@ -122,10 +115,13 @@ export function Board({
  * phase: the current turn phase. needed for exclusivity reasons. setHover: statechange for magnifying cards.
  */
 
-
-
 export function HandOfCards({
-  playerHand, stateChange, currentPlayer, ownerPlayer, phase, setHover,
+  playerHand,
+  stateChange,
+  currentPlayer,
+  ownerPlayer,
+  phase,
+  setHover,
 }: {
   playerHand: Card[];
   stateChange: React.Dispatch<React.SetStateAction<number>>;
@@ -148,7 +144,7 @@ export function HandOfCards({
           currentPlayer: currentPlayer,
           position: i,
           phase: phase,
-        })
+        }),
       );
       //not really relevant anymore since back-end axed spells/buildings, but in case we have time and they re-implement them i see no reason to remove this
       // else statement. currently does not execute
@@ -162,7 +158,7 @@ export function HandOfCards({
           ownerPlayer: ownerPlayer,
           currentPlayer: currentPlayer,
           phase: phase,
-        })
+        }),
       );
     }
   }
@@ -180,7 +176,12 @@ export function HandOfCards({
  * @returns markup for summoning buttons
  */
 export function SummoningButtons({
-  cardPos, game, setSummonState, playerid, log, setLog,
+  cardPos,
+  game,
+  setSummonState,
+  playerid,
+  log,
+  setLog,
 }: {
   cardPos: number;
   game: Game;
@@ -218,7 +219,7 @@ export function SummoningButtons({
         type="button"
         onClick={function () {
           handle(0, playerid);
-        } }
+        }}
       >
         Zone 1
       </button>
@@ -226,7 +227,7 @@ export function SummoningButtons({
         type="button"
         onClick={function () {
           handle(1, playerid);
-        } }
+        }}
       >
         Zone 2
       </button>
@@ -234,7 +235,7 @@ export function SummoningButtons({
         type="button"
         onClick={function () {
           handle(2, playerid);
-        } }
+        }}
       >
         Zone 3
       </button>
@@ -242,7 +243,7 @@ export function SummoningButtons({
         type="button"
         onClick={function () {
           handle(3, playerid);
-        } }
+        }}
       >
         Zone 4
       </button>
@@ -258,7 +259,11 @@ export function SummoningButtons({
  * @returns mark up for attacking buttons
  */
 export function AttackingButtons({
-  player, game, reset, resetState, setBegin,
+  player,
+  game,
+  reset,
+  resetState,
+  setBegin,
 }: {
   player: Player;
   game: Game;
@@ -272,7 +277,7 @@ export function AttackingButtons({
     game.simulateCombat(boardPos, playerid);
     if (game.getOtherPlayer(player.id).hp <= 0) {
       alert(
-        `${player.username} has won. Press OK to return to deck select screen.`
+        `${player.username} has won. Press OK to return to deck select screen.`,
       );
       setBegin(false);
     }
@@ -284,7 +289,7 @@ export function AttackingButtons({
         type="button"
         onClick={function () {
           handle(0, playerid);
-        } }
+        }}
       >
         Attack with monster at zone 1
       </button>
@@ -292,7 +297,7 @@ export function AttackingButtons({
         type="button"
         onClick={function () {
           handle(1, playerid);
-        } }
+        }}
       >
         Attack with monster at zone 2
       </button>
@@ -300,7 +305,7 @@ export function AttackingButtons({
         type="button"
         onClick={function () {
           handle(2, playerid);
-        } }
+        }}
       >
         Attack with monster at zone 3
       </button>
@@ -308,7 +313,7 @@ export function AttackingButtons({
         type="button"
         onClick={function () {
           handle(3, playerid);
-        } }
+        }}
       >
         Attack with monster at zone 4
       </button>
@@ -320,7 +325,10 @@ export function AttackingButtons({
  * @returns markup that displays the gamelog in the browser
  */
 export function GameLog({
-  turn, phase, currentPlayer, log,
+  turn,
+  phase,
+  currentPlayer,
+  log,
 }: {
   turn: number;
   phase: number;
@@ -352,7 +360,8 @@ export function GameLog({
   );
 }
 export let globalTempVariable = -1;
-export const setGlobalTempVariable = (val: number) => globalTempVariable = val;
+export const setGlobalTempVariable = (val: number) =>
+  (globalTempVariable = val);
 /**
  * @author Tanner Brown
  * So basically this is the markup that sits on the left of the screen. If its null (ie. no one has hovered a card yet) then its blank. However, if a card
@@ -361,7 +370,7 @@ export const setGlobalTempVariable = (val: number) => globalTempVariable = val;
  * @param param0
  * @returns
  */
-export function HoverCard({ card }: { card: Creature; }) {
+export function HoverCard({ card }: { card: Creature }) {
   if (card === null) {
     return <div className="hover_card_shape"></div>;
   }
@@ -376,7 +385,8 @@ export function HoverCard({ card }: { card: Creature; }) {
           style={{
             objectFit: "cover",
           }}
-          width={350} />
+          width={350}
+        />
       </div>
       <div className="flex-1 p-4 grid gap-2">
         <h2 className="text-s font-bold tracking-tight">{card.name}</h2>
@@ -404,7 +414,7 @@ export function HoverCard({ card }: { card: Creature; }) {
  * @returns Markup to display the game
  * @param game: the game object we're rendering. setBegin: when we set this as true the game ends and we go backto deck select screen
  */
-export function GameBoard({ game, setBegin }: { game: Game; setBegin: any; }) {
+export function GameBoard({ game, setBegin }: { game: Game; setBegin: any }) {
   // grab our players. a lot of components need this guys as parameters
   let player1 = game.getPlayerById(0);
   let player2 = game.getPlayerById(1);
@@ -595,7 +605,12 @@ export function GameBoard({ game, setBegin }: { game: Game; setBegin: any; }) {
  */
 
 export function PhaseButton({
-  game, imagePath, setPhase, setTurn, setCurrentPlayer, setSummoning,
+  game,
+  imagePath,
+  setPhase,
+  setTurn,
+  setCurrentPlayer,
+  setSummoning,
 }: {
   game: Game;
   imagePath: string;
@@ -617,4 +632,3 @@ export function PhaseButton({
     </button>
   );
 }
-

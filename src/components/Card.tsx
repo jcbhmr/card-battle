@@ -15,7 +15,13 @@ import { CreatureComponentOnBoard } from "./Creature";
  * player the cards are assigned to. phase: current turn phase. needed for making events phase exclusive
  */
 export function CardComponent({
-  card, state, position, setHover, currentPlayer, ownerPlayer, phase,
+  card,
+  state,
+  position,
+  setHover,
+  currentPlayer,
+  ownerPlayer,
+  phase,
 }: {
   card: Card | Creature;
   children?: ReactNode;
@@ -49,7 +55,9 @@ export function CardComponent({
   return (
     <button>
       <div
-        className={"card_shape overflow-auto hover:border-black player_" + ownerPlayer.id}
+        className={
+          "card_shape overflow-auto hover:border-black player_" + ownerPlayer.id
+        }
         onClick={handleClick}
         onMouseOver={() => {
           setHover(card);
@@ -65,7 +73,8 @@ export function CardComponent({
               aspectRatio: "240/135",
               objectFit: "cover",
             }}
-            width={350} />
+            width={350}
+          />
         </div>
         <div className="flex-1 p-4 grid gap-2">
           <h2 className="text-lg font-bold tracking-tight">{card.name}</h2>
@@ -73,14 +82,15 @@ export function CardComponent({
       </div>
     </button>
   );
-}/**
+} /**
  * @author Tanner Brown
  * I spoke about this in my documentation on the CreatureComponentOnBoard component. Check there for why this is a thing
  * @param param0
  * @returns
  */
 export function CardComponentOnBoard({
-  card, setHover,
+  card,
+  setHover,
 }: {
   card: Card | Creature;
   children?: ReactNode;
@@ -99,7 +109,7 @@ export function CardComponentOnBoard({
         className={className}
         onMouseOver={() => {
           setHover(card);
-        } }
+        }}
       >
         <div className="flex aspect-16/9">
           <img
@@ -111,7 +121,8 @@ export function CardComponentOnBoard({
               aspectRatio: "240/135",
               objectFit: "cover",
             }}
-            width={350} />
+            width={350}
+          />
         </div>
         <div className="flex-1 p-4 grid gap-2">
           <h2 className="text-lg font-bold tracking-tight">{card.name}</h2>
@@ -130,7 +141,10 @@ export function CardComponentOnBoard({
  */
 export function LandscapeCard({
   //building,
-  creature, player, landscapeColor, setHover,
+  creature,
+  player,
+  landscapeColor,
+  setHover,
 }: {
   //building: Building | undefined;
   creature: Creature | undefined;
@@ -153,13 +167,14 @@ export function LandscapeCard({
   // }
   return (
     <div
-      className={"landscape_shape flex justify-center items-center player_" +
+      className={
+        "landscape_shape flex justify-center items-center player_" +
         player.id +
-        ` bg-[${landscapeColor}]`}
+        ` bg-[${landscapeColor}]`
+      }
     >
       {c}
       {/* {b} */}
     </div>
   );
 }
-
