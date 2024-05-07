@@ -49,14 +49,14 @@ class Deck {
 //Made this card more for testing or ending the game quickly if we have to.
 put(
   "Swamp Dragon",
-  new Creature("Swamp Dragon", "", 2, LandscapeType.Swamp, 25, 8, ""),
+  new Creature("Swamp Dragon", "", 2, LandscapeType.Swamp, 25, 8, "src/assets/swamp-dragon.png"),
 );
 put(
   "Dark Angel",
-  new Creature("Dark Angel", "", 1, LandscapeType.Swamp, 10, 5, ""),
+  new Creature("Dark Angel", "", 1, LandscapeType.Swamp, 10, 5, "src/assets/dark-angel.png"),
 );
 
-put("Bog Bum", new Creature("Bog Bum", "", 1, LandscapeType.Swamp, 2, 6, ""));
+put("Bog Bum", new Creature("Bog Bum", "", 1, LandscapeType.Swamp, 2, 6, "src/assets/bog-bum.png"));
 
 // Not sure about this one. This card's ability is not really functional right now.
 put(
