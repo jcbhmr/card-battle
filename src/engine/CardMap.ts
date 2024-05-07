@@ -95,7 +95,7 @@ put(
 import n7 from "../assets/ban-she-queen.png";
 put(
   "Ban-She Queen",
-  new Creature("Ban She Queen", "", 2, LandscapeType.Swamp, 4, 9, n7),
+  new Creature("Ban She Queen", "", 2, LandscapeType.Swamp, 7, 9, n7),
 );
 
 import n8 from "../assets/ban-she-knight.png";
@@ -106,7 +106,7 @@ put(
 import n9 from "../assets/black-merlock.png";
 put(
   "Black Merlock",
-  new Creature("Black Merlock", "", 1, LandscapeType.Swamp, 2, 5, n9),
+  new Creature("Black Merlock", "", 1, LandscapeType.Swamp, 7, 5, n9),
 );
 
 import n10 from "../assets/bog-ban-she-angel.png";
@@ -115,7 +115,7 @@ put(
   new Creature("Bog Ban-She Angel", "", 1, LandscapeType.Swamp, 2, 7, n10),
 );
 import n11 from "../assets/eye-dude.png";
-put("Eye Dude", new Creature("Eye Dude", "", 1, LandscapeType.Swamp, 2, 9, n11));
+put("Eye Dude", new Creature("Eye Dude", "", 1, LandscapeType.Swamp, 3, 9, n11));
 
 import n12 from "../assets/giant-spider.png";
 put(
@@ -136,18 +136,18 @@ put(
 import n15 from "../assets/axe-stump.png";
 put(
   "Axe Stump",
-  new Creature("Axe Stump", "", 1, LandscapeType.Swamp, 4, 4, n15),
+  new Creature("Axe Stump", "", 1, LandscapeType.Swamp, 8, 4, n15),
 );
 
 import n16 from "../assets/skeleton-hand.png";
 put(
   "Skeleton Hand",
-  new Creature("Skeleton Hand", "", 2, LandscapeType.Swamp, 1, 11, n16),
+  new Creature("Skeleton Hand", "", 2, LandscapeType.Swamp, 3, 11, n16),
 );
 import n17 from "../assets/undying-tree.png";
 put(
   "Undying Tree",
-  new Creature("Undying Tree", "", 2, LandscapeType.Swamp, 3, 8, n17),
+  new Creature("Undying Tree", "", 2, LandscapeType.Swamp, 13, 8, n17),
 );
 
 import n18 from "../assets/bald-guy.png";
@@ -156,7 +156,7 @@ put("Bald Guy", new Creature("Bald Guy", "", 1, LandscapeType.Swamp, 3, 2, n18))
 import n19 from "../assets/the-sludge.png";
 put(
   "",
-  new Creature("The Sludge", "The Sludge", 1, LandscapeType.Swamp, 2, 5, n19),
+  new Creature("The Sludge", "The Sludge", 1, LandscapeType.Swamp, 5, 5, n19),
 );
 
 import n20 from "../assets/sludgebob.png";
@@ -168,18 +168,18 @@ put(
 import n21 from "../assets/general-mushroom.png";
 put(
   "General Mushroom",
-  new Creature("General Mushroom", "", 1, LandscapeType.Swamp, 4, 3, n21),
+  new Creature("General Mushroom", "", 1, LandscapeType.Swamp, 8, 3, n21),
 );
 
 import n22 from "../assets/swamp-beast.png";
 put(
   "Swamp Beast",
-  new Creature("Swamp Beast", "", 2, LandscapeType.Swamp, 5, 8, n22),
+  new Creature("Swamp Beast", "", 2, LandscapeType.Swamp, 9, 7, n22),
 );
 import n23 from "../assets/flying-gator.png";
 put(
   "Flying Gator",
-  new Creature("Flying Gator", "", 2, LandscapeType.Swamp, 6, 4, n23),
+  new Creature("Flying Gator", "", 2, LandscapeType.Swamp, 10, 4, n23),
 );
 import n24 from "../assets/orange-slime-monster.png";
 put(
@@ -264,7 +264,7 @@ put(
 import n33 from "../assets/black-cat.png";
 put(
   "Black Cat",
-  new Creature("Black Cat", "", 5, LandscapeType.Desert, 15, 35, n33),
+  new Creature("Black Cat", "", 1, LandscapeType.Desert, 5, 5, n33),
 );
 
 import n34 from "../assets/burning-hand.png";
@@ -276,22 +276,22 @@ put(
 import n35 from "../assets/cactus-thug.png";
 put(
   "Cactus Thug",
-  new Creature("Cactus Thug", "", 5, LandscapeType.Desert, 25, 12, n35),
+  new Creature("Cactus Thug", "", 2, LandscapeType.Desert, 5, 2, n35),
 );
 
 import n36 from "../assets/count-cactus.png";
 put(
   "Count Cactus",
-  new Creature("Count Cactus", "", 5, LandscapeType.Desert, 5, 48, n36),
+  new Creature("Count Cactus", "", 1, LandscapeType.Desert, 5, 4, n36),
 );
 
 import n37 from "../assets/fummy.png";
-put("Fummy", new Creature("Fummy", "", 4, LandscapeType.Desert, 4, 24, n37));
+put("Fummy", new Creature("Fummy", "", 2, LandscapeType.Desert, 4, 8, n37));
 
 import n38 from "../assets/giant-mummy-hand.png";
 put(
   "Giant Mummy Hand",
-  new Creature("Giant Mummy Hand", "", 4, LandscapeType.Desert, 9, 29, n38),
+  new Creature("Giant Mummy Hand", "", 2, LandscapeType.Desert, 9, 9, n38),
 );
 
 import n39 from "../assets/green-cactaball.png";
@@ -303,13 +303,13 @@ put(
 import n40 from "../assets/green-party-ogre.png";
 put(
   "Green Party Ogre",
-  new Creature("Green Party Ogre", "", 0, LandscapeType.Desert, 11, 19, n40),
+  new Creature("Green Party Ogre", "", 0, LandscapeType.Desert, 1, 9, n40),
 );
 
 import n41 from "../assets/lady-mary.png";
 put(
   "Lady Mary",
-  new Creature("Lady Mary", "", 4, LandscapeType.Desert, 18, 20, n41),
+  new Creature("Lady Mary", "", 2, LandscapeType.Desert, 8, 10, n41),
 );
 
 import n42 from "../assets/lime-slimey.png";
@@ -321,13 +321,13 @@ put(
 import n43 from "../assets/lost-golem.png";
 put(
   "Lost Golem",
-  new Creature("Lost Golem", "", 5, LandscapeType.Desert, 10, 36, n43),
+  new Creature("Lost Golem", "", 2, LandscapeType.Desert, 10, 6, n43),
 );
 
 import n44 from "../assets/mayonaise-angel.png";
 put(
   "Mayonaise Angel",
-  new Creature("Mayonaise Angel", "", 2, LandscapeType.Desert, 4, 12, n44),
+  new Creature("Mayonaise Angel", "", 1, LandscapeType.Desert, 4, 6, n44),
 );
 
 import n45 from "../assets/ms-mummy.png"
@@ -339,22 +339,22 @@ put(
 import n46 from "../assets/mud-angel.png"
 put(
   "Mud Angel",
-  new Creature("Mud Angel", "", 3, LandscapeType.Desert, 9, 21, n46),
+  new Creature("Mud Angel", "", 2, LandscapeType.Desert, 4, 11, n46),
 );
 
 import n47 from "../assets/pieclops.png"
 put(
   "Pieclops",
-  new Creature("Pieclops", "", 5, LandscapeType.Desert, 20, 25, n47),
+  new Creature("Pieclops", "", 2, LandscapeType.Desert, 7, 8, n47),
 );
 
 import n48 from "../assets/mud-angel.png"
-put("Prickle", new Creature("Prickle", "", 3, LandscapeType.Desert, 9, 18, n48));
+put("Prickle", new Creature("Prickle", "", 1, LandscapeType.Desert, 3, 8, n48));
 
 import n49 from "../assets/sandbacho.png"
 put(
   "Sandbacho",
-  new Creature("Sandbacho", "", 2, LandscapeType.Desert, 11, 10, n49),
+  new Creature("Sandbacho", "", 2, LandscapeType.Desert, 11, 5, n49),
 );
 
 import n50 from "../assets/sand-angel.png"
@@ -372,25 +372,25 @@ put(
 import n52 from "../assets/sand-jackal.png"
 put(
   "Sand Jackal",
-  new Creature("Sand Jackal", "", 3, LandscapeType.Desert, 6, 21, n52),
+  new Creature("Sand Jackal", "", 2, LandscapeType.Desert, 6, 11, n52),
 );
 
 import n53 from "../assets/sand-knight.png"
 put(
   "Sand Knight",
-  new Creature("Sand Knight", "", 4, LandscapeType.Desert, 20, 20, n53),
+  new Creature("Sand Knight", "", 2, LandscapeType.Desert, 5, 10, n53),
 );
 
 import n54 from "../assets/sandasaurus-rex.png"
 put(
   "Sandasaurus Rex",
-  new Creature("Sandasaurus Rex", "", 0, LandscapeType.Desert, 14, 16, n54),
+  new Creature("Sandasaurus Rex", "", 2, LandscapeType.Desert, 7, 10, n54),
 );
 
 import n55 from "../assets/sandfoot.png"
 put(
   "Sandfoot",
-  new Creature("Sandfoot", "", 3, LandscapeType.Desert, 10, 17, n55),
+  new Creature("Sandfoot", "", 2, LandscapeType.Desert, 4, 12, n55),
 );
 
 import n56 from "../assets/sand-snake.png"
@@ -402,34 +402,34 @@ put(
 import n57 from "../assets/sand-witch.png"
 put(
   "SandWitch",
-  new Creature("SandWitch", "", 4, LandscapeType.Desert, 25, 10, n57),
+  new Creature("SandWitch", "", 1, LandscapeType.Desert, 3, 5, n57),
 );
 
 import n58 from "../assets/sandy.png"
-put("Sandy", new Creature("Sandy", "", 5, LandscapeType.Desert, 28, 18, n58));
+put("Sandy", new Creature("Sandy", "", 2, LandscapeType.Desert, 8, 7, n58));
 
 import n59 from "../assets/wall-of-chocolate.png"
 put(
   "Wall of Chocolate",
-  new Creature("Wall of Chocolate", "", 3, LandscapeType.Desert, 5, 20, n59),
+  new Creature("Wall of Chocolate", "", 1, LandscapeType.Desert, 3, 9, n59),
 );
 
 import n60 from "../assets/wall-of-sand.png"
 put(
   "Wall of Sand",
-  new Creature("Wall of Sand", "", 3, LandscapeType.Desert, 0, 26, n60),
+  new Creature("Wall of Sand", "", 2, LandscapeType.Desert, 0, 20, n60),
 );
 
 import n61 from "../assets/the-mariachi.png"
 put(
   "The Mariachi",
-  new Creature("The Mariachi", "", 2, LandscapeType.Desert, 5, 20, n61),
+  new Creature("The Mariachi", "", 2, LandscapeType.Desert, 5, 15, n61),
 );
 
 import n62 from "../assets/sandhorn-devil.png"
 put(
   "Sandhorn Devil",
-  new Creature("Sandhorn Devil", "", 1, LandscapeType.Desert, 18, 21, n62),
+  new Creature("Sandhorn Devil", "", 1, LandscapeType.Desert, 3, 11, n62),
 );
 
 import n63 from "../assets/peach-djinni.png"
