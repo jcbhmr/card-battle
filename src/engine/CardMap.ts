@@ -1006,39 +1006,22 @@ import n21 from "../assets/general-mushroom.png"; addUrl("General Mushroom", n21
 import n22 from "../assets/swamp-beast.png"; addUrl("Swamp Beast", n22)
 import n23 from "../assets/flying-gator.png"; addUrl("Flying Gator", n23)
 import n24 from "../assets/orange-slime-monster.png"; addUrl("Orange Slime Monster", n24)
-
 import n25 from "../assets/green-mermaid.png"; addUrl("Green Mermaid", n25)
-
 import n26 from "../assets/green-merman.png"; addUrl("Green Merman", n26)
-
 import n27 from "../assets/furious-hen.png"; addUrl("Furious Hen", n27)
-
 import n28 from "../assets/furious-rooster.png"; addUrl("Furious Rooster", n28)
-
 import n29 from "../assets/papercut-tiger.png"; addUrl("Papercut Tiger", n29)
-
 import n30 from "../assets/cottonpult.png"; addUrl("Cottonpult", n30)
-
 import n31 from "../assets/music-mallard.png"; addUrl("Music Mallard", n31)
-
 import n32 from "../assets/beach-mum.png"; addUrl("Beach Mum", n32)
-
 import n33 from "../assets/black-cat.png"; addUrl("Black Cat", n33)
-
 import n34 from "../assets/burning-hand.png"; addUrl("Burning Hand", n34)
-
 import n35 from "../assets/cactus-thug.png"; addUrl("Cactus Thug", n35)
-
 import n36 from "../assets/count-cactus.png"; addUrl("Count Cactus", n36)
-
 import n37 from "../assets/fummy.png"; addUrl("Fummy", n37)
-
 import n38 from "../assets/giant-mummy-hand.png"; addUrl("Giant Mummy Hand", n38)
-
 import n39 from "../assets/green-cactaball.png"; addUrl("Green Cactaball", n39)
-
 import n40 from "../assets/green-party-ogre.png"; addUrl("Green Party Ogre", n40)
-
 import n41 from "../assets/lady-mary.png"; addUrl("Lady Mary", n41)
 
 import n42 from "../assets/lime-slimey.png"; addUrl("Lime Slimey", n42)
