@@ -405,7 +405,8 @@ put(
   new Creature("SandWitch", "", 4, LandscapeType.Desert, 25, 10, n57),
 );
 
-put("Sandy", new Creature("Sandy", "", 5, LandscapeType.Desert, 28, 18, ""));
+import n58 from "../assets/sandy.png"
+put("Sandy", new Creature("Sandy", "", 5, LandscapeType.Desert, 28, 18, n58));
 
 import n59 from "../assets/wall-of-chocolate.png"
 put(
@@ -413,24 +414,28 @@ put(
   new Creature("Wall of Chocolate", "", 3, LandscapeType.Desert, 5, 20, n59),
 );
 
+import n60 from "../assets/wall-of-sand.png"
 put(
   "Wall of Sand",
-  new Creature("Wall of Sand", "", 3, LandscapeType.Desert, 0, 26, ""),
+  new Creature("Wall of Sand", "", 3, LandscapeType.Desert, 0, 26, n60),
 );
 
+import n61 from "../assets/the-mariachi.png"
 put(
   "The Mariachi",
-  new Creature("The Mariachi", "", 2, LandscapeType.Desert, 5, 20, ""),
+  new Creature("The Mariachi", "", 2, LandscapeType.Desert, 5, 20, n61),
 );
 
+import n62 from "../assets/sandhorn-devil.png"
 put(
   "Sandhorn Devil",
-  new Creature("Sandhorn Devil", "", 1, LandscapeType.Desert, 18, 21, ""),
+  new Creature("Sandhorn Devil", "", 1, LandscapeType.Desert, 18, 21, n62),
 );
 
+import n63 from "../assets/peach-djinni.png"
 put(
   "Peach Djinni",
-  new Creature("Peach Djinni", "", 1, LandscapeType.Desert, 2, 8, ""),
+  new Creature("Peach Djinni", "", 1, LandscapeType.Desert, 2, 8, n63),
 );
 
 //=====================================================================================================================================================
