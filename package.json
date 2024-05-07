@@ -9,6 +9,7 @@
     "format": "prettier -w ."
   },
   "devDependencies": {
+    "@radix-ui/react-dropdown-menu": "^2.0.6",
     "@radix-ui/react-slot": "^1.0.2",
     "@types/node": "latest",
     "@types/react": "^18.2.64",
