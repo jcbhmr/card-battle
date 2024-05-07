@@ -281,6 +281,15 @@ export class Player {
     }
   }
 
+  deleteCardFromHand(card: Card) {
+    for (var i = 0; i < this.hand.length; i++) {
+      if (card.equals(this.hand[i])) {
+        this.hand.splice(i, 1);
+        return;
+      }
+    }
+  }
+
   drawCard(amount: number, useAction: boolean) {
     for (let i = 0; i < amount; i++) {
       if (this.deck.length >= 0) {
@@ -605,7 +614,7 @@ export class Game extends AbstractGame {
                 if (card.play(pos, pos.ownerId)) {
                   Game.getInstance().getPlayerById(playerId).actions -=
                     card.getCost();
-                  Game.getInstance().getPlayerById(playerId).discardCard(card);
+                  Game.getInstance().getPlayerById(playerId).deleteCardFromHand(card);
                   return Game.getInstance().dispatchEvent(
                     new PlayCardEvent(card, pos.ownerId),
                   );
@@ -641,6 +650,7 @@ export class Game extends AbstractGame {
     return false;
   }
 }
+
 function randomInt(min: number, max: number) {
   return Math.floor((max - min) * Math.random()) + min;
 }
