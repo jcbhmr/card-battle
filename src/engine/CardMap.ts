@@ -993,31 +993,18 @@ import n8 from "../assets/ban-she-knight.png"; addUrl("Ban-She Knight", n8)
 import n9 from "../assets/black-merlock.png"; addUrl("Black Merlock", n9)
 import n10 from "../assets/bog-ban-she-angel.png"; addUrl("Bog Ban-She Angel", n10)
 import n11 from "../assets/eye-dude.png"; addUrl("Eye Dude", n11)
-
 import n12 from "../assets/giant-spider.png"; addUrl("Giant Spider", n12)
-
 import n13 from "../assets/burning-eyebat.png"; addUrl("Burning Eyebat", n13)
-
 import n14 from "../assets/instigator.png"; addUrl("InstiGator", n14)
-
 import n15 from "../assets/axe-stump.png"; addUrl("Axe Stump", n15)
-
 import n16 from "../assets/skeleton-hand.png"; addUrl("Skeleton Hand", n16)
-
 import n17 from "../assets/undying-tree.png"; addUrl("Undying Tree", n17)
-
 import n18 from "../assets/bald-guy.png"; addUrl("Bald Guy", n18)
-
 import n19 from "../assets/the-sludge.png"; addUrl("The Sludge", n19)
-
 import n20 from "../assets/sludgebob.png"; addUrl("Sludgebob", n20)
-
 import n21 from "../assets/general-mushroom.png"; addUrl("General Mushroom", n21)
-
 import n22 from "../assets/swamp-beast.png"; addUrl("Swamp Beast", n22)
-
 import n23 from "../assets/flying-gator.png"; addUrl("Flying Gator", n23)
-
 import n24 from "../assets/orange-slime-monster.png"; addUrl("Orange Slime Monster", n24)
 
 import n25 from "../assets/green-mermaid.png"; addUrl("Green Mermaid", n25)
