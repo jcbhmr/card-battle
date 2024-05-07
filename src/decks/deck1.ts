@@ -1,4 +1,4 @@
-import { Card } from "../model";
+import { Card } from "../engine/game";
 import darkAngelPngUrl from "../assets/dark-angel.png";
 // make sure you do this ^
 export default [

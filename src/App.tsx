@@ -6,7 +6,7 @@ import {
   Targeter,
   LandscapeType,
   BoardPos,
-} from "./model";
+} from "./engine/game";
 //import { Creature, Building, Card } from "./engine/card";
 import { Creature, Card, Landscape } from "./engine/card";
 import { get, exportDecks } from "./engine/CardMap";

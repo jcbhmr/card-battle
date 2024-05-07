@@ -1,5 +1,5 @@
 import { createVerify } from "crypto";
-import { LandscapeType } from "../model.ts";
+import { LandscapeType } from "./game.ts";
 import { Card, Creature, Landscape } from "./card.ts";
 
 var cardMap: Map<string, Card> = new Map<string, Card>();

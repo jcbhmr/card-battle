@@ -53,8 +53,8 @@ This is Jacob's list of cool tech tools that were shown off at some point in tea
 
 - Classes get named in PascalCase like Java.
 - Methods get named in camelCase also like Java.
-- Single-export files _usually_ are named after said export exactly.
-- Multi-export files are named in kebab-case after a generic group name that is inclusive of all the symbols.
+- Single-export files _usually_ are named after said export exactly. `export default function App() { ... }` usually is called `App.tsx`
+- Multi-export files are named in kebab-case after a generic group name that is inclusive of all the symbols. Like `game.ts`.
 - In general, string literals are used for enums instead of number maps. For example it's `doThing("enum-value")` not `doThing(MyEnum.EnumValue)`.
 - Use [MDN](https://developer.mozilla.org/en-US/docs/Web/JavaScript) to find reference docs on JavaScript or Web API builtins.
 - Don't try to put too much in a single file; break things up logically.
@@ -64,3 +64,4 @@ This is Jacob's list of cool tech tools that were shown off at some point in tea
 - Avoid JSX UI logic in statements. Try to keep JSX focused on the big `return <>...</>` block. Prefer multiple micro-components.
 - Avoid redundant JavaDoc-style comments. TypeScript does a lot of the work for you in documenting the important "this is a number" bits.
 - When it makes sense it's OK to use a library. It's very easy to do: just `npm install <library>` and `import { ... } from "<library>"`.
+- JavaScript does have getters and setters for properties. That means you can intercept `object.property` with a `get property() { return 42 }` function that will be called whenever the `property` field is accessed. [Read more on MDN](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/get)
