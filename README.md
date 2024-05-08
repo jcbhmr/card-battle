@@ -4,7 +4,7 @@
 
 # Card battle
 
-🃏 Basic card game project for UWW
+🃏 Card game semester software project
 
 <p align=center>
   <img height=400 src="https://github.com/jcbhmr/card-battle/assets/61068799/84ccedc5-6472-4813-a9a7-879108f0c94b">
