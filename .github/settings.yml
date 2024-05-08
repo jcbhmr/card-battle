@@ -1,6 +1,6 @@
 # https://github.com/apps/settings
 repository:
   name: card-battle
-  description: 🃏 Basic card game project for UWW
+  description: 🃏 Card game semester software project
   homepage: https://jcbhmr.me/card-battle
   topics: javascript, game, card-game, combat, web-game, local-multiplayer, 2player, vite, two-player-game, card-battle, uw-whitewater, spring-2024
