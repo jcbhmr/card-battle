@@ -22,6 +22,8 @@
 🏫 Made for UW-Whitewater Software Engineering semester project \
 ⚛ Used React, TypeScript, Vite, TailwindCSS, and more!
 
+This project was made for the [COMPSCI 476 SOFTWARE ENGINEERING](https://courses.uww.edu/2241/Undergraduate/COMPSCI/476) class. The assignment itself was to come up with an idea for a software project and build that project over the course of the semester with a small-ish group of five people to develop real-world software development skills like using GitHub, how to work in a team, what tech you might need to know, etc. Our idea was to create a computer game inspired by a board game. We based this "Card battle" game off of the Adventure Time Card Wars idea and attempted to recreate some of the aspects of it in a web app. We used JavaScript, TypeScript, React, Vite, TailwindCSS, Node.js, npm, and more to create the basic web app that is viewable at [jcbhmr.me/card-battle](https://jcbhmr.me/card-battle/).
+
 ## Development
 
 ![TypeScript](https://img.shields.io/static/v1?style=for-the-badge&message=TypeScript&color=3178C6&logo=TypeScript&logoColor=FFFFFF&label=)
@@ -34,6 +36,7 @@
 <p align=center>
   <a href="https://upload.snakesandlattes.com/rules/a/AdventureTimeCardWarsFinnvsJake.pdf">Adventure Time Card Wars rulebook</a>
   | <a href="https://discord.com/channels/1210270012871548968/1210270013316141087">Team Discord</a>
+  | <a href="https://uwwtw.instructure.com/courses/629539">Canvas page</a>
 </p>
 
 This app is entirely client-side. There is no server-side component. You can get started easily using ⚡StackBlitz by clicking the <kbd>Open in Codeflow</kbd> button above.
