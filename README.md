@@ -2,6 +2,26 @@
   <b>You're probably looking for <a href="https://jcbhmr.me/card-battle/">jcbhmr.me/card-battle</a></b>
 </p>
 
+# Card battle
+
+🃏 Basic card game project for UWW
+
+<p align=center>
+  <img height=400 src="https://github.com/jcbhmr/card-battle/assets/61068799/84ccedc5-6472-4813-a9a7-879108f0c94b">
+</p>
+
+<p align=center>
+  <a href="https://jcbhmr.me/card-battle/">Live game site</a>
+  | <a href="https://github.com/jcbhmr/card-battle/blob/main/requirements-report.pdf">Requirements report</a>
+  | <a href="https://github.com/jcbhmr/card-battle/blob/main/test-and-delivery-plan.pdf">Test and delivery plan</a>
+  | <a href="https://github.com/jcbhmr/card-battle/blob/main/final-presentation.pdf">Final presentation</a>
+</p>
+
+🎮 Local multiplayer (2 player) \
+🔨 Proof-of-concept \
+🏫 Made for UW-Whitewater Software Engineering semester project \
+⚛ Used React, TypeScript, Vite, TailwindCSS, and more!
+
 ## Development
 
 ![TypeScript](https://img.shields.io/static/v1?style=for-the-badge&message=TypeScript&color=3178C6&logo=TypeScript&logoColor=FFFFFF&label=)
@@ -11,12 +31,9 @@
 
 [![Open in Codeflow](https://developer.stackblitz.com/img/open_in_codeflow.svg)](https://pr.new/https://github.com/jcbhmr/card-battle)
 
-<p align=center><a href="https://upload.snakesandlattes.com/rules/a/AdventureTimeCardWarsFinnvsJake.pdf">Adventure Time Card Wars rulebook PDF</a>
-  | <a href="https://uwwtw.instructure.com/courses/629539">UWW Canvas course</a>
+<p align=center>
+  <a href="https://upload.snakesandlattes.com/rules/a/AdventureTimeCardWarsFinnvsJake.pdf">Adventure Time Card Wars rulebook</a>
   | <a href="https://discord.com/channels/1210270012871548968/1210270013316141087">Team Discord</a>
-  | <a href="https://github.com/jcbhmr/card-battle/blob/main/requirements-report.pdf">Requirements report</a>
-  | <a href="https://github.com/jcbhmr/card-battle/blob/main/test-and-delivery-plan.pdf">Test and delivery plan</a>
-  | <a href="https://github.com/jcbhmr/card-battle/blob/main/final-presentation.pdf">Final presentation</a>
 </p>
 
 This app is entirely client-side. There is no server-side component. You can get started easily using ⚡StackBlitz by clicking the <kbd>Open in Codeflow</kbd> button above.
